@@ -1,0 +1,154 @@
+[
+  {
+    "approval_required": false,
+    "confidence": "0.7000",
+    "created_at": "2026-08-05 16:59:24.168413+00:00",
+    "evidence_ids": [
+      "4b2e6436-8054-5a64-8d42-fdb2da45501a"
+    ],
+    "finding_id": "f9d4bfb0-07fe-5a68-9234-d08bc485a502",
+    "id": "683de4da-a9bc-4bad-953d-91c55483f181",
+    "kind": "FINDING",
+    "payload_sha256": "d815a909f568ea2e877becec36c7c6288b20ac79275506b5aabfe80ed789bdad",
+    "receiver_agent": "evaluation-manager",
+    "risk": "LOW",
+    "room_id": "run:0004c98f-49b5-495a-b3fb-f818ef293d3b:task:2c6c1852-6700-5be7-afd6-d3cbfa9aa731:matrix",
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "sender_agent": "product-engineering",
+    "task_id": "2c6c1852-6700-5be7-afd6-d3cbfa9aa731",
+    "tenant_id": "fe4792d5-e506-4d84-b161-6278b725b70f"
+  },
+  {
+    "approval_required": false,
+    "confidence": "0.3500",
+    "created_at": "2026-08-05 16:59:24.168413+00:00",
+    "evidence_ids": [
+      "4b2e6436-8054-5a64-8d42-fdb2da45501a"
+    ],
+    "finding_id": "3bd9299c-0ce5-5616-8a87-8fed235e5654",
+    "id": "f95a52e6-0d79-427c-8a5a-d21a7664301d",
+    "kind": "FINDING",
+    "payload_sha256": "278b7673d68fe42356858b08ef155212025189f4272e2ab527a6cb4b792f780a",
+    "receiver_agent": "evaluation-manager",
+    "risk": "LOW",
+    "room_id": "run:0004c98f-49b5-495a-b3fb-f818ef293d3b:task:e4e19d35-9ee2-5a53-946b-5232f72f3485:matrix",
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "sender_agent": "user-evidence",
+    "task_id": "e4e19d35-9ee2-5a53-946b-5232f72f3485",
+    "tenant_id": "fe4792d5-e506-4d84-b161-6278b725b70f"
+  },
+  {
+    "approval_required": false,
+    "confidence": "0.7000",
+    "created_at": "2026-08-05 16:59:24.168413+00:00",
+    "evidence_ids": [
+      "4b2e6436-8054-5a64-8d42-fdb2da45501a"
+    ],
+    "finding_id": "ed501cc7-acad-5101-be04-99fac23375c3",
+    "id": "08f40744-2ea3-44ef-a845-1b2368a52406",
+    "kind": "FINDING",
+    "payload_sha256": "c7efa7217420d4c19bae9bdebe647bf9543a1cf30a9767d425d5e527857d30cc",
+    "receiver_agent": "evaluation-manager",
+    "risk": "LOW",
+    "room_id": "run:0004c98f-49b5-495a-b3fb-f818ef293d3b:task:835c0fe5-d30b-57a3-85d4-600bf8a2675c:matrix",
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "sender_agent": "business-investment",
+    "task_id": "835c0fe5-d30b-57a3-85d4-600bf8a2675c",
+    "tenant_id": "fe4792d5-e506-4d84-b161-6278b725b70f"
+  },
+  {
+    "approval_required": false,
+    "confidence": "0.3500",
+    "created_at": "2026-08-05 16:59:24.168413+00:00",
+    "evidence_ids": [
+      "4b2e6436-8054-5a64-8d42-fdb2da45501a"
+    ],
+    "finding_id": "0f586255-4001-5542-9e50-d3c506d91299",
+    "id": "68c46a79-45d3-4a64-a94d-e7690d4a1ba8",
+    "kind": "FINDING",
+    "payload_sha256": "9144f213e66fecc4821c3a10acbe819f83ff28d23b03d0875f2cc47d345247e6",
+    "receiver_agent": "evaluation-manager",
+    "risk": "LOW",
+    "room_id": "run:0004c98f-49b5-495a-b3fb-f818ef293d3b:task:3100c002-3a5b-53f6-ae99-971577ab267c:matrix",
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "sender_agent": "geo-policy-trend",
+    "task_id": "3100c002-3a5b-53f6-ae99-971577ab267c",
+    "tenant_id": "fe4792d5-e506-4d84-b161-6278b725b70f"
+  },
+  {
+    "approval_required": false,
+    "confidence": "0.7000",
+    "created_at": "2026-08-05 17:02:02.887336+00:00",
+    "evidence_ids": [
+      "19171fcc-dc36-52b3-9b60-275dcca290a4"
+    ],
+    "finding_id": "8588b144-ec58-5adf-bbf6-f774aae65a39",
+    "id": "12eeebae-4b64-432b-ad38-039fdf9935fb",
+    "kind": "FINDING",
+    "payload_sha256": "9a8b681664ec671e4a959efa6145a1e5ae04df657e349963062a04d0e6f4f0d8",
+    "receiver_agent": "evaluation-manager",
+    "risk": "LOW",
+    "room_id": "run:47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e:task:d52f3b10-b55c-5dc2-abb0-6b0bc549bac7:matrix",
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "sender_agent": "product-engineering",
+    "task_id": "d52f3b10-b55c-5dc2-abb0-6b0bc549bac7",
+    "tenant_id": "fe4792d5-e506-4d84-b161-6278b725b70f"
+  },
+  {
+    "approval_required": false,
+    "confidence": "0.3500",
+    "created_at": "2026-08-05 17:02:02.887336+00:00",
+    "evidence_ids": [
+      "19171fcc-dc36-52b3-9b60-275dcca290a4"
+    ],
+    "finding_id": "b4ccdcd6-b59d-5b88-a5e3-62808c02cc54",
+    "id": "fb59ce46-cdc3-4616-b099-9b966314a235",
+    "kind": "FINDING",
+    "payload_sha256": "34e50450cbe6c94b980e3c9a90d16bfd96ca7e39701a6c33cc2cdf37e230a592",
+    "receiver_agent": "evaluation-manager",
+    "risk": "LOW",
+    "room_id": "run:47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e:task:5d7fe1ee-13ba-53f5-9eea-e4231e4fdba9:matrix",
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "sender_agent": "user-evidence",
+    "task_id": "5d7fe1ee-13ba-53f5-9eea-e4231e4fdba9",
+    "tenant_id": "fe4792d5-e506-4d84-b161-6278b725b70f"
+  },
+  {
+    "approval_required": false,
+    "confidence": "0.7000",
+    "created_at": "2026-08-05 17:02:02.887336+00:00",
+    "evidence_ids": [
+      "19171fcc-dc36-52b3-9b60-275dcca290a4"
+    ],
+    "finding_id": "bc0ca975-ed70-5aee-810a-d584058c38d1",
+    "id": "e05689f9-fde0-43b4-995a-bf6929c65293",
+    "kind": "FINDING",
+    "payload_sha256": "4f1fa6366627649a4e1f2a77f4b4076610b931da1d0056b423f2525ee95f2c23",
+    "receiver_agent": "evaluation-manager",
+    "risk": "LOW",
+    "room_id": "run:47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e:task:224ff3f8-bf78-5fb4-bdb2-ef4b414f19ba:matrix",
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "sender_agent": "business-investment",
+    "task_id": "224ff3f8-bf78-5fb4-bdb2-ef4b414f19ba",
+    "tenant_id": "fe4792d5-e506-4d84-b161-6278b725b70f"
+  },
+  {
+    "approval_required": false,
+    "confidence": "0.3500",
+    "created_at": "2026-08-05 17:02:02.887336+00:00",
+    "evidence_ids": [
+      "19171fcc-dc36-52b3-9b60-275dcca290a4"
+    ],
+    "finding_id": "56a21811-4a5d-58a6-b9a2-f7da77927cdc",
+    "id": "149dce5b-8bad-462b-ad8c-4d616a2eca44",
+    "kind": "FINDING",
+    "payload_sha256": "edce204b672b048d78098bf2f3bf1b044cdd40c60e8dd888d6a3693962d489c8",
+    "receiver_agent": "evaluation-manager",
+    "risk": "LOW",
+    "room_id": "run:47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e:task:c143a412-cd63-5fb3-84b3-6b97ffc02aed:matrix",
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "sender_agent": "geo-policy-trend",
+    "task_id": "c143a412-cd63-5fb3-84b3-6b97ffc02aed",
+    "tenant_id": "fe4792d5-e506-4d84-b161-6278b725b70f"
+  }
+]

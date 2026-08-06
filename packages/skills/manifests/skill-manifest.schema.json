@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "skill_code", "version", "content_sha256", "input_schema", "output_schema", "preconditions", "permissions", "failure_classes", "budget", "evidence_requirements", "lifecycle", "may_write_business_state"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "skill_code": {"type": "string", "pattern": "^[a-z][a-z0-9-]{2,119}$"},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$"},
+    "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "input_schema": {"type": "object"},
+    "output_schema": {"type": "object"},
+    "preconditions": {"type": "array", "items": {"type": "string"}},
+    "permissions": {"type": "array", "items": {"type": "string"}},
+    "failure_classes": {"type": "array", "minItems": 1, "items": {"type": "string", "enum": ["TRANSIENT", "VALIDATION", "AUTHORIZATION", "DEPENDENCY", "BUDGET", "POLICY", "SUBMISSION_UNKNOWN", "BUSINESS"]}},
+    "budget": {"type": "object", "additionalProperties": false, "required": ["max_cost", "currency"], "properties": {"max_cost": {"type": "number", "minimum": 0}, "currency": {"type": "string", "minLength": 1}}},
+    "evidence_requirements": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "lifecycle": {"type": "object", "additionalProperties": false, "required": ["status", "rollback"], "properties": {"status": {"const": "APPROVED"}, "rollback": {"type": "string", "minLength": 1}}},
+    "may_write_business_state": {"const": false}
+  }
+}

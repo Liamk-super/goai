@@ -1,0 +1,128 @@
+[
+  {
+    "failure_class": null,
+    "from_status": "DRAFT",
+    "id": "00568c8e-9377-435d-8cc7-2008de926d90",
+    "occurred_at": "2026-08-05 16:58:01.601490+00:00",
+    "reason": "authorized intake",
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "to_status": "INTAKE"
+  },
+  {
+    "failure_class": null,
+    "from_status": "INTAKE",
+    "id": "f950b566-adba-4caf-9c68-e19080885423",
+    "occurred_at": "2026-08-05 16:58:01.604761+00:00",
+    "reason": "gap identified",
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "to_status": "WAITING_FOR_USER"
+  },
+  {
+    "failure_class": null,
+    "from_status": "WAITING_FOR_USER",
+    "id": "2860d104-81df-404c-8697-b61fa1b95ee8",
+    "occurred_at": "2026-08-05 16:58:01.607576+00:00",
+    "reason": "profile confirmed",
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "to_status": "PLANNED"
+  },
+  {
+    "failure_class": null,
+    "from_status": "PLANNED",
+    "id": "27b7f80c-f8d9-5948-93e8-25c6e4fa638a",
+    "occurred_at": "2026-08-05 16:59:24.168413+00:00",
+    "reason": "manifest frozen and zero-cost budget reserved",
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "to_status": "RUNNING"
+  },
+  {
+    "failure_class": null,
+    "from_status": "RUNNING",
+    "id": "78787cd3-12ce-586b-b2ac-1672fd815f58",
+    "occurred_at": "2026-08-05 16:59:24.169413+00:00",
+    "reason": "required tasks terminal",
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "to_status": "EVIDENCE_REVIEW"
+  },
+  {
+    "failure_class": null,
+    "from_status": "EVIDENCE_REVIEW",
+    "id": "72565f96-94cf-5365-848f-7ce26a32a5fa",
+    "occurred_at": "2026-08-05 16:59:24.170413+00:00",
+    "reason": "audit accepted and downgraded unsupported claims",
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "to_status": "SYNTHESIZING"
+  },
+  {
+    "failure_class": null,
+    "from_status": "SYNTHESIZING",
+    "id": "03ce23f4-96c2-5cea-a08e-cd7861f900f7",
+    "occurred_at": "2026-08-05 16:59:24.171413+00:00",
+    "reason": "decision report dossier committed",
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "to_status": "COMPLETED"
+  },
+  {
+    "failure_class": null,
+    "from_status": "DRAFT",
+    "id": "feaf1cc1-6fa8-4e6e-9fb3-188337043026",
+    "occurred_at": "2026-08-05 17:01:36.792997+00:00",
+    "reason": "authorized intake",
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "to_status": "INTAKE"
+  },
+  {
+    "failure_class": null,
+    "from_status": "INTAKE",
+    "id": "399d449d-b1a2-4dbd-bf75-4b0b7fd60fae",
+    "occurred_at": "2026-08-05 17:01:36.794977+00:00",
+    "reason": "gap identified",
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "to_status": "WAITING_FOR_USER"
+  },
+  {
+    "failure_class": null,
+    "from_status": "WAITING_FOR_USER",
+    "id": "933cf3df-142d-49ad-bfb4-8baf171577e7",
+    "occurred_at": "2026-08-05 17:01:36.797640+00:00",
+    "reason": "profile confirmed",
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "to_status": "PLANNED"
+  },
+  {
+    "failure_class": null,
+    "from_status": "PLANNED",
+    "id": "1e2d7cb5-363a-5b28-b2d1-b6f10894a16c",
+    "occurred_at": "2026-08-05 17:02:02.887336+00:00",
+    "reason": "manifest frozen and zero-cost budget reserved",
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "to_status": "RUNNING"
+  },
+  {
+    "failure_class": null,
+    "from_status": "RUNNING",
+    "id": "12ed47dd-f9c8-5a05-99d2-20cf6ba739a6",
+    "occurred_at": "2026-08-05 17:02:02.888336+00:00",
+    "reason": "required tasks terminal",
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "to_status": "EVIDENCE_REVIEW"
+  },
+  {
+    "failure_class": null,
+    "from_status": "EVIDENCE_REVIEW",
+    "id": "d45d781f-e309-5824-b133-3bf5582a949f",
+    "occurred_at": "2026-08-05 17:02:02.889336+00:00",
+    "reason": "audit accepted and downgraded unsupported claims",
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "to_status": "SYNTHESIZING"
+  },
+  {
+    "failure_class": null,
+    "from_status": "SYNTHESIZING",
+    "id": "e8dd67bc-032a-59f0-a8ca-b9bc81728dc2",
+    "occurred_at": "2026-08-05 17:02:02.890336+00:00",
+    "reason": "decision report dossier committed",
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "to_status": "COMPLETED"
+  }
+]

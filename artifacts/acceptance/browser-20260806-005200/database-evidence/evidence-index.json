@@ -1,0 +1,30 @@
+[
+  {
+    "created_at": "2026-08-05 16:59:24.168413+00:00",
+    "evidence_level": "E3",
+    "id": "4b2e6436-8054-5a64-8d42-fdb2da45501a",
+    "mime_type": "application/json",
+    "object_key": "tenant/fe4792d5-e506-4d84-b161-6278b725b70f/project/e78d6972-0c53-41d7-aaa0-f7c1a13f8e32/version/1ffd0a3c-ccb4-4318-8f7d-be8c20de20ba/run/0004c98f-49b5-495a-b3fb-f818ef293d3b/evidence/4b2e6436-8054-5a64-8d42-fdb2da45501a/repository.json",
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "sha256": "5c2cc6afcdcee22a165d2bf516b7b246f49d4e77f1ebc500a35840b183cc747b",
+    "simulated": false,
+    "size_bytes": 143,
+    "source_type": "REPOSITORY",
+    "task_id": "2c6c1852-6700-5be7-afd6-d3cbfa9aa731",
+    "trust_level": "E3"
+  },
+  {
+    "created_at": "2026-08-05 17:02:02.887336+00:00",
+    "evidence_level": "E3",
+    "id": "19171fcc-dc36-52b3-9b60-275dcca290a4",
+    "mime_type": "application/json",
+    "object_key": "tenant/fe4792d5-e506-4d84-b161-6278b725b70f/project/e78d6972-0c53-41d7-aaa0-f7c1a13f8e32/version/d91c3010-062e-4fe3-b7c8-98b6d32351bb/run/47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e/evidence/19171fcc-dc36-52b3-9b60-275dcca290a4/repository.json",
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "sha256": "b79b6d4cc1e32c78539f659184dc43cf02b3399c5b2fb203a691670f1e5b1a16",
+    "simulated": false,
+    "size_bytes": 143,
+    "source_type": "REPOSITORY",
+    "task_id": "d52f3b10-b55c-5dc2-abb0-6b0bc549bac7",
+    "trust_level": "E3"
+  }
+]

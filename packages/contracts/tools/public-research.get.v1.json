@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/tools/public-research.get.v1.json",
+  "x-network-policy": {"allowed_domains": ["creatrades.com", "www.creatrades.com", "app.creatrades.com"], "max_redirects": 3, "max_response_bytes": 1048576},
+  "x-execution-policy": {"timeout_seconds": 60, "max_cost": 0},
+  "title": "public-research.get v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "tool_id", "risk_tier", "permission", "network_level", "read_only", "input_schema", "output_schema", "network_policy", "execution_policy", "evidence_requirements"],
+  "properties": {
+    "contract_version": {"const": "1.0"}, "tool_id": {"const": "public-research.get.v1"}, "risk_tier": {"const": "LOW"}, "permission": {"const": "public_research.read"}, "network_level": {"const": "PUBLIC_RESEARCH"}, "read_only": {"const": true},
+    "input_schema": {"type": "object", "additionalProperties": false, "required": ["url"], "properties": {"url": {"type": "string", "format": "uri"}, "method": {"enum": ["GET", "HEAD"]}}},
+    "output_schema": {"type": "object", "additionalProperties": false, "required": ["source_url", "fetched_at", "content_sha256", "content_type"], "properties": {"source_url": {"type": "string", "format": "uri"}, "fetched_at": {"type": "string", "format": "date-time"}, "content_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "content_type": {"type": "string"}}},
+    "network_policy": {"type": "object", "additionalProperties": false, "required": ["methods", "allowed_domains", "max_redirects", "max_response_bytes"], "properties": {"methods": {"const": ["GET", "HEAD"]}, "allowed_domains": {"type": "array", "minItems": 1, "items": {"type": "string"}}, "max_redirects": {"type": "integer", "minimum": 0, "maximum": 5}, "max_response_bytes": {"type": "integer", "minimum": 1, "maximum": 5242880}}},
+    "execution_policy": {"type": "object", "additionalProperties": false, "required": ["timeout_seconds", "retryable_failures", "max_cost"], "properties": {"timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 900}, "retryable_failures": {"const": []}, "max_cost": {"const": 0}}}, "evidence_requirements": {"type": "array", "minItems": 1, "items": {"type": "string"}}, "data_egress": {"const": "public_url_and_redacted_metadata_only"}
+  },
+  "examples": [{"contract_version": "1.0", "tool_id": "public-research.get.v1", "risk_tier": "LOW", "permission": "public_research.read", "network_level": "PUBLIC_RESEARCH", "read_only": true, "input_schema": {"url": "https://creatrades.com", "method": "GET"}, "output_schema": {"source_url": "https://creatrades.com", "fetched_at": "2026-08-05T00:00:00Z", "content_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "content_type": "text/html"}, "network_policy": {"methods": ["GET", "HEAD"], "allowed_domains": ["creatrades.com", "www.creatrades.com", "app.creatrades.com"], "max_redirects": 3, "max_response_bytes": 1048576}, "execution_policy": {"timeout_seconds": 60, "retryable_failures": [], "max_cost": 0}, "evidence_requirements": ["source_url", "fetched_at", "content_sha256"], "data_egress": "public_url_and_redacted_metadata_only"}]
+}

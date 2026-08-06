@@ -1,0 +1,11 @@
+[
+  {
+    "action": "vertical_slice.completed",
+    "actor_type": "CONTROL_PLANE",
+    "id": "269e20f0-c0c7-4dec-806e-a62b64b0342e",
+    "occurred_at": "2026-08-05 17:49:54.783091+00:00",
+    "outcome": "SUCCESS",
+    "payload_sha256": "e91876344bf682db69fdaaab216dee913a659c86c4f1818b39b4aade52cf3562",
+    "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8"
+  }
+]

@@ -1,0 +1,34 @@
+{
+  "environment": "Test",
+  "budget_limit": 0,
+  "external_readonly_e2e": "BLOCKED_NO_AUTHORIZED_CASE",
+  "paid_provider_calls": "NOT_RUN",
+  "generated_at": "2026-08-05T17:21:12.0006041Z",
+  "gates": [
+    {
+      "gate": "contracts-domain",
+      "status": "PASS",
+      "log": "contracts-domain.txt"
+    },
+    {
+      "gate": "t11",
+      "status": "PASS",
+      "log": "t11.txt"
+    },
+    {
+      "gate": "local-vertical-slice",
+      "status": "PASS",
+      "log": "local-vertical-slice.txt"
+    },
+    {
+      "gate": "readonly-tools",
+      "status": "PASS",
+      "log": "readonly-tools.txt"
+    },
+    {
+      "gate": "security",
+      "status": "PASS",
+      "log": "security.txt"
+    }
+  ]
+}

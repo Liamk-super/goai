@@ -1,0 +1,35 @@
+openapi: 3.1.0
+info:
+  title: LaunchScope Experience Read API
+  version: 1.0.0
+  description: Additive, read-only workspace and Ops projections. This contract does not alter control-plane.v1.
+paths:
+  /experience/reports/{reportId}:
+    get:
+      summary: Read a committed report by its immutable report identifier
+      responses:
+        '200': {description: Durable append-only report projection}
+        '404': {description: Report absent or outside the tenant boundary}
+  /experience/runs/{runId}/report:
+    get:
+      summary: Read a committed report and its Evidence/Finding/Decision chain
+      responses:
+        '200': {description: Durable append-only report projection}
+        '404': {description: No committed report exists}
+  /experience/projects/{projectId}/compare/{runId}:
+    get:
+      summary: Compare a candidate run with its previous durable project run
+      responses:
+        '200': {description: Same-standard comparison projection}
+  /ops/audit/runs/{runId}:
+    get:
+      summary: Separate Ops-domain redacted run metadata
+      responses:
+        '200': {description: No material, report, prompt, or private reasoning content}
+        '403': {description: A separately authenticated Ops identity is required}
+  /ops/audit/events:
+    get:
+      summary: Separate Ops-domain redacted event metadata
+      responses:
+        '200': {description: Event metadata only}
+        '403': {description: A separately authenticated Ops identity is required}

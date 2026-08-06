@@ -1,0 +1,78 @@
+name: launchscope-test
+
+services:
+  postgres:
+    extends:
+      file: docker-compose.yml
+      service: postgres
+    environment:
+      POSTGRES_DB: launchscope_test
+      POSTGRES_USER: launchscope_test
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
+    ports: !override
+      - "127.0.0.1:${POSTGRES_TEST_PORT:-55432}:5432"
+    volumes: !reset
+      - postgres-test-data:/var/lib/postgresql/data
+
+  minio:
+    extends:
+      file: docker-compose.yml
+      service: minio
+    ports: !override
+      - "127.0.0.1:${MINIO_TEST_API_PORT:-59000}:9000"
+    volumes: !reset
+      - minio-test-data:/data
+
+  rocketmq-namesrv:
+    extends:
+      file: docker-compose.yml
+      service: rocketmq-namesrv
+    ports: !reset []
+
+  rocketmq-broker:
+    extends:
+      file: docker-compose.yml
+      service: rocketmq-broker
+    ports: !reset []
+    volumes: !reset
+      - rocketmq-test-store:/home/rocketmq/store
+
+  rocketmq-proxy:
+    extends:
+      file: docker-compose.yml
+      service: rocketmq-proxy
+    ports: !reset []
+
+  nacos:
+    extends:
+      file: docker-compose.yml
+      service: nacos
+    ports: !reset []
+
+  higress:
+    extends:
+      file: docker-compose.yml
+      service: higress
+    ports: !reset []
+    volumes: !reset
+      - higress-test-data:/data
+
+  otel-collector:
+    extends:
+      file: docker-compose.yml
+      service: otel-collector
+    ports: !reset []
+
+volumes:
+  postgres-test-data:
+    name: launchscope-test-postgres-data
+  minio-test-data:
+    name: launchscope-test-minio-data
+  rocketmq-test-store:
+    name: launchscope-test-rocketmq-store
+  higress-test-data:
+    name: launchscope-test-higress-data
+
+networks:
+  launchscope:
+    name: launchscope-test-network

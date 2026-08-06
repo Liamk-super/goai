@@ -1,0 +1,32 @@
+{
+  "project_id": "ee39ba86-09b3-405c-8eee-67f4ec068cd3",
+  "runs": [
+    {
+      "attention_reason": null,
+      "correlation_id": "6f74bea9-b49a-44b8-99a1-059b80699403",
+      "created_at": "2026-08-05 17:49:54.016973+00:00",
+      "current_stage": "VERSION_REGRESSION",
+      "id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8",
+      "idempotency_key": "plan:5e21cbe0-5ba4-4f69-8669-ac4c149b61ee:6f74bea9-b49a-44b8-99a1-059b80699403",
+      "last_failure_class": null,
+      "product_version_id": "5e21cbe0-5ba4-4f69-8669-ac4c149b61ee",
+      "project_id": "ee39ba86-09b3-405c-8eee-67f4ec068cd3",
+      "standard_version": "1.0",
+      "state_flags": {
+        "audit_ready": true,
+        "budget_reserved": true,
+        "decision_committed": true,
+        "dossier_committed": true,
+        "gap_identified": true,
+        "material_profile_complete": true,
+        "profile_confirmed": true,
+        "report_committed": true,
+        "required_tasks_terminal": true
+      },
+      "status": "COMPLETED",
+      "tenant_id": "5ef3f88d-e562-4919-8465-85cf13f4df2a",
+      "updated_at": "2026-08-05 17:49:54.918506+00:00"
+    }
+  ],
+  "same_standard": true
+}

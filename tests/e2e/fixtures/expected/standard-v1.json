@@ -1,0 +1,12 @@
+{
+  "standard_version": "1.0",
+  "dimensions": [
+    "PRODUCT_IMPLEMENTATION",
+    "USER_USAGE",
+    "BUSINESS_INVESTMENT",
+    "GEO_POLICY_TREND"
+  ],
+  "required_agent_handoffs": 3,
+  "required_auditor_outcomes": ["ACCEPTED", "DOWNGRADED"],
+  "external_research_claimed": false
+}

@@ -1,0 +1,12 @@
+schema_version: "1.0"
+code: user-evidence
+version: "1.0"
+role: specialist
+responsibilities: [assess user problem evidence, demand signals, and validation gaps]
+inputs: [run_manifest, product_profile, evidence_refs, assigned_task]
+outputs: [finding, state_change_request]
+allowed_skills: [browser-product-audit]
+allowed_tools: [browser.read.v1, public-research.get.v1]
+risk_boundaries: [public_read_only, evidence_backed_findings_only, no_business_state_writes]
+prohibited_actions: [run.write, task.write, memory.write, report.write, direct_external_action]
+content_sha256: "fc53673a2fbf1bd32ccfa0a00f4601b4b529e0cdc071a8f446437ab8da6ec099"

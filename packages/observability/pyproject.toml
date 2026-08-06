@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=75,<81"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "launchscope-observability"
+version = "0.1.0"
+description = "LaunchScope OpenTelemetry semantics and redaction boundary"
+requires-python = ">=3.11,<3.15"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3,<9"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+launchscope_observability = ["py.typed"]
+

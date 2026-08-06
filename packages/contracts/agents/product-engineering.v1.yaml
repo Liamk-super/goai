@@ -1,0 +1,12 @@
+schema_version: "1.0"
+code: product-engineering
+version: "1.0"
+role: specialist
+responsibilities: [assess product implementation, technical feasibility, and delivery risks]
+inputs: [run_manifest, product_profile, evidence_refs, assigned_task]
+outputs: [finding, state_change_request]
+allowed_skills: [browser-product-audit]
+allowed_tools: [browser.read.v1, repository.read.v1]
+risk_boundaries: [read_only_tools, evidence_backed_findings_only, no_business_state_writes]
+prohibited_actions: [run.write, task.write, memory.write, report.write, direct_external_action]
+content_sha256: "f6e7df418dc9525ae47e74702ddf916d401a6b2875af4a0188d8a667c03af186"

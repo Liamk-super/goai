@@ -1,0 +1,20 @@
+[
+  {
+    "created_at": "2026-08-05 16:59:24.168413+00:00",
+    "id": "94845383-1948-51c6-bbcb-18bbfe9daf5a",
+    "parameters_sha256": "5b647160120393673f413ef58499190a4fbc7239a39fd05d152bbd12b9151d97",
+    "risk_tier": "LOW",
+    "skill_invocation_id": "9bc5084a-fe35-5d6f-841e-e41110bd7fc2",
+    "status": "SUCCEEDED",
+    "tool_code": "repository.read.v1"
+  },
+  {
+    "created_at": "2026-08-05 17:02:02.887336+00:00",
+    "id": "6c7c6d81-0d65-5416-a257-54a707e0bdb6",
+    "parameters_sha256": "c7576dba592727f8ccc5e2deed22505ba260297e0c87c7a5be37d1bd66e68d90",
+    "risk_tier": "LOW",
+    "skill_invocation_id": "a4dd6854-75e5-52bd-ad30-5269d838ca62",
+    "status": "SUCCEEDED",
+    "tool_code": "repository.read.v1"
+  }
+]

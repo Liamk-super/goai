@@ -1,0 +1,756 @@
+openapi: 3.1.0
+info:
+  title: LaunchScope Control Plane API
+  version: 1.0.0
+  description: |
+    Product-agnostic REST and SSE contract for the LaunchScope control plane.
+    PostgreSQL is the business-state authority. This document defines transport
+    semantics only; it does not select a Demo product or enable external calls.
+  x-contract-version: '1.0'
+  x-version-policy: independent-api-version
+servers:
+  - url: /api/v1
+tags:
+  - name: Identity
+  - name: Projects
+  - name: Product versions
+  - name: Materials
+  - name: Intake
+  - name: Runs
+  - name: Run events
+paths:
+  /tenants:
+    post:
+      tags: [Identity]
+      operationId: createTenant
+      summary: Create a tenant and its owner workspace
+      parameters:
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/WriteCorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [slug, workspace_name]
+              properties:
+                slug: {type: string, minLength: 1, maxLength: 120}
+                workspace_name: {type: string, minLength: 1, maxLength: 200}
+              additionalProperties: false
+      responses:
+        '201': {description: Tenant and workspace created}
+        '400': {$ref: '#/components/responses/ValidationError'}
+  /workspaces:
+    post:
+      tags: [Identity]
+      operationId: createWorkspace
+      summary: Create a tenant-local workspace for a tenant member
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/WriteCorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: {type: string, minLength: 1, maxLength: 200}
+              additionalProperties: false
+      responses:
+        '201': {description: Workspace created}
+        '403': {$ref: '#/components/responses/PolicyBlocked'}
+  /projects:
+    post:
+      tags: [Projects]
+      operationId: createProject
+      summary: Create a product-agnostic validation project
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/WriteCorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProjectRequest'
+      responses:
+        '202':
+          $ref: '#/components/responses/Accepted'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          $ref: '#/components/responses/IdempotencyConflict'
+        '422':
+          $ref: '#/components/responses/PolicyBlocked'
+    get:
+      tags: [Projects]
+      operationId: listProjects
+      summary: List projects using an opaque cursor
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/ReadCorrelationId'
+      responses:
+        '200':
+          description: Cursor page of projects
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectPage'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /projects/{projectId}/versions:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    post:
+      tags: [Product versions]
+      operationId: submitProductVersion
+      summary: Submit a product version and isolated material references
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/WriteCorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitProductVersionRequest'
+      responses:
+        '202':
+          $ref: '#/components/responses/Accepted'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/IdempotencyConflict'
+        '422':
+          $ref: '#/components/responses/PolicyBlocked'
+
+  /projects/{projectId}/runs:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    post:
+      tags: [Runs]
+      operationId: startRun
+      summary: Request a run after its manifest is frozen
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/WriteCorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRunRequest'
+      responses:
+        '202':
+          $ref: '#/components/responses/Accepted'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/IdempotencyConflict'
+        '422':
+          $ref: '#/components/responses/PolicyBlocked'
+    get:
+      tags: [Runs]
+      operationId: listRuns
+      summary: List runs for a project using an opaque cursor
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/ReadCorrelationId'
+      responses:
+        '200':
+          description: Cursor page of runs
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunPage'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /product-versions/{versionId}/materials:initiate:
+    post:
+      tags: [Materials]
+      operationId: initiateMaterialUpload
+      summary: Issue a tenant/version-isolated quarantine object upload URL
+      parameters:
+        - $ref: '#/components/parameters/ProductVersionId'
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/WriteCorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InitiateMaterialRequest'
+      responses:
+        '201': {description: Quarantine upload initiated}
+        '403': {$ref: '#/components/responses/PolicyBlocked'}
+        '422': {$ref: '#/components/responses/PolicyBlocked'}
+  /materials/{materialId}/complete:
+    post:
+      tags: [Materials]
+      operationId: completeMaterialUpload
+      summary: Verify quarantined object hash, MIME type, and size from object storage
+      parameters:
+        - $ref: '#/components/parameters/MaterialId'
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/WriteCorrelationId'
+      responses:
+        '200': {description: Material is VALIDATED or REJECTED}
+        '403': {$ref: '#/components/responses/PolicyBlocked'}
+  /product-versions/{versionId}/gap-questions:
+    post:
+      tags: [Intake]
+      operationId: generateGapQuestions
+      summary: Generate a MODEL_INFERENCE draft and 3 to 5 priority questions
+      parameters:
+        - $ref: '#/components/parameters/ProductVersionId'
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/WriteCorrelationId'
+      responses:
+        '200': {description: Correlation-bound draft and question set}
+        '422': {$ref: '#/components/responses/PolicyBlocked'}
+  /product-versions/{versionId}/gap-answers:
+    post:
+      tags: [Intake]
+      operationId: answerGapQuestions
+      summary: Answer the active correlation-bound gap questions
+      parameters:
+        - $ref: '#/components/parameters/ProductVersionId'
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/WriteCorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnswerGapQuestionsRequest'
+      responses:
+        '200': {description: Draft updated; this is still not a confirmed profile}
+        '422': {$ref: '#/components/responses/PolicyBlocked'}
+  /product-versions/{versionId}/profile-confirmations:
+    post:
+      tags: [Intake]
+      operationId: confirmProductProfile
+      summary: Convert answered draft fields into user-confirmed ProductProfile facts
+      parameters:
+        - $ref: '#/components/parameters/ProductVersionId'
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/WriteCorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [acknowledge_model_inference]
+              properties:
+                acknowledge_model_inference: {type: boolean, const: true}
+              additionalProperties: false
+      responses:
+        '201': {description: Immutable confirmed ProductProfile fact created}
+        '422': {$ref: '#/components/responses/PolicyBlocked'}
+  /product-versions/{versionId}/plan:
+    post:
+      tags: [Intake]
+      operationId: enterPlanned
+      summary: Enter PLANNED only after ProductProfile confirmation
+      description: This endpoint never reserves budget or creates Worker tasks.
+      parameters:
+        - $ref: '#/components/parameters/ProductVersionId'
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/WriteCorrelationId'
+      responses:
+        '200': {description: Run entered PLANNED}
+        '422': {$ref: '#/components/responses/PolicyBlocked'}
+
+  /runs/{runId}:
+    parameters:
+      - $ref: '#/components/parameters/RunId'
+    get:
+      tags: [Runs]
+      operationId: getRun
+      summary: Read durable run state
+      parameters:
+        - $ref: '#/components/parameters/ReadCorrelationId'
+      responses:
+        '200':
+          description: Durable run projection and current event cursor
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: [Runs]
+      operationId: submitRunCommand
+      summary: Submit an idempotent command request for a run
+      description: |
+        The control plane binds the headers and route identifiers into the
+        canonical command envelope. A replay with the same tenant and
+        Idempotency-Key returns the original accepted result; a different
+        payload with that key returns IDEMPOTENCY_CONFLICT.
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/WriteCorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunCommandRequest'
+      responses:
+        '202':
+          $ref: '#/components/responses/Accepted'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/IdempotencyConflict'
+        '422':
+          $ref: '#/components/responses/PolicyBlocked'
+
+  /runs/{runId}/events:
+    parameters:
+      - $ref: '#/components/parameters/RunId'
+    get:
+      tags: [Run events]
+      operationId: streamRunEvents
+      summary: Resume a durable run event stream
+      description: |
+        The stream is backed by the durable event log, not process memory.
+        Each SSE frame uses `id` as an opaque, tenant- and run-scoped cursor.
+        On reconnect the client sends the last received cursor in
+        `Last-Event-ID`; `cursor` is also accepted for clients that cannot set
+        that header. If both are present, `Last-Event-ID` wins. The server
+        replays events strictly after that cursor. With no cursor it sends a
+        durable run snapshot followed by events from the current cursor. An
+        expired or malformed cursor returns CURSOR_INVALID and the client must
+        refetch the run snapshot before opening a new stream.
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/LastEventId'
+        - $ref: '#/components/parameters/ReadCorrelationId'
+      responses:
+        '200':
+          description: Server-sent events with durable cursor ids
+          headers:
+            X-Correlation-Id:
+              $ref: '#/components/headers/CorrelationId'
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: 'SSE frames: id, event, and JSON data. The id is the opaque resume cursor.'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/CursorInvalid'
+
+components:
+  parameters:
+    ProductVersionId:
+      name: versionId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Uuid'
+    MaterialId:
+      name: materialId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Uuid'
+    TenantId:
+      name: X-Tenant-Id
+      in: header
+      required: true
+      schema:
+        $ref: '#/components/schemas/Uuid'
+    ActorId:
+      name: X-Actor-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 255
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Uuid'
+    RunId:
+      name: runId
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Uuid'
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: 'Stable caller-generated key scoped to tenant, operation and request payload.'
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 200
+        pattern: '^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$'
+    WriteCorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: true
+      description: 'Trace and causation grouping identifier. The response echoes it.'
+      schema:
+        $ref: '#/components/schemas/Uuid'
+    ReadCorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: false
+      description: 'Optional read correlation identifier; generated by the control plane when absent.'
+      schema:
+        $ref: '#/components/schemas/Uuid'
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      description: 'Opaque cursor returned by the previous page or SSE response; clients must not decode or manufacture it.'
+      schema:
+        $ref: '#/components/schemas/Cursor'
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    LastEventId:
+      name: Last-Event-ID
+      in: header
+      required: false
+      description: 'Last durably received SSE cursor. It takes precedence over the cursor query parameter.'
+      schema:
+        $ref: '#/components/schemas/Cursor'
+  headers:
+    CorrelationId:
+      description: 'Correlation identifier for this response and its server-side audit trail.'
+      schema:
+        $ref: '#/components/schemas/Uuid'
+  responses:
+    Accepted:
+      description: Accepted exactly once or replayed from the idempotency record
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AcceptedResponse'
+    ValidationError:
+      description: Request or cursor validation failed
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    IdempotencyConflict:
+      description: The idempotency key is already bound to a different request hash
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found within the tenant scope
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    PolicyBlocked:
+      description: Policy, budget or approval gate blocked the operation
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    CursorInvalid:
+      description: The requested durable event cursor is malformed or expired
+      headers:
+        X-Correlation-Id:
+          $ref: '#/components/headers/CorrelationId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    Uuid:
+      type: string
+      format: uuid
+    Cursor:
+      type: string
+      minLength: 1
+      maxLength: 512
+      pattern: '^[A-Za-z0-9._:-]+$'
+    CreateProjectRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        workspace_id:
+          $ref: '#/components/schemas/Uuid'
+      additionalProperties: false
+    SubmitProductVersionRequest:
+      type: object
+      required: [label, material_ids]
+      properties:
+        label:
+          type: string
+          minLength: 1
+        material_ids:
+          type: array
+          minItems: 1
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/Uuid'
+      additionalProperties: false
+    InitiateMaterialRequest:
+      type: object
+      required: [display_name, sha256, size_bytes, mime_type]
+      properties:
+        display_name: {type: string, minLength: 1, maxLength: 255}
+        sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        size_bytes: {type: integer, minimum: 1, maximum: 20971520}
+        mime_type:
+          type: string
+          enum: [application/json, application/pdf, image/jpeg, image/png, image/webp, text/plain]
+      additionalProperties: false
+    AnswerGapQuestionsRequest:
+      type: object
+      required: [correlation_id, answers]
+      properties:
+        correlation_id:
+          $ref: '#/components/schemas/Uuid'
+        answers:
+          type: object
+          additionalProperties:
+            type: string
+            minLength: 1
+            maxLength: 2000
+      additionalProperties: false
+    CreateRunRequest:
+      type: object
+      required: [product_version_id, standard_version, run_manifest_version, run_manifest_sha256]
+      properties:
+        product_version_id:
+          $ref: '#/components/schemas/Uuid'
+        standard_version:
+          type: string
+          minLength: 1
+        run_manifest_version:
+          type: string
+          pattern: '^[0-9]+\\.[0-9]+$'
+        run_manifest_sha256:
+          type: string
+          pattern: '^[A-Fa-f0-9]{64}$'
+      additionalProperties: false
+    RunCommandRequest:
+      type: object
+      required: [command_type, schema_version, payload]
+      properties:
+        command_type:
+          type: string
+          enum:
+            - evaluation.run.start
+            - evaluation.task.dispatch
+            - evidence.capture.request
+            - decision.synthesize
+            - evaluation.run.cancel
+            - approval.resolve
+        schema_version:
+          type: string
+          pattern: '^[0-9]+\\.[0-9]+$'
+        payload:
+          type: object
+      additionalProperties: false
+    AcceptedResponse:
+      type: object
+      required: [status, operation_id, resource_type, resource_id, correlation_id, idempotency_key]
+      properties:
+        status:
+          type: string
+          enum: [ACCEPTED, REPLAYED]
+        operation_id:
+          $ref: '#/components/schemas/Uuid'
+        resource_type:
+          type: string
+          minLength: 1
+        resource_id:
+          type: string
+          minLength: 1
+        correlation_id:
+          $ref: '#/components/schemas/Uuid'
+        idempotency_key:
+          type: string
+      additionalProperties: false
+    ErrorResponse:
+      type: object
+      required: [error_code, message, correlation_id, retryable, details]
+      properties:
+        error_code:
+          type: string
+          enum:
+            - VALIDATION_ERROR
+            - UNAUTHORIZED
+            - FORBIDDEN
+            - NOT_FOUND
+            - CONFLICT
+            - IDEMPOTENCY_CONFLICT
+            - PRECONDITION_FAILED
+            - CURSOR_INVALID
+            - RATE_LIMITED
+            - DEPENDENCY_UNAVAILABLE
+            - BUDGET_EXCEEDED
+            - POLICY_BLOCKED
+            - SUBMISSION_UNKNOWN
+            - INTERNAL_ERROR
+        message:
+          type: string
+          minLength: 1
+        correlation_id:
+          $ref: '#/components/schemas/Uuid'
+        retryable:
+          type: boolean
+        details:
+          type: object
+      additionalProperties: false
+    Project:
+      type: object
+      required: [project_id, workspace_id, name, status]
+      properties:
+        project_id:
+          $ref: '#/components/schemas/Uuid'
+        workspace_id:
+          $ref: '#/components/schemas/Uuid'
+        name:
+          type: string
+        status:
+          type: string
+      additionalProperties: false
+    ProductVersion:
+      type: object
+      required: [product_version_id, project_id, label, status]
+      properties:
+        product_version_id:
+          $ref: '#/components/schemas/Uuid'
+        project_id:
+          $ref: '#/components/schemas/Uuid'
+        label:
+          type: string
+        status:
+          type: string
+      additionalProperties: false
+    RunResponse:
+      type: object
+      required: [run_id, project_id, product_version_id, status, standard_version, current_cursor, correlation_id]
+      properties:
+        run_id:
+          $ref: '#/components/schemas/Uuid'
+        project_id:
+          $ref: '#/components/schemas/Uuid'
+        product_version_id:
+          $ref: '#/components/schemas/Uuid'
+        status:
+          type: string
+        standard_version:
+          type: string
+        current_cursor:
+          $ref: '#/components/schemas/Cursor'
+        correlation_id:
+          $ref: '#/components/schemas/Uuid'
+      additionalProperties: false
+    ProjectPage:
+      type: object
+      required: [items, next_cursor, has_more, correlation_id]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Project'
+        next_cursor:
+          anyOf:
+            - $ref: '#/components/schemas/Cursor'
+            - type: 'null'
+        has_more:
+          type: boolean
+        correlation_id:
+          $ref: '#/components/schemas/Uuid'
+      additionalProperties: false
+    RunPage:
+      type: object
+      required: [items, next_cursor, has_more, correlation_id]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RunResponse'
+        next_cursor:
+          anyOf:
+            - $ref: '#/components/schemas/Cursor'
+            - type: 'null'
+        has_more:
+          type: boolean
+        correlation_id:
+          $ref: '#/components/schemas/Uuid'
+      additionalProperties: false

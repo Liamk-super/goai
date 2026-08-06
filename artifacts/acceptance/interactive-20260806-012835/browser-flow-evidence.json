@@ -1,0 +1,363 @@
+{
+  "started_at": "2026-08-05T17:49:37.233Z",
+  "api_responses": [
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/projects"
+    },
+    {
+      "method": "POST",
+      "status": 201,
+      "url": "http://127.0.0.1:8100/api/v1/projects"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/projects"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/projects/ee39ba86-09b3-405c-8eee-67f4ec068cd3/runs"
+    },
+    {
+      "method": "POST",
+      "status": 201,
+      "url": "http://127.0.0.1:8100/api/v1/projects/ee39ba86-09b3-405c-8eee-67f4ec068cd3/versions"
+    },
+    {
+      "method": "POST",
+      "status": 201,
+      "url": "http://127.0.0.1:8100/api/v1/product-versions/0d741b9e-92f3-479c-b192-1b1a27a089eb/materials:initiate"
+    },
+    {
+      "method": "PUT",
+      "status": 200,
+      "url": "http://127.0.0.1:59000/launchscope-browser-evidence/tenant/5ef3f88d-e562-4919-8465-85cf13f4df2a/workspace/c2398b47-bcd5-4565-a80c-445f4ffb5926/project/ee39ba86-09b3-405c-8eee-67f4ec068cd3/version/0d741b9e-92f3-479c-b192-1b1a27a089eb/quarantine/190b1b67-6bfb-4c2f-aadc-2aef8fd5539c"
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/materials/190b1b67-6bfb-4c2f-aadc-2aef8fd5539c/complete"
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/product-versions/0d741b9e-92f3-479c-b192-1b1a27a089eb/gap-questions"
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/product-versions/0d741b9e-92f3-479c-b192-1b1a27a089eb/gap-answers"
+    },
+    {
+      "method": "POST",
+      "status": 201,
+      "url": "http://127.0.0.1:8100/api/v1/product-versions/0d741b9e-92f3-479c-b192-1b1a27a089eb/profile-confirmations"
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/product-versions/0d741b9e-92f3-479c-b192-1b1a27a089eb/plan"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/runs/253fcb32-5b8e-4c9a-8652-493e1e7e5ca6"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/runs/253fcb32-5b8e-4c9a-8652-493e1e7e5ca6"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/runs/253fcb32-5b8e-4c9a-8652-493e1e7e5ca6/events"
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/runs/253fcb32-5b8e-4c9a-8652-493e1e7e5ca6/execute-local-demo"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/runs/253fcb32-5b8e-4c9a-8652-493e1e7e5ca6"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/runs/253fcb32-5b8e-4c9a-8652-493e1e7e5ca6/events"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/experience/runs/253fcb32-5b8e-4c9a-8652-493e1e7e5ca6/report"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/experience/reports/53347e2d-64be-5498-8835-bfb3ec09b6fc"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/experience/evidence/38c8656a-ac69-5556-af6e-3d2ee14c3d77/read-url"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/projects/ee39ba86-09b3-405c-8eee-67f4ec068cd3/runs"
+    },
+    {
+      "method": "POST",
+      "status": 201,
+      "url": "http://127.0.0.1:8100/api/v1/projects/ee39ba86-09b3-405c-8eee-67f4ec068cd3/versions"
+    },
+    {
+      "method": "POST",
+      "status": 201,
+      "url": "http://127.0.0.1:8100/api/v1/product-versions/5e21cbe0-5ba4-4f69-8669-ac4c149b61ee/materials:initiate"
+    },
+    {
+      "method": "PUT",
+      "status": 200,
+      "url": "http://127.0.0.1:59000/launchscope-browser-evidence/tenant/5ef3f88d-e562-4919-8465-85cf13f4df2a/workspace/c2398b47-bcd5-4565-a80c-445f4ffb5926/project/ee39ba86-09b3-405c-8eee-67f4ec068cd3/version/5e21cbe0-5ba4-4f69-8669-ac4c149b61ee/quarantine/75e26ce0-2888-4116-a8e1-2e65439e64f9"
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/materials/75e26ce0-2888-4116-a8e1-2e65439e64f9/complete"
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/product-versions/5e21cbe0-5ba4-4f69-8669-ac4c149b61ee/gap-questions"
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/product-versions/5e21cbe0-5ba4-4f69-8669-ac4c149b61ee/gap-answers"
+    },
+    {
+      "method": "POST",
+      "status": 201,
+      "url": "http://127.0.0.1:8100/api/v1/product-versions/5e21cbe0-5ba4-4f69-8669-ac4c149b61ee/profile-confirmations"
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/product-versions/5e21cbe0-5ba4-4f69-8669-ac4c149b61ee/plan"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/runs/89e6bb20-6d11-4dde-9bed-31a0e2359af8"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/runs/89e6bb20-6d11-4dde-9bed-31a0e2359af8"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/runs/89e6bb20-6d11-4dde-9bed-31a0e2359af8/events"
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/runs/89e6bb20-6d11-4dde-9bed-31a0e2359af8/execute-local-demo"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/runs/89e6bb20-6d11-4dde-9bed-31a0e2359af8"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/runs/89e6bb20-6d11-4dde-9bed-31a0e2359af8/events"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/experience/runs/89e6bb20-6d11-4dde-9bed-31a0e2359af8/report"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/experience/reports/5b30f683-6215-54a3-a543-7c68f2bc0781"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/experience/evidence/54ef0949-ced7-5fc2-b30d-8d02a1f8ee7e/read-url"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/projects/ee39ba86-09b3-405c-8eee-67f4ec068cd3/runs"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/experience/projects/ee39ba86-09b3-405c-8eee-67f4ec068cd3/compare/89e6bb20-6d11-4dde-9bed-31a0e2359af8"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/ops/audit/events"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/ops/audit/runs/89e6bb20-6d11-4dde-9bed-31a0e2359af8"
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "url": "http://127.0.0.1:8100/api/v1/ops/audit/runs/89e6bb20-6d11-4dde-9bed-31a0e2359af8"
+    },
+    {
+      "method": "GET",
+      "status": 404,
+      "url": "http://127.0.0.1:8100/api/v1/runs/00000000-0000-0000-0000-000000000000/events"
+    },
+    {
+      "method": "GET",
+      "status": 404,
+      "url": "http://127.0.0.1:8100/api/v1/runs/00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "failed_requests": [
+    {
+      "method": "PUT",
+      "url": "http://127.0.0.1:59000/launchscope-browser-evidence/tenant/5ef3f88d-e562-4919-8465-85cf13f4df2a/workspace/c2398b47-bcd5-4565-a80c-445f4ffb5926/project/ee39ba86-09b3-405c-8eee-67f4ec068cd3/version/0d741b9e-92f3-479c-b192-1b1a27a089eb/quarantine/190b1b67-6bfb-4c2f-aadc-2aef8fd5539c",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "method": "PUT",
+      "url": "http://127.0.0.1:59000/launchscope-browser-evidence/tenant/5ef3f88d-e562-4919-8465-85cf13f4df2a/workspace/c2398b47-bcd5-4565-a80c-445f4ffb5926/project/ee39ba86-09b3-405c-8eee-67f4ec068cd3/version/5e21cbe0-5ba4-4f69-8669-ac4c149b61ee/quarantine/75e26ce0-2888-4116-a8e1-2e65439e64f9",
+      "error": "net::ERR_ABORTED"
+    }
+  ],
+  "http_errors": [
+    {
+      "method": "GET",
+      "status": 404,
+      "url": "http://127.0.0.1:8100/api/v1/runs/00000000-0000-0000-0000-000000000000/events"
+    },
+    {
+      "method": "GET",
+      "status": 404,
+      "url": "http://127.0.0.1:8100/api/v1/runs/00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "console_errors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "checks": [
+    {
+      "name": "projects page renders",
+      "passed": true
+    },
+    {
+      "name": "project creation navigates to durable URL",
+      "passed": true
+    },
+    {
+      "name": "project detail renders",
+      "passed": true
+    },
+    {
+      "name": "V1 gap questions loaded",
+      "passed": true,
+      "count": 5
+    },
+    {
+      "name": "V1 run planned",
+      "passed": true
+    },
+    {
+      "name": "V1 SSE delivered durable events",
+      "passed": true,
+      "eventCount": 7
+    },
+    {
+      "name": "V1 completed",
+      "passed": true
+    },
+    {
+      "name": "V1 report contains evidence chain",
+      "passed": true,
+      "evidenceCount": 4
+    },
+    {
+      "name": "V1 signed evidence read succeeds",
+      "passed": true
+    },
+    {
+      "name": "V2 gap questions loaded",
+      "passed": true,
+      "count": 5
+    },
+    {
+      "name": "V2 run planned",
+      "passed": true
+    },
+    {
+      "name": "V2 SSE delivered durable events",
+      "passed": true,
+      "eventCount": 7
+    },
+    {
+      "name": "V2 completed",
+      "passed": true
+    },
+    {
+      "name": "V2 report contains evidence chain",
+      "passed": true,
+      "evidenceCount": 4
+    },
+    {
+      "name": "V2 signed evidence read succeeds",
+      "passed": true
+    },
+    {
+      "name": "version comparison is comparable",
+      "passed": true
+    },
+    {
+      "name": "Ops redacted ledger has events",
+      "passed": true,
+      "rowCount": 40
+    },
+    {
+      "name": "Ops projection does not expose material bodies",
+      "passed": true
+    },
+    {
+      "name": "unknown run fails visibly",
+      "passed": true,
+      "message": "run was not found"
+    },
+    {
+      "name": "mobile project page has no horizontal overflow",
+      "passed": true,
+      "width": 390,
+      "scrollWidth": 390,
+      "canScrollX": false
+    },
+    {
+      "name": "mobile primary action remains visible",
+      "passed": true
+    }
+  ],
+  "project_id": "ee39ba86-09b3-405c-8eee-67f4ec068cd3",
+  "run_v1": "253fcb32-5b8e-4c9a-8652-493e1e7e5ca6",
+  "run_v2": "89e6bb20-6d11-4dde-9bed-31a0e2359af8",
+  "finished_at": "2026-08-05T17:50:04.884Z"
+}

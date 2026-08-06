@@ -1,0 +1,6 @@
+{
+  "schema_version": "1.0", "skill_code": "browser-product-audit", "version": "1.0", "content_sha256": "7213f2d1b2ba9c5003346fdf95f9b6f27fa15fcb80747dfad0de8535a4acf87e",
+  "input_schema": {"type": "object", "additionalProperties": false, "required": ["target_url"], "properties": {"target_url": {"type": "string", "format": "uri"}}},
+  "output_schema": {"type": "object", "additionalProperties": false, "required": ["evidence_objects", "findings"], "properties": {"evidence_objects": {"type": "array", "minItems": 1, "items": {"type": "object"}}, "findings": {"type": "array", "items": {"type": "object"}}}},
+  "preconditions": ["public_read_only_target"], "permissions": ["browser.read"], "failure_classes": ["DEPENDENCY", "POLICY", "SUBMISSION_UNKNOWN"], "budget": {"max_cost": 0, "currency": "unit"}, "evidence_requirements": ["private_snapshot_hash"], "lifecycle": {"status": "APPROVED", "rollback": "disable version"}, "may_write_business_state": false
+}

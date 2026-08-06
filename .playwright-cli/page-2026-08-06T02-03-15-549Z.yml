@@ -1,0 +1,45 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - link "LaunchScope projects" [ref=e4] [cursor=pointer]:
+      - /url: /projects
+      - generic [ref=e5]: LS
+      - generic [ref=e6]:
+        - strong [ref=e7]: LaunchScope
+        - generic [ref=e8]: evidence command
+    - navigation "Primary navigation" [ref=e9]:
+      - link "Projects" [ref=e10] [cursor=pointer]:
+        - /url: /projects
+      - link "New signal" [ref=e11] [cursor=pointer]:
+        - /url: /projects/new
+    - generic [ref=e12]:
+      - generic [ref=e13]:
+        - generic [ref=e14]: Language
+        - combobox "Language" [ref=e15]:
+          - option "English" [selected]
+          - option "简体中文"
+      - generic [ref=e16]: PostgreSQL truth
+  - generic [ref=e18]: 22.3193° N · 114.1694° E / V0.1
+  - main [ref=e19]:
+    - generic [ref=e20]:
+      - generic [ref=e21]:
+        - paragraph [ref=e22]: Signal atlas / 01
+        - heading "Projects in motion." [level=1] [ref=e23]
+        - paragraph [ref=e24]: Each dossier is a living chain of versions, evidence, decisions and unresolved questions—not a folder of stale reports.
+      - link "Open new signal" [ref=e26] [cursor=pointer]:
+        - /url: /projects/new
+    - region "Workspace metrics" [ref=e27]:
+      - generic [ref=e28]:
+        - text: Visible projects
+        - strong [ref=e29]: —
+      - generic [ref=e30]:
+        - text: State source
+        - strong [ref=e31]: Postgres
+      - generic [ref=e32]:
+        - text: Default posture
+        - strong [ref=e33]: Read only
+      - generic [ref=e34]:
+        - text: Evidence policy
+        - strong [ref=e35]: Traceable
+  - contentinfo [ref=e36]:
+    - generic [ref=e37]: Evidence before assertion.
+    - generic [ref=e38]: Read-only by default · fail-closed always.

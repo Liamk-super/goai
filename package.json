@@ -1,0 +1,23 @@
+{
+  "name": "launchscope",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.9.0",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "lint": "pnpm run lint:typescript && pnpm run lint:python",
+    "lint:typescript": "pnpm -r --if-present lint",
+    "lint:python": "python -m ruff check apps packages",
+    "test": "pnpm run test:typescript && pnpm run test:python",
+    "test:typescript": "pnpm -r --if-present test",
+    "test:python": "python -m pytest packages/contracts/tests -q",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "format:check": "pnpm exec prettier --check package.json pnpm-workspace.yaml tsconfig.base.json apps/web/package.json apps/web/tsconfig.json apps/web/src/index.ts apps/web/next-env.d.ts apps/ops/package.json apps/ops/tsconfig.json apps/ops/src/index.ts apps/ops/next-env.d.ts packages/skills/README.md infra/compose/docker-compose.yml infra/compose/docker-compose.test.yml infra/compose/otel-collector.yaml"
+  },
+  "devDependencies": {
+    "prettier": "3.4.2",
+    "typescript": "5.7.2"
+  }
+}

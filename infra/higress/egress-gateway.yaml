@@ -1,0 +1,21 @@
+apiVersion: networking.higress.io/v1alpha1
+kind: EgressPolicy
+metadata:
+  name: launchscope-public-research
+spec:
+  defaultAction: DENY
+  workerIdentity: launchscope-worker
+  allowedMethods: [GET, HEAD]
+  allowedSchemes: [https]
+  denyCidrs:
+    - 127.0.0.0/8
+    - 10.0.0.0/8
+    - 172.16.0.0/12
+    - 192.168.0.0/16
+    - 169.254.0.0/16
+    - ::1/128
+    - fc00::/7
+    - fe80::/10
+  denyHosts: [localhost, metadata.google.internal, 169.254.169.254]
+  requireDnsRevalidationOnRedirect: true
+  requireShortLivedCapabilityToken: true

@@ -1,0 +1,65 @@
+[
+  {
+    "failure_class": null,
+    "from_status": "DRAFT",
+    "id": "160d5b53-1ff6-4337-9ea1-2040195bccc8",
+    "occurred_at": "2026-08-05 17:49:54.018010+00:00",
+    "reason": "authorized intake",
+    "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8",
+    "to_status": "INTAKE"
+  },
+  {
+    "failure_class": null,
+    "from_status": "INTAKE",
+    "id": "80180156-5567-4ac3-8357-0550d2a1f3b8",
+    "occurred_at": "2026-08-05 17:49:54.018983+00:00",
+    "reason": "gap identified",
+    "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8",
+    "to_status": "WAITING_FOR_USER"
+  },
+  {
+    "failure_class": null,
+    "from_status": "WAITING_FOR_USER",
+    "id": "85f7206a-b3d0-48cc-8318-893c1cd384f2",
+    "occurred_at": "2026-08-05 17:49:54.019777+00:00",
+    "reason": "profile confirmed",
+    "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8",
+    "to_status": "PLANNED"
+  },
+  {
+    "failure_class": null,
+    "from_status": "PLANNED",
+    "id": "b7613361-a8a1-5e24-831b-10eea49a3c2e",
+    "occurred_at": "2026-08-05 17:49:54.783091+00:00",
+    "reason": "manifest frozen and zero-cost budget reserved",
+    "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8",
+    "to_status": "RUNNING"
+  },
+  {
+    "failure_class": null,
+    "from_status": "RUNNING",
+    "id": "cf4bc3be-c6ae-52b2-b5f2-62bf67fbafb4",
+    "occurred_at": "2026-08-05 17:49:54.784091+00:00",
+    "reason": "required tasks terminal",
+    "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8",
+    "to_status": "EVIDENCE_REVIEW"
+  },
+  {
+    "failure_class": null,
+    "from_status": "EVIDENCE_REVIEW",
+    "id": "7155da31-de4c-5566-b7e5-8ed1c78779cc",
+    "occurred_at": "2026-08-05 17:49:54.785091+00:00",
+    "reason": "audit accepted and downgraded unsupported claims",
+    "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8",
+    "to_status": "SYNTHESIZING"
+  },
+  {
+    "failure_class": null,
+    "from_status": "SYNTHESIZING",
+    "id": "9358e3db-f73d-548c-8d92-93c314ed31a7",
+    "occurred_at": "2026-08-05 17:49:54.786091+00:00",
+    "reason": "decision report dossier committed",
+    "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8",
+    "to_status": "COMPLETED"
+  }
+]

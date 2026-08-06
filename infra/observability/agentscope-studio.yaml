@@ -1,0 +1,23 @@
+apiVersion: launchscope.io/v1alpha1
+kind: ObservabilityBackend
+metadata:
+  name: agentscope-studio
+spec:
+  mode: local-demo
+  enabled: false
+  endpointRef: ${AGENTSCOPE_STUDIO_ENDPOINT}
+  traceSource: otlp
+  dataPolicy:
+    allowBusinessBodies: false
+    allowedFields:
+      - tenant_id
+      - run_id
+      - stage_code
+      - task_id
+      - agent_code
+      - skill_code
+      - tool_code
+      - outcome
+      - duration_ms
+      - payload_sha256
+  note: "Enable only when a pinned AgentScope Studio image is approved for the local profile."

@@ -1,0 +1,38 @@
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+!.env.test.example
+!.env.demo.example
+
+# Node / pnpm
+node_modules/
+.pnpm-store/
+*.tsbuildinfo
+.next/
+out/
+dist/
+coverage/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local infrastructure state and logs
+infra/compose/.data/
+infra/compose/.logs/
+infra/agentteams/generated/
+.demo/
+*.log
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

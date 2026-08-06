@@ -1,0 +1,6 @@
+{
+  "schema_version": "1.0", "skill_code": "intake-gap-diagnosis", "version": "1.0", "content_sha256": "69ec850b751242bb6f01c03f4cbe08ceffa9c0d3ac5c5661230b79c293a29811",
+  "input_schema": {"type": "object", "additionalProperties": false, "required": ["profile_draft"], "properties": {"profile_draft": {"type": "object"}}},
+  "output_schema": {"type": "object", "additionalProperties": false, "required": ["questions"], "properties": {"questions": {"type": "array", "minItems": 3, "maxItems": 5, "items": {"type": "object"}}}},
+  "preconditions": ["profile_draft"], "permissions": ["profile.read"], "failure_classes": ["VALIDATION"], "budget": {"max_cost": 0, "currency": "unit"}, "evidence_requirements": ["profile_provenance"], "lifecycle": {"status": "APPROVED", "rollback": "disable version"}, "may_write_business_state": false
+}

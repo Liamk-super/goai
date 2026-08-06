@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/events/envelope.schema.json",
+  "title": "LaunchScope event and command envelope",
+  "description": "The shared transport envelope for versioned events and commands. event_id is the message identity for both message types.",
+  "$defs": {
+    "EnvelopeFields": {
+      "type": "object",
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Unique message identity. Commands retain this frozen field name for transport compatibility."
+        },
+        "tenant_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "run_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "task_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "correlation_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "causation_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "idempotency_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$"
+        },
+        "schema_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+$",
+          "description": "Independent contract version in MAJOR.MINOR form."
+        },
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "payload": {
+          "type": "object",
+          "description": "Event- or command-specific structured data; never a chat transcript or private chain of thought."
+        },
+        "event_type": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]*(\\.[a-z0-9_-]+)+$"
+        },
+        "command_type": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]*(\\.[a-z0-9_-]+)+$"
+        }
+      },
+      "required": [
+        "event_id",
+        "tenant_id",
+        "run_id",
+        "task_id",
+        "correlation_id",
+        "causation_id",
+        "idempotency_key",
+        "schema_version",
+        "occurred_at",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    "EventEnvelope": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/EnvelopeFields"
+        },
+        {
+          "type": "object",
+          "required": [
+            "event_type"
+          ],
+          "properties": {
+            "event_type": {
+              "type": "string"
+            }
+          },
+          "not": {
+            "required": [
+              "command_type"
+            ]
+          }
+        }
+      ]
+    },
+    "CommandEnvelope": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/EnvelopeFields"
+        },
+        {
+          "type": "object",
+          "required": [
+            "command_type"
+          ],
+          "properties": {
+            "command_type": {
+              "type": "string"
+            }
+          },
+          "not": {
+            "required": [
+              "event_type"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "examples": [
+    {
+      "event_type": "evaluation.run.started",
+      "event_id": "11111111-1111-4111-8111-111111111111",
+      "tenant_id": "22222222-2222-4222-8222-222222222222",
+      "run_id": "33333333-3333-4333-8333-333333333333",
+      "task_id": null,
+      "correlation_id": "44444444-4444-4444-8444-444444444444",
+      "causation_id": null,
+      "idempotency_key": "run-start-01",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:00:00Z",
+      "payload": {
+        "project_id": "55555555-5555-4555-8555-555555555555"
+      }
+    }
+  ]
+}

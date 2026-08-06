@@ -1,0 +1,20 @@
+apiVersion: launchscope.io/v1alpha1
+kind: RocketMQTopicSet
+metadata:
+  name: launchscope-v02
+spec:
+  schemaVersion: "1.0"
+  topics:
+    - {name: launchscope-evaluation-events-v1, retentionHours: 168, bodyPolicy: structured-envelope-only}
+    - {name: launchscope.commands.run, retentionHours: 72, bodyPolicy: structured-metadata-only}
+    - {name: launchscope.commands.skill, retentionHours: 72, bodyPolicy: structured-metadata-only}
+    - {name: launchscope.events.domain, retentionHours: 168, bodyPolicy: structured-metadata-only}
+    - {name: launchscope.events.audit, retentionHours: 8760, bodyPolicy: hash-and-metadata-only}
+  requiredEnvelope:
+    - tenant_id
+    - run_id
+    - task_id
+    - correlation_id
+    - idempotency_key
+    - schema_version
+  forbiddenFields: [prompt, messages, chat_history, private_reasoning, material_body, report_body, access_token]

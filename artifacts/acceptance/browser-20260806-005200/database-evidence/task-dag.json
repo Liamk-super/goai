@@ -1,0 +1,176 @@
+[
+  {
+    "agent_identity_ref": "product-engineering@1.0",
+    "budget_slice": {
+      "category": "tool",
+      "reserved": "0"
+    },
+    "dependencies": [],
+    "id": "2c6c1852-6700-5be7-afd6-d3cbfa9aa731",
+    "required": true,
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "skill_ref": "browser-product-audit",
+    "skill_version": "1.0",
+    "stage_code": "PARALLEL_EVALUATION",
+    "status": "SUCCEEDED",
+    "tool_allowlist": [
+      "repository.read.v1"
+    ]
+  },
+  {
+    "agent_identity_ref": "user-evidence@1.0",
+    "budget_slice": {
+      "category": "tool",
+      "reserved": "0"
+    },
+    "dependencies": [],
+    "id": "e4e19d35-9ee2-5a53-946b-5232f72f3485",
+    "required": true,
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "skill_ref": "browser-product-audit",
+    "skill_version": "1.0",
+    "stage_code": "PARALLEL_EVALUATION",
+    "status": "SUCCEEDED",
+    "tool_allowlist": []
+  },
+  {
+    "agent_identity_ref": "business-investment@1.0",
+    "budget_slice": {
+      "category": "tool",
+      "reserved": "0"
+    },
+    "dependencies": [],
+    "id": "835c0fe5-d30b-57a3-85d4-600bf8a2675c",
+    "required": true,
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "skill_ref": "business-investment-assessment",
+    "skill_version": "1.0",
+    "stage_code": "PARALLEL_EVALUATION",
+    "status": "SUCCEEDED",
+    "tool_allowlist": []
+  },
+  {
+    "agent_identity_ref": "geo-policy-trend@1.0",
+    "budget_slice": {
+      "category": "tool",
+      "reserved": "0"
+    },
+    "dependencies": [],
+    "id": "3100c002-3a5b-53f6-ae99-971577ab267c",
+    "required": true,
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "skill_ref": "business-investment-assessment",
+    "skill_version": "1.0",
+    "stage_code": "PARALLEL_EVALUATION",
+    "status": "SUCCEEDED",
+    "tool_allowlist": []
+  },
+  {
+    "agent_identity_ref": "evidence-auditor@1.0",
+    "budget_slice": {
+      "category": "tool",
+      "reserved": "0"
+    },
+    "dependencies": [
+      "2c6c1852-6700-5be7-afd6-d3cbfa9aa731",
+      "e4e19d35-9ee2-5a53-946b-5232f72f3485",
+      "835c0fe5-d30b-57a3-85d4-600bf8a2675c",
+      "3100c002-3a5b-53f6-ae99-971577ab267c"
+    ],
+    "id": "63e2353f-d2ad-5479-b0d4-6dead333223d",
+    "required": true,
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "skill_ref": "evidence-grounding-audit",
+    "skill_version": "1.0",
+    "stage_code": "EVIDENCE_REVIEW",
+    "status": "SUCCEEDED",
+    "tool_allowlist": []
+  },
+  {
+    "agent_identity_ref": "product-engineering@1.0",
+    "budget_slice": {
+      "category": "tool",
+      "reserved": "0"
+    },
+    "dependencies": [],
+    "id": "d52f3b10-b55c-5dc2-abb0-6b0bc549bac7",
+    "required": true,
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "skill_ref": "browser-product-audit",
+    "skill_version": "1.0",
+    "stage_code": "PARALLEL_EVALUATION",
+    "status": "SUCCEEDED",
+    "tool_allowlist": [
+      "repository.read.v1"
+    ]
+  },
+  {
+    "agent_identity_ref": "user-evidence@1.0",
+    "budget_slice": {
+      "category": "tool",
+      "reserved": "0"
+    },
+    "dependencies": [],
+    "id": "5d7fe1ee-13ba-53f5-9eea-e4231e4fdba9",
+    "required": true,
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "skill_ref": "browser-product-audit",
+    "skill_version": "1.0",
+    "stage_code": "PARALLEL_EVALUATION",
+    "status": "SUCCEEDED",
+    "tool_allowlist": []
+  },
+  {
+    "agent_identity_ref": "business-investment@1.0",
+    "budget_slice": {
+      "category": "tool",
+      "reserved": "0"
+    },
+    "dependencies": [],
+    "id": "224ff3f8-bf78-5fb4-bdb2-ef4b414f19ba",
+    "required": true,
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "skill_ref": "business-investment-assessment",
+    "skill_version": "1.0",
+    "stage_code": "PARALLEL_EVALUATION",
+    "status": "SUCCEEDED",
+    "tool_allowlist": []
+  },
+  {
+    "agent_identity_ref": "geo-policy-trend@1.0",
+    "budget_slice": {
+      "category": "tool",
+      "reserved": "0"
+    },
+    "dependencies": [],
+    "id": "c143a412-cd63-5fb3-84b3-6b97ffc02aed",
+    "required": true,
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "skill_ref": "business-investment-assessment",
+    "skill_version": "1.0",
+    "stage_code": "PARALLEL_EVALUATION",
+    "status": "SUCCEEDED",
+    "tool_allowlist": []
+  },
+  {
+    "agent_identity_ref": "evidence-auditor@1.0",
+    "budget_slice": {
+      "category": "tool",
+      "reserved": "0"
+    },
+    "dependencies": [
+      "d52f3b10-b55c-5dc2-abb0-6b0bc549bac7",
+      "5d7fe1ee-13ba-53f5-9eea-e4231e4fdba9",
+      "224ff3f8-bf78-5fb4-bdb2-ef4b414f19ba",
+      "c143a412-cd63-5fb3-84b3-6b97ffc02aed"
+    ],
+    "id": "5751eeb2-466a-5f8d-8774-c50e10b0a114",
+    "required": true,
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "skill_ref": "evidence-grounding-audit",
+    "skill_version": "1.0",
+    "stage_code": "EVIDENCE_REVIEW",
+    "status": "SUCCEEDED",
+    "tool_allowlist": []
+  }
+]

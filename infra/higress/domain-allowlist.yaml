@@ -1,0 +1,8 @@
+apiVersion: networking.higress.io/v1alpha1
+kind: DomainAllowlist
+metadata:
+  name: launchscope-public-research
+spec:
+  policyVersion: "1.0"
+  domains: [creatrades.com, www.creatrades.com, app.creatrades.com]
+  rejectEmptyRuntimeExpansion: true

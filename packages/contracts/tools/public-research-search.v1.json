@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/tools/public-research-search.v1.json",
+  "x-network-policy": {"allowed_domains": ["api.tavily.com"], "max_redirects": 0, "max_response_bytes": 1048576},
+  "x-execution-policy": {"timeout_seconds": 30, "max_cost": 1},
+  "type": "object", "additionalProperties": false,
+  "required": ["contract_version", "tool_id", "permission", "network_level", "read_only", "input_schema", "output_schema"],
+  "properties": {
+    "contract_version": {"const": "1.0"}, "tool_id": {"const": "public-research-search.v1"},
+    "permission": {"const": "public_research.search"}, "network_level": {"const": "PUBLIC_RESEARCH"}, "read_only": {"const": true},
+    "input_schema": {"type": "object", "additionalProperties": false, "required": ["query", "region"], "properties": {"query": {"type": "string"}, "region": {"type": "string"}, "max_results": {"type": "integer"}, "days": {"type": "integer"}}},
+    "output_schema": {"type": "object", "required": ["evidence_id", "query", "region", "fetched_at", "results"], "properties": {"evidence_id": {"type": "string"}, "query": {"type": "string"}, "region": {"type": "string"}, "fetched_at": {"type": "string"}, "results": {"type": "array"}}}
+  },
+  "examples": [{"contract_version": "1.0", "tool_id": "public-research-search.v1", "permission": "public_research.search", "network_level": "PUBLIC_RESEARCH", "read_only": true, "input_schema": {"query": "Hong Kong AI policy", "region": "HK", "max_results": 5}, "output_schema": {"evidence_id": "00000000-0000-0000-0000-000000000001", "query": "Hong Kong AI policy", "region": "HK", "fetched_at": "2026-08-06T00:00:00Z", "results": []}}]
+}

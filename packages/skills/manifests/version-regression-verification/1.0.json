@@ -1,0 +1,6 @@
+{
+  "schema_version": "1.0", "skill_code": "version-regression-verification", "version": "1.0", "content_sha256": "e10cfe33ca094a5c81e0264b2a01166af6014f332f53d3eb6f0c4ebc60e9ad30",
+  "input_schema": {"type": "object", "additionalProperties": false, "required": ["baseline_run_id", "candidate_product_version_id"], "properties": {"baseline_run_id": {"type": "string", "format": "uuid"}, "candidate_product_version_id": {"type": "string", "format": "uuid"}}},
+  "output_schema": {"type": "object", "additionalProperties": false, "required": ["comparison", "evidence_ids"], "properties": {"comparison": {"type": "object"}, "evidence_ids": {"type": "array", "items": {"type": "string", "format": "uuid"}}}},
+  "preconditions": ["baseline_manifest_locked", "candidate_material_validated"], "permissions": ["evidence.read", "material.read"], "failure_classes": ["VALIDATION", "DEPENDENCY", "POLICY"], "budget": {"max_cost": 0, "currency": "unit"}, "evidence_requirements": ["same_standard_version"], "lifecycle": {"status": "APPROVED", "rollback": "disable version"}, "may_write_business_state": false
+}

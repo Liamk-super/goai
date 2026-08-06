@@ -1,0 +1,29 @@
+{
+  "decisions": [
+    {
+      "created_at": "2026-08-05 17:49:54.783091+00:00",
+      "dimension_grades": {
+        "BUSINESS_INVESTMENT": "WEAK",
+        "GEO_POLICY_TREND": "INSUFFICIENT_EVIDENCE",
+        "PRODUCT_IMPLEMENTATION": "MODERATE",
+        "USER_USAGE": "INSUFFICIENT_EVIDENCE"
+      },
+      "hard_blocks": [],
+      "id": "901e5f3c-cf4a-5915-b51c-86b46074e942",
+      "recommendation": "VALIDATE_FURTHER",
+      "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8",
+      "standard_version": "1.0"
+    }
+  ],
+  "reports": [
+    {
+      "created_at": "2026-08-05 17:49:54.783091+00:00",
+      "decision_id": "901e5f3c-cf4a-5915-b51c-86b46074e942",
+      "id": "5b30f683-6215-54a3-a543-7c68f2bc0781",
+      "object_key": "tenant/5ef3f88d-e562-4919-8465-85cf13f4df2a/project/ee39ba86-09b3-405c-8eee-67f4ec068cd3/version/5e21cbe0-5ba4-4f69-8669-ac4c149b61ee/run/89e6bb20-6d11-4dde-9bed-31a0e2359af8/reports/5b30f683-6215-54a3-a543-7c68f2bc0781.html",
+      "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8",
+      "sha256": "ca7119a8e20f10209bb6e48f00050be85b3d145cef98b027591ec86b5a39462d",
+      "status": "COMMITTED"
+    }
+  ]
+}

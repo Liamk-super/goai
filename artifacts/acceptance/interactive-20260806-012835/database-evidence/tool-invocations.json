@@ -1,0 +1,11 @@
+[
+  {
+    "created_at": "2026-08-05 17:49:54.783091+00:00",
+    "id": "704d214b-7153-5158-92ef-631f029cc9fd",
+    "parameters_sha256": "c7576dba592727f8ccc5e2deed22505ba260297e0c87c7a5be37d1bd66e68d90",
+    "risk_tier": "LOW",
+    "skill_invocation_id": "21476ae9-4025-54ee-afbe-14d0a5503d47",
+    "status": "SUCCEEDED",
+    "tool_code": "repository.read.v1"
+  }
+]

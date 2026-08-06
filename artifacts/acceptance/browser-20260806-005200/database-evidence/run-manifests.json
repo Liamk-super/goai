@@ -1,0 +1,168 @@
+[
+  {
+    "budget": {
+      "external_cost": "0",
+      "token": "0",
+      "tool": "0"
+    },
+    "created_at": "2026-08-05 16:59:24.168413+00:00",
+    "frozen_config": {
+      "agents": {
+        "business-investment": {
+          "sha256": "4e95b1697bb188336da621704977373e992152d5c11208b267bed95d77eb2f1c",
+          "version": "1.0"
+        },
+        "evaluation-manager": {
+          "sha256": "e2282abba0ca41d86e42ff2e86edd38d69a58f2de164ca095891d09e0a986bdf",
+          "version": "1.0"
+        },
+        "evidence-auditor": {
+          "sha256": "180c863b35f7666169f99a92e4c2ac90adbde0368e5942db4453a37543f0e091",
+          "version": "1.0"
+        },
+        "geo-policy-trend": {
+          "sha256": "3a46e3d8722ef0867c66b1536885daeff06142f4256b60da5baa42190577144f",
+          "version": "1.0"
+        },
+        "product-engineering": {
+          "sha256": "f6e7df418dc9525ae47e74702ddf916d401a6b2875af4a0188d8a667c03af186",
+          "version": "1.0"
+        },
+        "user-evidence": {
+          "sha256": "fc53673a2fbf1bd32ccfa0a00f4601b4b529e0cdc071a8f446437ab8da6ec099",
+          "version": "1.0"
+        }
+      },
+      "budget": {
+        "external_cost": "0",
+        "token": "0",
+        "tool": "0"
+      },
+      "execution_mode": "LOCAL_DETERMINISTIC_READONLY",
+      "failure_policy": {
+        "SUBMISSION_UNKNOWN": "NEEDS_ATTENTION_NO_RETRY"
+      },
+      "materials": [
+        {
+          "id": "0b8a817c-6f19-4e48-ae88-d791e10295a6",
+          "sha256": "61ef30049d70bd9980082a0178b34e32f38e956bf9ff0705a045225f1f5b50b4"
+        }
+      ],
+      "models": {
+        "deterministic-local-rules": "1.0"
+      },
+      "permissions": [
+        "repository.read"
+      ],
+      "product_version_id": "1ffd0a3c-ccb4-4318-8f7d-be8c20de20ba",
+      "prompts": {
+        "local-evidence-synthesis": "1.0"
+      },
+      "schema_version": "1.0",
+      "skills": {
+        "browser-product-audit": "7213f2d1b2ba9c5003346fdf95f9b6f27fa15fcb80747dfad0de8535a4acf87e",
+        "business-investment-assessment": "480e67be1d98e57f2a65c06f0ee29c7679f623a8b90351f0ae9b36b234059777",
+        "evidence-grounding-audit": "45cbd0dcc1c5afc4fcfee862a2608ba9f305c4d0d34deac890c2e50bb6ee0d2c",
+        "intake-gap-diagnosis": "69ec850b751242bb6f01c03f4cbe08ceffa9c0d3ac5c5661230b79c293a29811",
+        "product-intake-normalizer": "0693e5f779790cb8e4e65910302fbe1cacc38f2fc35de227b5a1eceecf43d0f2",
+        "version-regression-verification": "e10cfe33ca094a5c81e0264b2a01166af6014f332f53d3eb6f0c4ebc60e9ad30"
+      },
+      "standard_version": "1.0",
+      "tools": {
+        "repository.read.v1": "1.0"
+      }
+    },
+    "manifest_sha256": "d67adf0eb64deb09d6c205614f326783b4f4f872284f0ccb8b31dc588f965d4a",
+    "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+    "security_policy": {
+      "permissions": [
+        "repository.read"
+      ],
+      "version": "1.0"
+    },
+    "tenant_id": "fe4792d5-e506-4d84-b161-6278b725b70f"
+  },
+  {
+    "budget": {
+      "external_cost": "0",
+      "token": "0",
+      "tool": "0"
+    },
+    "created_at": "2026-08-05 17:02:02.887336+00:00",
+    "frozen_config": {
+      "agents": {
+        "business-investment": {
+          "sha256": "4e95b1697bb188336da621704977373e992152d5c11208b267bed95d77eb2f1c",
+          "version": "1.0"
+        },
+        "evaluation-manager": {
+          "sha256": "e2282abba0ca41d86e42ff2e86edd38d69a58f2de164ca095891d09e0a986bdf",
+          "version": "1.0"
+        },
+        "evidence-auditor": {
+          "sha256": "180c863b35f7666169f99a92e4c2ac90adbde0368e5942db4453a37543f0e091",
+          "version": "1.0"
+        },
+        "geo-policy-trend": {
+          "sha256": "3a46e3d8722ef0867c66b1536885daeff06142f4256b60da5baa42190577144f",
+          "version": "1.0"
+        },
+        "product-engineering": {
+          "sha256": "f6e7df418dc9525ae47e74702ddf916d401a6b2875af4a0188d8a667c03af186",
+          "version": "1.0"
+        },
+        "user-evidence": {
+          "sha256": "fc53673a2fbf1bd32ccfa0a00f4601b4b529e0cdc071a8f446437ab8da6ec099",
+          "version": "1.0"
+        }
+      },
+      "budget": {
+        "external_cost": "0",
+        "token": "0",
+        "tool": "0"
+      },
+      "execution_mode": "LOCAL_DETERMINISTIC_READONLY",
+      "failure_policy": {
+        "SUBMISSION_UNKNOWN": "NEEDS_ATTENTION_NO_RETRY"
+      },
+      "materials": [
+        {
+          "id": "edfdea2c-b7ad-4226-a23a-7788af3237f3",
+          "sha256": "b581554a746c6c7900894692d498662e55d2366e9ffc0551ab031f1bb4706409"
+        }
+      ],
+      "models": {
+        "deterministic-local-rules": "1.0"
+      },
+      "permissions": [
+        "repository.read"
+      ],
+      "product_version_id": "d91c3010-062e-4fe3-b7c8-98b6d32351bb",
+      "prompts": {
+        "local-evidence-synthesis": "1.0"
+      },
+      "schema_version": "1.0",
+      "skills": {
+        "browser-product-audit": "7213f2d1b2ba9c5003346fdf95f9b6f27fa15fcb80747dfad0de8535a4acf87e",
+        "business-investment-assessment": "480e67be1d98e57f2a65c06f0ee29c7679f623a8b90351f0ae9b36b234059777",
+        "evidence-grounding-audit": "45cbd0dcc1c5afc4fcfee862a2608ba9f305c4d0d34deac890c2e50bb6ee0d2c",
+        "intake-gap-diagnosis": "69ec850b751242bb6f01c03f4cbe08ceffa9c0d3ac5c5661230b79c293a29811",
+        "product-intake-normalizer": "0693e5f779790cb8e4e65910302fbe1cacc38f2fc35de227b5a1eceecf43d0f2",
+        "version-regression-verification": "e10cfe33ca094a5c81e0264b2a01166af6014f332f53d3eb6f0c4ebc60e9ad30"
+      },
+      "standard_version": "1.0",
+      "tools": {
+        "repository.read.v1": "1.0"
+      }
+    },
+    "manifest_sha256": "de4d8d74f3a465e84d9190d15aebd31482456aa879aeea73252ea2ed4ca18c88",
+    "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+    "security_policy": {
+      "permissions": [
+        "repository.read"
+      ],
+      "version": "1.0"
+    },
+    "tenant_id": "fe4792d5-e506-4d84-b161-6278b725b70f"
+  }
+]

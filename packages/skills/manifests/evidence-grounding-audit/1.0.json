@@ -1,0 +1,6 @@
+{
+  "schema_version": "1.0", "skill_code": "evidence-grounding-audit", "version": "1.0", "content_sha256": "45cbd0dcc1c5afc4fcfee862a2608ba9f305c4d0d34deac890c2e50bb6ee0d2c",
+  "input_schema": {"type": "object", "additionalProperties": false, "required": ["finding_ids"], "properties": {"finding_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "format": "uuid"}}}},
+  "output_schema": {"type": "object", "additionalProperties": false, "required": ["audit_results"], "properties": {"audit_results": {"type": "array", "items": {"type": "object"}}}},
+  "preconditions": ["finding_submitted"], "permissions": ["evidence.read", "finding.read"], "failure_classes": ["VALIDATION", "DEPENDENCY"], "budget": {"max_cost": 0, "currency": "unit"}, "evidence_requirements": ["finding_evidence_chain"], "lifecycle": {"status": "APPROVED", "rollback": "disable version"}, "may_write_business_state": false
+}

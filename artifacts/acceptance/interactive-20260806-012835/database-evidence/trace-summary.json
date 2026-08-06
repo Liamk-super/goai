@@ -1,0 +1,7 @@
+{
+  "durable_status_event_count": 7,
+  "note": "Durable status and handoff facts remain the replay source when no external OTel backend is configured.",
+  "structured_handoff_count": 4,
+  "trace_metadata": [],
+  "trace_metadata_count": 0
+}

@@ -1,0 +1,6 @@
+{
+  "schema_version": "1.0", "skill_code": "product-intake-normalizer", "version": "1.0", "content_sha256": "0693e5f779790cb8e4e65910302fbe1cacc38f2fc35de227b5a1eceecf43d0f2",
+  "input_schema": {"type": "object", "additionalProperties": false, "required": ["product_version_id", "material_ids"], "properties": {"product_version_id": {"type": "string", "format": "uuid"}, "material_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "format": "uuid"}}}},
+  "output_schema": {"type": "object", "additionalProperties": false, "required": ["profile_draft", "evidence_ids"], "properties": {"profile_draft": {"type": "object"}, "evidence_ids": {"type": "array", "items": {"type": "string", "format": "uuid"}}}},
+  "preconditions": ["validated_material"], "permissions": ["material.read"], "failure_classes": ["VALIDATION", "DEPENDENCY"], "budget": {"max_cost": 0, "currency": "unit"}, "evidence_requirements": ["material_hash"], "lifecycle": {"status": "APPROVED", "rollback": "disable version"}, "may_write_business_state": false
+}

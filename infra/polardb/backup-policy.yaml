@@ -1,0 +1,17 @@
+apiVersion: launchscope.io/v1alpha1
+kind: DatabaseRecoveryPolicy
+metadata:
+  name: launchscope-v01
+spec:
+  engine: PostgreSQL-compatible
+  localDemo:
+    highAvailabilityClaim: false
+    recoveryMode: checkpoint-and-replay
+  productionTarget:
+    rpoMinutes: 5
+    rtoMinutes: 30
+    managedBackups: true
+    pointInTimeRecovery: true
+  failClosedAfterRecovery:
+    statuses: [SUBMISSION_UNKNOWN, WAITING_FOR_APPROVAL, NEEDS_ATTENTION]
+    prohibitedActions: [retry, provider_switch, runtime_switch, resubmit, manual_settlement]

@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/events/decision-events.v1.json",
+  "title": "LaunchScope decision and report events v1",
+  "description": "T9 additive event family. The published evaluation event schema remains unchanged.",
+  "type": "object",
+  "oneOf": [
+    { "$ref": "#/$defs/DecisionReported" },
+    { "$ref": "#/$defs/VersionRegressionRecorded" }
+  ],
+  "x-contract-version": "1.0",
+  "x-compatibility": {
+    "consumer-rule": "accept-current-and-immediately-previous-released-minor",
+    "breaking-change": "new-major-file",
+    "published-schema-is-immutable": true
+  },
+  "$defs": {
+    "Uuid": { "type": "string", "format": "uuid" },
+    "DecisionReported": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "decision.reported" },
+            "payload": {
+              "type": "object",
+              "required": ["report_id", "decision_id", "standard_version", "recommendation", "result_sha256"],
+              "properties": {
+                "report_id": { "$ref": "#/$defs/Uuid" },
+                "decision_id": { "$ref": "#/$defs/Uuid" },
+                "standard_version": { "type": "string", "minLength": 1 },
+                "recommendation": { "enum": ["PROCEED", "VALIDATE_FURTHER", "ADJUST", "PAUSE"] },
+                "result_sha256": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    },
+    "VersionRegressionRecorded": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "version.regression.recorded" },
+            "payload": {
+              "type": "object",
+              "required": ["baseline_run_id", "candidate_run_id", "standard_version", "result", "comparable"],
+              "properties": {
+                "baseline_run_id": { "$ref": "#/$defs/Uuid" },
+                "candidate_run_id": { "$ref": "#/$defs/Uuid" },
+                "standard_version": { "type": "string", "minLength": 1 },
+                "result": { "enum": ["PASS", "FAIL", "INSUFFICIENT_EVIDENCE"] },
+                "comparable": { "type": "boolean" },
+                "supplemental_standard_version": { "type": "string", "minLength": 1 }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    }
+  }
+}

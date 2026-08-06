@@ -1,0 +1,158 @@
+{
+  "audits": [
+    {
+      "audited_at": "2026-08-05 16:59:24.168413+00:00",
+      "auditor_id": "evidence-auditor",
+      "decision": "DOWNGRADED",
+      "finding_id": "0f586255-4001-5542-9e50-d3c506d91299",
+      "id": "836ba440-4933-458c-b646-e9d57da29570",
+      "reason": "local fixture cannot establish external demand",
+      "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b"
+    },
+    {
+      "audited_at": "2026-08-05 16:59:24.168413+00:00",
+      "auditor_id": "evidence-auditor",
+      "decision": "DOWNGRADED",
+      "finding_id": "3bd9299c-0ce5-5616-8a87-8fed235e5654",
+      "id": "1965e589-b537-49f4-acd4-0f94d7a875c8",
+      "reason": "local fixture cannot establish external demand",
+      "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b"
+    },
+    {
+      "audited_at": "2026-08-05 17:02:02.887336+00:00",
+      "auditor_id": "evidence-auditor",
+      "decision": "DOWNGRADED",
+      "finding_id": "56a21811-4a5d-58a6-b9a2-f7da77927cdc",
+      "id": "365d6354-1e52-4da3-822f-14e4d4509929",
+      "reason": "local fixture cannot establish external demand",
+      "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e"
+    },
+    {
+      "audited_at": "2026-08-05 17:02:02.887336+00:00",
+      "auditor_id": "evidence-auditor",
+      "decision": "ACCEPTED",
+      "finding_id": "8588b144-ec58-5adf-bbf6-f774aae65a39",
+      "id": "54b8a445-3885-46f8-a7ab-ea5f1219c807",
+      "reason": "hash and scope verified",
+      "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e"
+    },
+    {
+      "audited_at": "2026-08-05 17:02:02.887336+00:00",
+      "auditor_id": "evidence-auditor",
+      "decision": "DOWNGRADED",
+      "finding_id": "b4ccdcd6-b59d-5b88-a5e3-62808c02cc54",
+      "id": "347195d4-83f5-40d5-a1c3-1ed70500ff74",
+      "reason": "local fixture cannot establish external demand",
+      "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e"
+    },
+    {
+      "audited_at": "2026-08-05 17:02:02.887336+00:00",
+      "auditor_id": "evidence-auditor",
+      "decision": "ACCEPTED",
+      "finding_id": "bc0ca975-ed70-5aee-810a-d584058c38d1",
+      "id": "b2b75f47-b146-48d0-a33f-ef716bf170ae",
+      "reason": "hash and scope verified",
+      "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e"
+    },
+    {
+      "audited_at": "2026-08-05 16:59:24.168413+00:00",
+      "auditor_id": "evidence-auditor",
+      "decision": "ACCEPTED",
+      "finding_id": "ed501cc7-acad-5101-be04-99fac23375c3",
+      "id": "d068a33d-9603-4b19-bed5-710b6e2aa519",
+      "reason": "hash and scope verified",
+      "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b"
+    },
+    {
+      "audited_at": "2026-08-05 16:59:24.168413+00:00",
+      "auditor_id": "evidence-auditor",
+      "decision": "ACCEPTED",
+      "finding_id": "f9d4bfb0-07fe-5a68-9234-d08bc485a502",
+      "id": "dcc5ed37-7523-4fd4-b53d-0a0079d4021a",
+      "reason": "hash and scope verified",
+      "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b"
+    }
+  ],
+  "findings": [
+    {
+      "claim_type": "FINDING",
+      "dimension_code": "PRODUCT_IMPLEMENTATION",
+      "grade": "MODERATE",
+      "hard_block": false,
+      "id": "f9d4bfb0-07fe-5a68-9234-d08bc485a502",
+      "is_hypothesis": false,
+      "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+      "simulated": false
+    },
+    {
+      "claim_type": "HYPOTHESIS",
+      "dimension_code": "USER_USAGE",
+      "grade": "INSUFFICIENT_EVIDENCE",
+      "hard_block": false,
+      "id": "3bd9299c-0ce5-5616-8a87-8fed235e5654",
+      "is_hypothesis": true,
+      "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+      "simulated": false
+    },
+    {
+      "claim_type": "FINDING",
+      "dimension_code": "BUSINESS_INVESTMENT",
+      "grade": "WEAK",
+      "hard_block": false,
+      "id": "ed501cc7-acad-5101-be04-99fac23375c3",
+      "is_hypothesis": false,
+      "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+      "simulated": false
+    },
+    {
+      "claim_type": "HYPOTHESIS",
+      "dimension_code": "GEO_POLICY_TREND",
+      "grade": "INSUFFICIENT_EVIDENCE",
+      "hard_block": false,
+      "id": "0f586255-4001-5542-9e50-d3c506d91299",
+      "is_hypothesis": true,
+      "run_id": "0004c98f-49b5-495a-b3fb-f818ef293d3b",
+      "simulated": false
+    },
+    {
+      "claim_type": "FINDING",
+      "dimension_code": "PRODUCT_IMPLEMENTATION",
+      "grade": "MODERATE",
+      "hard_block": false,
+      "id": "8588b144-ec58-5adf-bbf6-f774aae65a39",
+      "is_hypothesis": false,
+      "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+      "simulated": false
+    },
+    {
+      "claim_type": "HYPOTHESIS",
+      "dimension_code": "USER_USAGE",
+      "grade": "INSUFFICIENT_EVIDENCE",
+      "hard_block": false,
+      "id": "b4ccdcd6-b59d-5b88-a5e3-62808c02cc54",
+      "is_hypothesis": true,
+      "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+      "simulated": false
+    },
+    {
+      "claim_type": "FINDING",
+      "dimension_code": "BUSINESS_INVESTMENT",
+      "grade": "WEAK",
+      "hard_block": false,
+      "id": "bc0ca975-ed70-5aee-810a-d584058c38d1",
+      "is_hypothesis": false,
+      "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+      "simulated": false
+    },
+    {
+      "claim_type": "HYPOTHESIS",
+      "dimension_code": "GEO_POLICY_TREND",
+      "grade": "INSUFFICIENT_EVIDENCE",
+      "hard_block": false,
+      "id": "56a21811-4a5d-58a6-b9a2-f7da77927cdc",
+      "is_hypothesis": true,
+      "run_id": "47aa67fb-e1e5-45ae-9ea2-56aa9fc1762e",
+      "simulated": false
+    }
+  ]
+}

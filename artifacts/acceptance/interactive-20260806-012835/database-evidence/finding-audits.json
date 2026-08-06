@@ -1,0 +1,82 @@
+{
+  "audits": [
+    {
+      "audited_at": "2026-08-05 17:49:54.783091+00:00",
+      "auditor_id": "evidence-auditor",
+      "decision": "DOWNGRADED",
+      "finding_id": "3fa9a7f8-3d8d-588c-bfb0-c8d5e04c8392",
+      "id": "a75448b5-32e8-4a97-8e7e-0419b63b017c",
+      "reason": "local fixture cannot establish external demand",
+      "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8"
+    },
+    {
+      "audited_at": "2026-08-05 17:49:54.783091+00:00",
+      "auditor_id": "evidence-auditor",
+      "decision": "ACCEPTED",
+      "finding_id": "a364b7fb-7f99-5dfd-91be-f8261da8b0f1",
+      "id": "c160bfb5-6c26-4be6-abb0-1204879b7f82",
+      "reason": "hash and scope verified",
+      "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8"
+    },
+    {
+      "audited_at": "2026-08-05 17:49:54.783091+00:00",
+      "auditor_id": "evidence-auditor",
+      "decision": "ACCEPTED",
+      "finding_id": "b92f20f0-508f-5ab4-800b-65b66439937b",
+      "id": "482ee4ff-123d-4740-80a6-2a66ce225aa8",
+      "reason": "hash and scope verified",
+      "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8"
+    },
+    {
+      "audited_at": "2026-08-05 17:49:54.783091+00:00",
+      "auditor_id": "evidence-auditor",
+      "decision": "DOWNGRADED",
+      "finding_id": "d0f5826f-1bc4-59dc-b023-e32f68a48d97",
+      "id": "504d5a3b-bbdb-4c1b-ba90-c42be16cf7e8",
+      "reason": "local fixture cannot establish external demand",
+      "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8"
+    }
+  ],
+  "findings": [
+    {
+      "claim_type": "FINDING",
+      "dimension_code": "BUSINESS_INVESTMENT",
+      "grade": "WEAK",
+      "hard_block": false,
+      "id": "a364b7fb-7f99-5dfd-91be-f8261da8b0f1",
+      "is_hypothesis": false,
+      "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8",
+      "simulated": false
+    },
+    {
+      "claim_type": "HYPOTHESIS",
+      "dimension_code": "GEO_POLICY_TREND",
+      "grade": "INSUFFICIENT_EVIDENCE",
+      "hard_block": false,
+      "id": "3fa9a7f8-3d8d-588c-bfb0-c8d5e04c8392",
+      "is_hypothesis": true,
+      "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8",
+      "simulated": false
+    },
+    {
+      "claim_type": "FINDING",
+      "dimension_code": "PRODUCT_IMPLEMENTATION",
+      "grade": "MODERATE",
+      "hard_block": false,
+      "id": "b92f20f0-508f-5ab4-800b-65b66439937b",
+      "is_hypothesis": false,
+      "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8",
+      "simulated": false
+    },
+    {
+      "claim_type": "HYPOTHESIS",
+      "dimension_code": "USER_USAGE",
+      "grade": "INSUFFICIENT_EVIDENCE",
+      "hard_block": false,
+      "id": "d0f5826f-1bc4-59dc-b023-e32f68a48d97",
+      "is_hypothesis": true,
+      "run_id": "89e6bb20-6d11-4dde-9bed-31a0e2359af8",
+      "simulated": false
+    }
+  ]
+}

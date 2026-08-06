@@ -1,0 +1,10 @@
+{
+  "version": "v1.2.0",
+  "release_commit": "793db24",
+  "windows_installer_url": "https://raw.githubusercontent.com/agentscope-ai/AgentTeams/v1.2.0/install/agentteams-install.ps1",
+  "windows_installer_sha256": "f46a6b0a4e676bf4557f83448bfdb59fdb872a01349a1320a1aedbdb2db7bb41",
+  "unix_installer_url": "https://raw.githubusercontent.com/agentscope-ai/AgentTeams/v1.2.0/install/agentteams-install.sh",
+  "unix_installer_sha256": "701f53c53dc476d8ca7f33428e231c1706d967ac2b517ec4c1c59d742864331d",
+  "api_version": "agentteams.io/v1beta1",
+  "mode": "embedded"
+}

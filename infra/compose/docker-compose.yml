@@ -1,0 +1,178 @@
+name: launchscope
+
+x-launchscope-labels: &launchscope-labels
+  com.launchscope.stack: "v0.2"
+  com.launchscope.secret-policy: "external-reference-only"
+
+services:
+  postgres:
+    image: postgres:16.4-alpine@sha256:5660c2cbfea50c7a9127d17dc4e48543eedd3d7a41a595a2dfa572471e37e64c
+    init: true
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-launchscope}
+      POSTGRES_USER: ${POSTGRES_USER:-launchscope}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks: [launchscope]
+    labels: *launchscope-labels
+
+  minio:
+    image: minio/minio:RELEASE.2024-10-13T13-34-11Z@sha256:9535594ad4122b7a78c6632788a989b96d9199b483d3bd71a5ceae73a922cdfa
+    init: true
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-}
+      MINIO_API_CORS_ALLOW_ORIGIN: ${MINIO_API_CORS_ALLOW_ORIGIN:-http://127.0.0.1:3000}
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fsS http://127.0.0.1:9000/minio/health/live >/dev/null",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks: [launchscope]
+    labels: *launchscope-labels
+
+  rocketmq-namesrv:
+    image: apache/rocketmq:5.3.2@sha256:4a80ff5cd4b0a3d3ef6dc338ce2028a85bd995648cb3aa5c3e753746d2dbc587
+    init: true
+    command: ["sh", "mqnamesrv"]
+    ports:
+      - "${ROCKETMQ_NAMESRV_PORT:-9876}:9876"
+    healthcheck:
+      test:
+        ["CMD-SHELL", "test -f /home/rocketmq/logs/rocketmqlogs/namesrv.log"]
+      interval: 5s
+      timeout: 5s
+      retries: 18
+    networks: [launchscope]
+    labels: *launchscope-labels
+
+  rocketmq-broker:
+    image: apache/rocketmq:5.3.2@sha256:4a80ff5cd4b0a3d3ef6dc338ce2028a85bd995648cb3aa5c3e753746d2dbc587
+    init: true
+    depends_on:
+      rocketmq-namesrv:
+        condition: service_healthy
+    command: ["sh", "mqbroker"]
+    environment:
+      NAMESRV_ADDR: rocketmq-namesrv:9876
+    ports:
+      - "${ROCKETMQ_BROKER_VIP_PORT:-10909}:10909"
+      - "${ROCKETMQ_BROKER_PORT:-10911}:10911"
+      - "${ROCKETMQ_BROKER_HA_PORT:-10912}:10912"
+    volumes:
+      - rocketmq-store:/home/rocketmq/store
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /home/rocketmq/logs/rocketmqlogs/broker.log"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+    networks: [launchscope]
+    labels: *launchscope-labels
+
+  rocketmq-proxy:
+    image: apache/rocketmq:5.3.2@sha256:4a80ff5cd4b0a3d3ef6dc338ce2028a85bd995648cb3aa5c3e753746d2dbc587
+    init: true
+    depends_on:
+      rocketmq-namesrv:
+        condition: service_healthy
+      rocketmq-broker:
+        condition: service_healthy
+    command: ["sh", "mqproxy", "-n", "rocketmq-namesrv:9876"]
+    environment:
+      NAMESRV_ADDR: rocketmq-namesrv:9876
+    ports:
+      - "${ROCKETMQ_PROXY_PORT:-8081}:8081"
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /home/rocketmq/logs/rocketmqlogs/proxy.log"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+    networks: [launchscope]
+    labels: *launchscope-labels
+
+  nacos:
+    image: nacos/nacos-server:v2.5.1@sha256:00774155ca5816f81d8bdc9e3a73d2f41f40542c3bc47bbce7791d1cec9d3fae
+    init: true
+    environment:
+      MODE: standalone
+      NACOS_AUTH_ENABLE: ${NACOS_AUTH_ENABLE:-false}
+    ports:
+      - "${NACOS_PORT:-8848}:8848"
+      - "${NACOS_CLIENT_PORT:-9848}:9848"
+      - "${NACOS_CLIENT_TLS_PORT:-9849}:9849"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fsS http://127.0.0.1:8848/nacos/actuator/health >/dev/null",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+    networks: [launchscope]
+    labels: *launchscope-labels
+
+  higress:
+    image: higress-registry.cn-hangzhou.cr.aliyuncs.com/higress/all-in-one@sha256:fe52b99a756fea5c95f633a43fdfe085976ffd09d6a43165db3ffe31a53467e0
+    init: true
+    environment:
+      MODE: ${HIGRESS_MODE:-full}
+      USE_PLUGIN_SERVER: "on"
+    ports:
+      - "${HIGRESS_CONSOLE_PORT:-8001}:8001"
+      - "${HIGRESS_HTTP_PORT:-8080}:8080"
+      - "${HIGRESS_HTTPS_PORT:-8443}:8443"
+    volumes:
+      - higress-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8001/ >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+    networks: [launchscope]
+    labels: *launchscope-labels
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.109.0@sha256:af0f72b2d2493fc17f06cf3bc136548240cd7ebb2c8b1c8a7be6f3eb03068389
+    init: true
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    ports:
+      - "${OTEL_GRPC_PORT:-4317}:4317"
+      - "${OTEL_HTTP_PORT:-4318}:4318"
+      - "${OTEL_HEALTH_PORT:-13133}:13133"
+    volumes:
+      - ./otel-collector.yaml:/etc/otelcol-contrib/config.yaml:ro
+    networks: [launchscope]
+    labels: *launchscope-labels
+
+volumes:
+  postgres-data:
+    name: launchscope-postgres-data
+  minio-data:
+    name: launchscope-minio-data
+  rocketmq-store:
+    name: launchscope-rocketmq-store
+  higress-data:
+    name: launchscope-higress-data
+
+networks:
+  launchscope:
+    name: launchscope-network

@@ -1,0 +1,88 @@
+[build-system]
+requires = ["setuptools>=75,<81"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "launchscope-workspace"
+version = "0.1.0"
+description = "LaunchScope V0.1 Python workspace configuration"
+requires-python = ">=3.11,<3.15"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "jsonschema>=4.23,<5",
+  "alembic>=1.14,<2",
+  "mypy>=1.13,<2",
+  "psycopg[binary]>=3.2,<4",
+  "pytest>=8.3,<9",
+  "PyYAML>=6.0.2,<7",
+  "referencing>=0.35,<1",
+  "ruff>=0.8,<1",
+  "SQLAlchemy>=2.0.36,<3",
+  "types-PyYAML>=6.0.12,<7"
+]
+
+[tool.setuptools]
+py-modules = []
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+src = [
+  "apps/api/src",
+  "apps/orchestrator/src",
+  "apps/worker/src",
+  "packages/domain/src",
+  "packages/contracts/src",
+  "packages/skills/src",
+  "packages/observability/src"
+]
+extend-exclude = [".git", ".venv", "node_modules", "dist", "build"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# T1 contract tests are frozen artifacts; keep their source text unchanged
+# while allowing the workspace lint command to cover later implementation code.
+"packages/contracts/tests/*.py" = ["E501", "I001"]
+
+[tool.pytest.ini_options]
+testpaths = ["packages", "apps", "tests"]
+pythonpath = [
+  "apps/api/src",
+  "apps/orchestrator/src",
+  "apps/worker/src",
+  "packages/domain/src",
+  "packages/contracts/src",
+  "packages/skills/src",
+  "packages/observability/src"
+]
+addopts = "-ra"
+
+[tool.mypy]
+python_version = "3.11"
+explicit_package_bases = true
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_incomplete_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+mypy_path = [
+  "apps/api/src",
+  "apps/orchestrator/src",
+  "apps/worker/src",
+  "packages/domain/src",
+  "packages/contracts/src",
+  "packages/skills/src",
+  "packages/observability/src"
+]
+exclude = [
+  "(?x)(^|[\\\\/])(tests?|migrations)([\\\\/]|$)",
+]
+
+[[tool.mypy.overrides]]
+module = "launchscope_api.infrastructure.db.schema"
+disable_error_code = ["arg-type", "type-arg"]

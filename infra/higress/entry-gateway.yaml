@@ -1,0 +1,11 @@
+apiVersion: networking.higress.io/v1alpha1
+kind: McpBridgePolicy
+metadata:
+  name: launchscope-worker-entry
+spec:
+  target: worker
+  denyAmbientCredentials: true
+  denyShell: true
+  denyRepositoryWrite: true
+  defaultNetwork: deny
+  allowedCallers: [orchestrator]

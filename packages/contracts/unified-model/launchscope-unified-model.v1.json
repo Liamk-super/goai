@@ -1,0 +1,822 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/unified-model/launchscope-unified-model.v1.json",
+  "title": "LaunchScope UnifiedModel v1",
+  "description": "A versioned semantic exchange snapshot for cross-Agent handoff, external mapping and filtered retrieval. It is not the transaction model.",
+  "type": "object",
+  "required": [
+    "model_type",
+    "schema_version",
+    "model_instance_id",
+    "tenant_id",
+    "project_id",
+    "entities",
+    "relations",
+    "provenance",
+    "transaction_authority"
+  ],
+  "properties": {
+    "model_type": {
+      "const": "launchscope.unified-model"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "model_instance_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "tenant_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "workspace_id": {
+      "type": ["string", "null"],
+      "format": "uuid"
+    },
+    "project_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "entities": {
+      "type": "object",
+      "required": [
+        "products",
+        "versions",
+        "runs",
+        "agents",
+        "tasks",
+        "skills",
+        "tools",
+        "hypotheses",
+        "findings",
+        "evidence",
+        "decisions"
+      ],
+      "properties": {
+        "products": { "type": "array", "items": { "$ref": "#/$defs/Product" } },
+        "versions": { "type": "array", "items": { "$ref": "#/$defs/ProductVersion" } },
+        "runs": { "type": "array", "items": { "$ref": "#/$defs/EvaluationRun" } },
+        "agents": { "type": "array", "items": { "$ref": "#/$defs/AgentIdentity" } },
+        "tasks": { "type": "array", "items": { "$ref": "#/$defs/Task" } },
+        "skills": { "type": "array", "items": { "$ref": "#/$defs/SkillContract" } },
+        "tools": { "type": "array", "items": { "$ref": "#/$defs/ToolContract" } },
+        "hypotheses": { "type": "array", "items": { "$ref": "#/$defs/Hypothesis" } },
+        "findings": { "type": "array", "items": { "$ref": "#/$defs/Finding" } },
+        "evidence": { "type": "array", "items": { "$ref": "#/$defs/Evidence" } },
+        "decisions": { "type": "array", "items": { "$ref": "#/$defs/Decision" } }
+      },
+      "additionalProperties": false
+    },
+    "relations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Relation" }
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "transaction_authority": {
+      "$ref": "#/$defs/TransactionAuthority"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "Version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "SourceRef": {
+      "type": "object",
+      "required": ["system", "resource_type", "resource_id", "version"],
+      "properties": {
+        "system": { "type": "string", "minLength": 1 },
+        "resource_type": { "type": "string", "minLength": 1 },
+        "resource_id": { "type": "string", "minLength": 1 },
+        "version": { "$ref": "#/$defs/Version" }
+      },
+      "additionalProperties": false
+    },
+    "EntityBase": {
+      "type": "object",
+      "required": ["entity_id", "entity_type", "entity_version", "source_ref"],
+      "properties": {
+        "entity_id": { "type": "string", "minLength": 1 },
+        "entity_type": { "type": "string", "minLength": 1 },
+        "entity_version": { "$ref": "#/$defs/Version" },
+        "source_ref": { "$ref": "#/$defs/SourceRef" }
+      }
+    },
+    "Product": {
+      "allOf": [
+        { "$ref": "#/$defs/EntityBase" },
+        {
+          "type": "object",
+          "properties": {
+            "entity_type": { "const": "Product" },
+            "project_id": { "$ref": "#/$defs/Uuid" },
+            "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+            "status_projection": { "type": "string", "minLength": 1 }
+          },
+          "required": ["entity_type", "project_id", "name"]
+        }
+      ]
+    },
+    "ProductVersion": {
+      "allOf": [
+        { "$ref": "#/$defs/EntityBase" },
+        {
+          "type": "object",
+          "properties": {
+            "entity_type": { "const": "ProductVersion" },
+            "product_id": { "$ref": "#/$defs/Uuid" },
+            "label": { "type": "string", "minLength": 1 },
+            "material_refs": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+            "status_projection": { "type": "string", "minLength": 1 }
+          },
+          "required": ["entity_type", "product_id", "label", "material_refs"]
+        }
+      ]
+    },
+    "EvaluationRun": {
+      "allOf": [
+        { "$ref": "#/$defs/EntityBase" },
+        {
+          "type": "object",
+          "properties": {
+            "entity_type": { "const": "EvaluationRun" },
+            "run_id": { "$ref": "#/$defs/Uuid" },
+            "product_version_id": { "$ref": "#/$defs/Uuid" },
+            "status_projection": { "type": "string", "minLength": 1 },
+            "standard_version": { "$ref": "#/$defs/Version" },
+            "run_manifest_ref": { "type": "string", "minLength": 1 }
+          },
+          "required": ["entity_type", "run_id", "product_version_id", "status_projection", "standard_version", "run_manifest_ref"]
+        }
+      ]
+    },
+    "AgentIdentity": {
+      "type": "object",
+      "required": [
+        "entity_id",
+        "entity_type",
+        "entity_version",
+        "source_ref",
+        "agent_identity_ref",
+        "version",
+        "role",
+        "responsibilities",
+        "input_contract_ref",
+        "output_contract_ref",
+        "allowed_skill_refs",
+        "allowed_tool_refs",
+        "can_submit",
+        "forbidden_actions"
+      ],
+      "properties": {
+        "entity_id": { "$ref": "#/$defs/Uuid" },
+        "entity_type": { "const": "AgentIdentity" },
+        "entity_version": { "$ref": "#/$defs/Version" },
+        "source_ref": { "$ref": "#/$defs/SourceRef" },
+        "agent_identity_ref": { "type": "string", "minLength": 1 },
+        "version": { "$ref": "#/$defs/Version" },
+        "role": {
+          "type": "string",
+          "enum": [
+            "EVALUATION_MANAGER",
+            "PRODUCT_ENGINEERING",
+            "USER_EVIDENCE",
+            "BUSINESS_INVESTMENT",
+            "GEO_POLICY_TREND",
+            "EVIDENCE_AUDITOR"
+          ]
+        },
+        "responsibilities": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "input_contract_ref": { "type": "string", "minLength": 1 },
+        "output_contract_ref": { "type": "string", "minLength": 1 },
+        "allowed_skill_refs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "allowed_tool_refs": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "can_submit": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "enum": ["FINDING", "STATE_CHANGE_REQUEST", "MEMORY_CANDIDATE"] }
+        },
+        "forbidden_actions": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      },
+      "additionalProperties": false
+    },
+    "Task": {
+      "allOf": [
+        { "$ref": "#/$defs/EntityBase" },
+        {
+          "type": "object",
+          "properties": {
+            "entity_type": { "const": "Task" },
+            "task_id": { "$ref": "#/$defs/Uuid" },
+            "run_id": { "$ref": "#/$defs/Uuid" },
+            "stage_code": { "type": "string", "minLength": 1 },
+            "agent_identity_ref": { "type": "string", "minLength": 1 },
+            "skill_ref": { "type": "string", "minLength": 1 },
+            "dependencies": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/Uuid" } },
+            "status_projection": { "type": "string", "minLength": 1 }
+          },
+          "required": ["entity_type", "task_id", "run_id", "stage_code", "agent_identity_ref", "skill_ref", "dependencies", "status_projection"]
+        }
+      ]
+    },
+    "SkillContract": {
+      "type": "object",
+      "required": [
+        "entity_id",
+        "entity_type",
+        "entity_version",
+        "source_ref",
+        "skill_ref",
+        "version",
+        "tier",
+        "input_schema_ref",
+        "output_schema_ref",
+        "preconditions",
+        "permissions",
+        "failure_classes",
+        "budget",
+        "evidence_requirements",
+        "may_write_business_state",
+        "lifecycle"
+      ],
+      "properties": {
+        "entity_id": { "$ref": "#/$defs/Uuid" },
+        "entity_type": { "const": "Skill" },
+        "entity_version": { "$ref": "#/$defs/Version" },
+        "source_ref": { "$ref": "#/$defs/SourceRef" },
+        "skill_ref": { "type": "string", "minLength": 1 },
+        "version": { "$ref": "#/$defs/Version" },
+        "tier": { "type": "string", "enum": ["P0", "P1", "REFERENCE"] },
+        "input_schema_ref": { "type": "string", "minLength": 1 },
+        "output_schema_ref": { "type": "string", "minLength": 1 },
+        "preconditions": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "permissions": {
+          "type": "object",
+          "required": ["network_level", "allowed_domains", "allowed_actions"],
+          "properties": {
+            "network_level": { "type": "string", "enum": ["NONE", "PUBLIC_RESEARCH", "AUTHENTICATED_RESEARCH", "EXTERNAL_ACTION"] },
+            "allowed_domains": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+            "allowed_actions": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+          },
+          "additionalProperties": false
+        },
+        "failure_classes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "enum": ["TRANSIENT", "VALIDATION", "AUTHORIZATION", "DEPENDENCY", "BUDGET", "POLICY", "SUBMISSION_UNKNOWN", "BUSINESS"] }
+        },
+        "budget": {
+          "type": "object",
+          "required": ["max_duration_seconds", "max_cost"],
+          "properties": {
+            "max_duration_seconds": { "type": "integer", "minimum": 1 },
+            "max_cost": { "type": "number", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "evidence_requirements": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "may_write_business_state": { "const": false },
+        "lifecycle": { "type": "string", "enum": ["PROPOSED", "ACTIVE", "DEPRECATED"] }
+      },
+      "additionalProperties": false,
+      "if": {
+        "required": ["tier"],
+        "properties": { "tier": { "const": "P0" } }
+      },
+      "then": {
+        "properties": {
+          "skill_ref": {
+            "enum": [
+              "product-intake-normalizer",
+              "intake-gap-diagnosis",
+              "browser-product-audit",
+              "business-investment-assessment",
+              "evidence-grounding-audit",
+              "version-regression-verification"
+            ]
+          }
+        }
+      }
+    },
+    "ToolContract": {
+      "type": "object",
+      "required": ["entity_id", "entity_type", "entity_version", "source_ref", "tool_ref", "version", "risk_tier", "network_level", "allowed_actions", "read_only"],
+      "properties": {
+        "entity_id": { "$ref": "#/$defs/Uuid" },
+        "entity_type": { "const": "Tool" },
+        "entity_version": { "$ref": "#/$defs/Version" },
+        "source_ref": { "$ref": "#/$defs/SourceRef" },
+        "tool_ref": { "type": "string", "minLength": 1 },
+        "version": { "$ref": "#/$defs/Version" },
+        "risk_tier": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH"] },
+        "network_level": { "type": "string", "enum": ["NONE", "PUBLIC_RESEARCH", "AUTHENTICATED_RESEARCH", "EXTERNAL_ACTION"] },
+        "allowed_actions": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "read_only": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "Hypothesis": {
+      "allOf": [
+        { "$ref": "#/$defs/EntityBase" },
+        {
+          "type": "object",
+          "properties": {
+            "entity_type": { "const": "Hypothesis" },
+            "hypothesis_id": { "$ref": "#/$defs/Uuid" },
+            "statement": { "type": "string", "minLength": 1 },
+            "status": { "type": "string", "enum": ["OPEN", "SUPPORTED", "REFUTED", "SUPERSEDED"] },
+            "evidence_refs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/Uuid" } }
+          },
+          "required": ["entity_type", "hypothesis_id", "statement", "status", "evidence_refs"]
+        }
+      ]
+    },
+    "Finding": {
+      "allOf": [
+        { "$ref": "#/$defs/EntityBase" },
+        {
+          "type": "object",
+          "properties": {
+            "entity_type": { "const": "Finding" },
+            "finding_id": { "$ref": "#/$defs/Uuid" },
+            "dimension_code": { "type": "string", "enum": ["PRODUCT_IMPLEMENTATION", "USER_USAGE", "BUSINESS_INVESTMENT", "GEO_POLICY_TREND"] },
+            "grade": { "type": "string", "enum": ["STRONG", "MODERATE", "WEAK", "INSUFFICIENT_EVIDENCE"] },
+            "evidence_refs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/Uuid" } },
+            "is_hypothesis": { "type": "boolean" },
+            "supersedes_id": { "anyOf": [{ "$ref": "#/$defs/Uuid" }, { "type": "null" }] }
+          },
+          "required": ["entity_type", "finding_id", "dimension_code", "grade", "evidence_refs", "is_hypothesis", "supersedes_id"]
+        }
+      ]
+    },
+    "Evidence": {
+      "allOf": [
+        { "$ref": "#/$defs/EntityBase" },
+        {
+          "type": "object",
+          "properties": {
+            "entity_type": { "const": "Evidence" },
+            "evidence_id": { "$ref": "#/$defs/Uuid" },
+            "source_type": { "type": "string", "enum": ["MATERIAL", "PUBLIC_RESEARCH", "AUTHENTICATED_RESEARCH", "DERIVED"] },
+            "trust_level": { "type": "string", "enum": ["E0", "E1", "E2", "E3", "E4", "E5"] },
+            "object_ref": { "type": "string", "minLength": 1 },
+            "sha256": { "type": "string", "pattern": "^[A-Fa-f0-9]{64}$" },
+            "captured_at": { "type": "string", "format": "date-time" },
+            "access_scope": { "type": "string", "enum": ["TENANT", "WORKSPACE", "PROJECT", "RUN"] }
+          },
+          "required": ["entity_type", "evidence_id", "source_type", "trust_level", "object_ref", "sha256", "captured_at", "access_scope"]
+        }
+      ]
+    },
+    "Decision": {
+      "allOf": [
+        { "$ref": "#/$defs/EntityBase" },
+        {
+          "type": "object",
+          "properties": {
+            "entity_type": { "const": "Decision" },
+            "decision_id": { "$ref": "#/$defs/Uuid" },
+            "recommendation": { "type": "string", "enum": ["PROCEED", "VALIDATE_FURTHER", "ADJUST", "PAUSE"] },
+            "standard_version": { "$ref": "#/$defs/Version" },
+            "dimension_grades": {
+              "type": "object",
+              "properties": {
+                "PRODUCT_IMPLEMENTATION": { "type": "string", "enum": ["STRONG", "MODERATE", "WEAK", "INSUFFICIENT_EVIDENCE"] },
+                "USER_USAGE": { "type": "string", "enum": ["STRONG", "MODERATE", "WEAK", "INSUFFICIENT_EVIDENCE"] },
+                "BUSINESS_INVESTMENT": { "type": "string", "enum": ["STRONG", "MODERATE", "WEAK", "INSUFFICIENT_EVIDENCE"] },
+                "GEO_POLICY_TREND": { "type": "string", "enum": ["STRONG", "MODERATE", "WEAK", "INSUFFICIENT_EVIDENCE"] }
+              },
+              "additionalProperties": false
+            },
+            "finding_refs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/Uuid" } },
+            "blocking_reasons": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+          },
+          "required": ["entity_type", "decision_id", "recommendation", "standard_version", "dimension_grades", "finding_refs", "blocking_reasons"]
+        }
+      ]
+    },
+    "Relation": {
+      "type": "object",
+      "required": ["relation_id", "relation_type", "from_ref", "to_ref", "relation_version"],
+      "properties": {
+        "relation_id": { "$ref": "#/$defs/Uuid" },
+        "relation_type": {
+          "type": "string",
+          "enum": ["PROJECT_HAS_VERSION", "RUN_FOR_VERSION", "TASK_ASSIGNED_TO_AGENT", "TASK_USES_SKILL", "FINDING_SUPPORTED_BY_EVIDENCE", "DECISION_INCLUDES_FINDING", "FINDING_SUPERSEDES_FINDING"]
+        },
+        "from_ref": { "type": "string", "minLength": 1 },
+        "to_ref": { "type": "string", "minLength": 1 },
+        "relation_version": { "$ref": "#/$defs/Version" }
+      },
+      "additionalProperties": false
+    },
+    "Provenance": {
+      "type": "object",
+      "required": ["producer", "created_at", "correlation_id", "source_event_ids", "source_transaction_ids"],
+      "properties": {
+        "producer": { "type": "string", "minLength": 1 },
+        "created_at": { "type": "string", "format": "date-time" },
+        "correlation_id": { "$ref": "#/$defs/Uuid" },
+        "source_event_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/Uuid" } },
+        "source_transaction_ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+      },
+      "additionalProperties": false
+    },
+    "TransactionAuthority": {
+      "type": "object",
+      "required": ["system", "owns"],
+      "properties": {
+        "system": { "const": "postgresql" },
+        "owns": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "enum": ["business_state", "approval", "budget", "idempotency", "audit"] }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "examples": [
+    {
+      "model_type": "launchscope.unified-model",
+      "schema_version": "1.0",
+      "model_instance_id": "11111111-2222-4333-8444-555555555555",
+      "tenant_id": "21111111-2222-4333-8444-555555555555",
+      "workspace_id": "31111111-2222-4333-8444-555555555555",
+      "project_id": "41111111-2222-4333-8444-555555555555",
+      "entities": {
+        "products": [
+          {
+            "entity_id": "41111111-2222-4333-8444-555555555555",
+            "entity_type": "Product",
+            "entity_version": "1.0",
+            "source_ref": { "system": "postgresql", "resource_type": "project", "resource_id": "41111111-2222-4333-8444-555555555555", "version": "1.0" },
+            "project_id": "41111111-2222-4333-8444-555555555555",
+            "name": "Unselected product",
+            "status_projection": "DRAFT"
+          }
+        ],
+        "versions": [
+          {
+            "entity_id": "51111111-2222-4333-8444-555555555555",
+            "entity_type": "ProductVersion",
+            "entity_version": "1.0",
+            "source_ref": { "system": "postgresql", "resource_type": "product_version", "resource_id": "51111111-2222-4333-8444-555555555555", "version": "1.0" },
+            "product_id": "41111111-2222-4333-8444-555555555555",
+            "label": "V1",
+            "material_refs": ["material:61111111-2222-4333-8444-555555555555"],
+            "status_projection": "SUBMITTED"
+          }
+        ],
+        "runs": [
+          {
+            "entity_id": "71111111-2222-4333-8444-555555555555",
+            "entity_type": "EvaluationRun",
+            "entity_version": "1.0",
+            "source_ref": { "system": "postgresql", "resource_type": "evaluation_run", "resource_id": "71111111-2222-4333-8444-555555555555", "version": "1.0" },
+            "run_id": "71111111-2222-4333-8444-555555555555",
+            "product_version_id": "51111111-2222-4333-8444-555555555555",
+            "status_projection": "DRAFT",
+            "standard_version": "1.0",
+            "run_manifest_ref": "run-manifest:81111111-2222-4333-8444-555555555555"
+          }
+        ],
+        "agents": [
+          {
+            "entity_id": "91111111-2222-4333-8444-555555555555",
+            "entity_type": "AgentIdentity",
+            "entity_version": "1.0",
+            "source_ref": { "system": "nacos", "resource_type": "agent_identity", "resource_id": "evaluation-manager", "version": "1.0" },
+            "agent_identity_ref": "evaluation-manager",
+            "version": "1.0",
+            "role": "EVALUATION_MANAGER",
+            "responsibilities": ["plan and coordinate evaluation tasks"],
+            "input_contract_ref": "agent-input:1.0",
+            "output_contract_ref": "agent-output:1.0",
+            "allowed_skill_refs": ["intake-gap-diagnosis"],
+            "allowed_tool_refs": [],
+            "can_submit": ["STATE_CHANGE_REQUEST"],
+            "forbidden_actions": ["directly mutate final run state", "write long-term memory"]
+          },
+          {
+            "entity_id": "a1111111-2222-4333-8444-555555555555",
+            "entity_type": "AgentIdentity",
+            "entity_version": "1.0",
+            "source_ref": { "system": "nacos", "resource_type": "agent_identity", "resource_id": "product-engineering", "version": "1.0" },
+            "agent_identity_ref": "product-engineering",
+            "version": "1.0",
+            "role": "PRODUCT_ENGINEERING",
+            "responsibilities": ["assess product operation and technical delivery"],
+            "input_contract_ref": "agent-input:1.0",
+            "output_contract_ref": "agent-output:1.0",
+            "allowed_skill_refs": ["browser-product-audit"],
+            "allowed_tool_refs": ["read-only-product-audit"],
+            "can_submit": ["FINDING"],
+            "forbidden_actions": ["evaluate investment value", "write production state"]
+          },
+          {
+            "entity_id": "b1111111-2222-4333-8444-555555555555",
+            "entity_type": "AgentIdentity",
+            "entity_version": "1.0",
+            "source_ref": { "system": "nacos", "resource_type": "agent_identity", "resource_id": "user-evidence", "version": "1.0" },
+            "agent_identity_ref": "user-evidence",
+            "version": "1.0",
+            "role": "USER_EVIDENCE",
+            "responsibilities": ["identify user evidence and evidence gaps"],
+            "input_contract_ref": "agent-input:1.0",
+            "output_contract_ref": "agent-output:1.0",
+            "allowed_skill_refs": ["product-intake-normalizer"],
+            "allowed_tool_refs": [],
+            "can_submit": ["FINDING", "MEMORY_CANDIDATE"],
+            "forbidden_actions": ["present simulated users as real users", "write long-term memory directly"]
+          },
+          {
+            "entity_id": "c1111111-2222-4333-8444-555555555555",
+            "entity_type": "AgentIdentity",
+            "entity_version": "1.0",
+            "source_ref": { "system": "nacos", "resource_type": "agent_identity", "resource_id": "business-investment", "version": "1.0" },
+            "agent_identity_ref": "business-investment",
+            "version": "1.0",
+            "role": "BUSINESS_INVESTMENT",
+            "responsibilities": ["assess pricing cost channel and investment conditions"],
+            "input_contract_ref": "agent-input:1.0",
+            "output_contract_ref": "agent-output:1.0",
+            "allowed_skill_refs": ["business-investment-assessment"],
+            "allowed_tool_refs": [],
+            "can_submit": ["FINDING"],
+            "forbidden_actions": ["publish or purchase anything", "write production state"]
+          },
+          {
+            "entity_id": "d1111111-2222-4333-8444-555555555555",
+            "entity_type": "AgentIdentity",
+            "entity_version": "1.0",
+            "source_ref": { "system": "nacos", "resource_type": "agent_identity", "resource_id": "geo-policy-trend", "version": "1.0" },
+            "agent_identity_ref": "geo-policy-trend",
+            "version": "1.0",
+            "role": "GEO_POLICY_TREND",
+            "responsibilities": ["assess regional policy and time-bounded trends"],
+            "input_contract_ref": "agent-input:1.0",
+            "output_contract_ref": "agent-output:1.0",
+            "allowed_skill_refs": ["evidence-grounding-audit"],
+            "allowed_tool_refs": [],
+            "can_submit": ["FINDING"],
+            "forbidden_actions": ["treat search summaries as facts", "write production state"]
+          },
+          {
+            "entity_id": "e1111111-2222-4333-8444-555555555555",
+            "entity_type": "AgentIdentity",
+            "entity_version": "1.0",
+            "source_ref": { "system": "nacos", "resource_type": "agent_identity", "resource_id": "evidence-auditor", "version": "1.0" },
+            "agent_identity_ref": "evidence-auditor",
+            "version": "1.0",
+            "role": "EVIDENCE_AUDITOR",
+            "responsibilities": ["audit source scope freshness and conflicts"],
+            "input_contract_ref": "agent-input:1.0",
+            "output_contract_ref": "agent-output:1.0",
+            "allowed_skill_refs": ["evidence-grounding-audit"],
+            "allowed_tool_refs": [],
+            "can_submit": ["STATE_CHANGE_REQUEST"],
+            "forbidden_actions": ["rewrite original findings", "approve its own external action"]
+          }
+        ],
+        "tasks": [
+          {
+            "entity_id": "f1111111-2222-4333-8444-555555555555",
+            "entity_type": "Task",
+            "entity_version": "1.0",
+            "source_ref": { "system": "postgresql", "resource_type": "task", "resource_id": "f1111111-2222-4333-8444-555555555555", "version": "1.0" },
+            "task_id": "f1111111-2222-4333-8444-555555555555",
+            "run_id": "71111111-2222-4333-8444-555555555555",
+            "stage_code": "GAP_ANALYSIS",
+            "agent_identity_ref": "evaluation-manager",
+            "skill_ref": "intake-gap-diagnosis",
+            "dependencies": [],
+            "status_projection": "PLANNED"
+          }
+        ],
+        "skills": [
+          {
+            "entity_id": "12111111-2222-4333-8444-555555555555",
+            "entity_type": "Skill",
+            "entity_version": "1.0",
+            "source_ref": { "system": "nacos", "resource_type": "skill", "resource_id": "product-intake-normalizer", "version": "1.0" },
+            "skill_ref": "product-intake-normalizer",
+            "version": "1.0",
+            "tier": "P0",
+            "input_schema_ref": "skill-input:product-intake-normalizer:1.0",
+            "output_schema_ref": "skill-output:product-intake-normalizer:1.0",
+            "preconditions": ["material is isolated and hash checked"],
+            "permissions": { "network_level": "NONE", "allowed_domains": [], "allowed_actions": ["read-isolated-material"] },
+            "failure_classes": ["VALIDATION", "POLICY"],
+            "budget": { "max_duration_seconds": 120, "max_cost": 0 },
+            "evidence_requirements": ["material hash"],
+            "may_write_business_state": false,
+            "lifecycle": "ACTIVE"
+          },
+          {
+            "entity_id": "13111111-2222-4333-8444-555555555555",
+            "entity_type": "Skill",
+            "entity_version": "1.0",
+            "source_ref": { "system": "nacos", "resource_type": "skill", "resource_id": "intake-gap-diagnosis", "version": "1.0" },
+            "skill_ref": "intake-gap-diagnosis",
+            "version": "1.0",
+            "tier": "P0",
+            "input_schema_ref": "skill-input:intake-gap-diagnosis:1.0",
+            "output_schema_ref": "skill-output:intake-gap-diagnosis:1.0",
+            "preconditions": ["product profile draft exists"],
+            "permissions": { "network_level": "NONE", "allowed_domains": [], "allowed_actions": ["read-profile-draft"] },
+            "failure_classes": ["VALIDATION", "BUSINESS"],
+            "budget": { "max_duration_seconds": 120, "max_cost": 0 },
+            "evidence_requirements": ["gap references"],
+            "may_write_business_state": false,
+            "lifecycle": "ACTIVE"
+          },
+          {
+            "entity_id": "14111111-2222-4333-8444-555555555555",
+            "entity_type": "Skill",
+            "entity_version": "1.0",
+            "source_ref": { "system": "nacos", "resource_type": "skill", "resource_id": "browser-product-audit", "version": "1.0" },
+            "skill_ref": "browser-product-audit",
+            "version": "1.0",
+            "tier": "P0",
+            "input_schema_ref": "skill-input:browser-product-audit:1.0",
+            "output_schema_ref": "skill-output:browser-product-audit:1.0",
+            "preconditions": ["read-only audit permission exists"],
+            "permissions": { "network_level": "PUBLIC_RESEARCH", "allowed_domains": [], "allowed_actions": ["read-product-surface"] },
+            "failure_classes": ["DEPENDENCY", "POLICY", "SUBMISSION_UNKNOWN"],
+            "budget": { "max_duration_seconds": 300, "max_cost": 0 },
+            "evidence_requirements": ["capture hash and timestamp"],
+            "may_write_business_state": false,
+            "lifecycle": "ACTIVE"
+          },
+          {
+            "entity_id": "15111111-2222-4333-8444-555555555555",
+            "entity_type": "Skill",
+            "entity_version": "1.0",
+            "source_ref": { "system": "nacos", "resource_type": "skill", "resource_id": "business-investment-assessment", "version": "1.0" },
+            "skill_ref": "business-investment-assessment",
+            "version": "1.0",
+            "tier": "P0",
+            "input_schema_ref": "skill-input:business-investment-assessment:1.0",
+            "output_schema_ref": "skill-output:business-investment-assessment:1.0",
+            "preconditions": ["cost and pricing evidence is labeled"],
+            "permissions": { "network_level": "NONE", "allowed_domains": [], "allowed_actions": ["read-business-evidence"] },
+            "failure_classes": ["VALIDATION", "BUSINESS"],
+            "budget": { "max_duration_seconds": 180, "max_cost": 0 },
+            "evidence_requirements": ["source references or hypothesis label"],
+            "may_write_business_state": false,
+            "lifecycle": "ACTIVE"
+          },
+          {
+            "entity_id": "16111111-2222-4333-8444-555555555555",
+            "entity_type": "Skill",
+            "entity_version": "1.0",
+            "source_ref": { "system": "nacos", "resource_type": "skill", "resource_id": "evidence-grounding-audit", "version": "1.0" },
+            "skill_ref": "evidence-grounding-audit",
+            "version": "1.0",
+            "tier": "P0",
+            "input_schema_ref": "skill-input:evidence-grounding-audit:1.0",
+            "output_schema_ref": "skill-output:evidence-grounding-audit:1.0",
+            "preconditions": ["evidence references are available"],
+            "permissions": { "network_level": "PUBLIC_RESEARCH", "allowed_domains": [], "allowed_actions": ["read-source-metadata"] },
+            "failure_classes": ["VALIDATION", "POLICY", "DEPENDENCY"],
+            "budget": { "max_duration_seconds": 180, "max_cost": 0 },
+            "evidence_requirements": ["source scope freshness and hash"],
+            "may_write_business_state": false,
+            "lifecycle": "ACTIVE"
+          },
+          {
+            "entity_id": "17111111-2222-4333-8444-555555555555",
+            "entity_type": "Skill",
+            "entity_version": "1.0",
+            "source_ref": { "system": "nacos", "resource_type": "skill", "resource_id": "version-regression-verification", "version": "1.0" },
+            "skill_ref": "version-regression-verification",
+            "version": "1.0",
+            "tier": "P0",
+            "input_schema_ref": "skill-input:version-regression-verification:1.0",
+            "output_schema_ref": "skill-output:version-regression-verification:1.0",
+            "preconditions": ["base and candidate versions exist"],
+            "permissions": { "network_level": "NONE", "allowed_domains": [], "allowed_actions": ["read-version-evidence"] },
+            "failure_classes": ["VALIDATION", "BUSINESS"],
+            "budget": { "max_duration_seconds": 180, "max_cost": 0 },
+            "evidence_requirements": ["same standard version"],
+            "may_write_business_state": false,
+            "lifecycle": "ACTIVE"
+          },
+          {
+            "entity_id": "18111111-2222-4333-8444-555555555555",
+            "entity_type": "Skill",
+            "entity_version": "1.0",
+            "source_ref": { "system": "adr", "resource_type": "reference_skill", "resource_id": "user-validation-designer", "version": "0.1" },
+            "skill_ref": "user-validation-designer",
+            "version": "0.1",
+            "tier": "REFERENCE",
+            "input_schema_ref": "unregistered",
+            "output_schema_ref": "unregistered",
+            "preconditions": ["separate ADR approval required"],
+            "permissions": { "network_level": "NONE", "allowed_domains": [], "allowed_actions": ["none"] },
+            "failure_classes": ["POLICY"],
+            "budget": { "max_duration_seconds": 1, "max_cost": 0 },
+            "evidence_requirements": ["not executable in V0.1"],
+            "may_write_business_state": false,
+            "lifecycle": "PROPOSED"
+          }
+        ],
+        "tools": [
+          {
+            "entity_id": "19111111-2222-4333-8444-555555555555",
+            "entity_type": "Tool",
+            "entity_version": "1.0",
+            "source_ref": { "system": "contract", "resource_type": "tool", "resource_id": "read-only-product-audit", "version": "1.0" },
+            "tool_ref": "read-only-product-audit",
+            "version": "1.0",
+            "risk_tier": "LOW",
+            "network_level": "PUBLIC_RESEARCH",
+            "allowed_actions": ["read-only"],
+            "read_only": true
+          }
+        ],
+        "hypotheses": [
+          {
+            "entity_id": "1a111111-2222-4333-8444-555555555555",
+            "entity_type": "Hypothesis",
+            "entity_version": "1.0",
+            "source_ref": { "system": "postgresql", "resource_type": "hypothesis", "resource_id": "1a111111-2222-4333-8444-555555555555", "version": "1.0" },
+            "hypothesis_id": "1a111111-2222-4333-8444-555555555555",
+            "statement": "User need is not yet evidenced.",
+            "status": "OPEN",
+            "evidence_refs": []
+          }
+        ],
+        "findings": [
+          {
+            "entity_id": "1b111111-2222-4333-8444-555555555555",
+            "entity_type": "Finding",
+            "entity_version": "1.0",
+            "source_ref": { "system": "postgresql", "resource_type": "finding", "resource_id": "1b111111-2222-4333-8444-555555555555", "version": "1.0" },
+            "finding_id": "1b111111-2222-4333-8444-555555555555",
+            "dimension_code": "USER_USAGE",
+            "grade": "INSUFFICIENT_EVIDENCE",
+            "evidence_refs": ["1c111111-2222-4333-8444-555555555555"],
+            "is_hypothesis": false,
+            "supersedes_id": null
+          }
+        ],
+        "evidence": [
+          {
+            "entity_id": "1c111111-2222-4333-8444-555555555555",
+            "entity_type": "Evidence",
+            "entity_version": "1.0",
+            "source_ref": { "system": "postgresql", "resource_type": "evidence", "resource_id": "1c111111-2222-4333-8444-555555555555", "version": "1.0" },
+            "evidence_id": "1c111111-2222-4333-8444-555555555555",
+            "source_type": "MATERIAL",
+            "trust_level": "E3",
+            "object_ref": "object:tenant/project/run/evidence",
+            "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "captured_at": "2026-08-05T08:00:00Z",
+            "access_scope": "PROJECT"
+          }
+        ],
+        "decisions": [
+          {
+            "entity_id": "1d111111-2222-4333-8444-555555555555",
+            "entity_type": "Decision",
+            "entity_version": "1.0",
+            "source_ref": { "system": "postgresql", "resource_type": "decision", "resource_id": "1d111111-2222-4333-8444-555555555555", "version": "1.0" },
+            "decision_id": "1d111111-2222-4333-8444-555555555555",
+            "recommendation": "VALIDATE_FURTHER",
+            "standard_version": "1.0",
+            "dimension_grades": { "USER_USAGE": "INSUFFICIENT_EVIDENCE" },
+            "finding_refs": ["1b111111-2222-4333-8444-555555555555"],
+            "blocking_reasons": []
+          }
+        ]
+      },
+      "relations": [
+        { "relation_id": "1e111111-2222-4333-8444-555555555555", "relation_type": "RUN_FOR_VERSION", "from_ref": "run:71111111-2222-4333-8444-555555555555", "to_ref": "version:51111111-2222-4333-8444-555555555555", "relation_version": "1.0" },
+        { "relation_id": "1f111111-2222-4333-8444-555555555555", "relation_type": "FINDING_SUPPORTED_BY_EVIDENCE", "from_ref": "finding:1b111111-2222-4333-8444-555555555555", "to_ref": "evidence:1c111111-2222-4333-8444-555555555555", "relation_version": "1.0" }
+      ],
+      "provenance": {
+        "producer": "control-plane",
+        "created_at": "2026-08-05T08:00:00Z",
+        "correlation_id": "21111111-3333-4333-8444-555555555555",
+        "source_event_ids": ["22111111-2222-4333-8444-555555555555"],
+        "source_transaction_ids": ["tx:example-1"]
+      },
+      "transaction_authority": {
+        "system": "postgresql",
+        "owns": ["business_state", "approval", "budget", "idempotency", "audit"]
+      }
+    }
+  ]
+}

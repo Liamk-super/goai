@@ -1,0 +1,836 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/events/evaluation-events.v1.json",
+  "title": "LaunchScope evaluation events v1",
+  "description": "Versioned domain events for the evaluation lifecycle. Consumers must tolerate additive payload fields and accept the current and immediately previous released minor version.",
+  "type": "object",
+  "oneOf": [
+    { "$ref": "#/$defs/ProjectCreated" },
+    { "$ref": "#/$defs/ProductVersionSubmitted" },
+    { "$ref": "#/$defs/IntakeGapIdentified" },
+    { "$ref": "#/$defs/ProfileConfirmed" },
+    { "$ref": "#/$defs/EvaluationRunStarted" },
+    { "$ref": "#/$defs/TaskDispatched" },
+    { "$ref": "#/$defs/EvidenceCaptured" },
+    { "$ref": "#/$defs/FindingSubmitted" },
+    { "$ref": "#/$defs/EvidenceAuditCompleted" },
+    { "$ref": "#/$defs/ApprovalRequested" },
+    { "$ref": "#/$defs/ApprovalResolved" },
+    { "$ref": "#/$defs/RunNeedsAttention" },
+    { "$ref": "#/$defs/DecisionSynthesized" },
+    { "$ref": "#/$defs/DossierCommitted" },
+    { "$ref": "#/$defs/VersionRegressionCompleted" },
+    { "$ref": "#/$defs/RunCompleted" },
+    { "$ref": "#/$defs/RunFailed" }
+  ],
+  "x-contract-version": "1.0",
+  "x-compatibility": {
+    "consumer-rule": "accept-current-and-immediately-previous-released-minor",
+    "breaking-change": "new-major-file",
+    "published-schema-is-immutable": true
+  },
+  "$defs": {
+    "Uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "Sha256": {
+      "type": "string",
+      "pattern": "^[A-Fa-f0-9]{64}$"
+    },
+    "UuidList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/Uuid"
+      }
+    },
+    "StageCode": {
+      "type": "string",
+      "enum": [
+        "INTAKE",
+        "GAP_ANALYSIS",
+        "PROFILE_CONFIRMATION",
+        "PLANNING",
+        "PARALLEL_EVALUATION",
+        "EVIDENCE_REVIEW",
+        "REMEDIATION",
+        "SYNTHESIS",
+        "DOSSIER_COMMIT",
+        "VERSION_REGRESSION"
+      ]
+    },
+    "DimensionCode": {
+      "type": "string",
+      "enum": [
+        "PRODUCT_IMPLEMENTATION",
+        "USER_USAGE",
+        "BUSINESS_INVESTMENT",
+        "GEO_POLICY_TREND"
+      ]
+    },
+    "FindingGrade": {
+      "type": "string",
+      "enum": [
+        "STRONG",
+        "MODERATE",
+        "WEAK",
+        "INSUFFICIENT_EVIDENCE"
+      ]
+    },
+    "FailureClass": {
+      "type": "string",
+      "enum": [
+        "TRANSIENT",
+        "VALIDATION",
+        "AUTHORIZATION",
+        "DEPENDENCY",
+        "BUDGET",
+        "POLICY",
+        "SUBMISSION_UNKNOWN",
+        "BUSINESS"
+      ]
+    },
+    "CommonPayload": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "ProjectCreatedPayload": {
+      "type": "object",
+      "properties": {
+        "project_id": { "$ref": "#/$defs/Uuid" },
+        "workspace_id": { "$ref": "#/$defs/Uuid" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 200 }
+      },
+      "required": ["project_id", "workspace_id", "name"],
+      "additionalProperties": false
+    },
+    "ProductVersionSubmittedPayload": {
+      "type": "object",
+      "properties": {
+        "project_id": { "$ref": "#/$defs/Uuid" },
+        "product_version_id": { "$ref": "#/$defs/Uuid" },
+        "material_ids": { "$ref": "#/$defs/UuidList" },
+        "submitted_by": { "type": "string", "minLength": 1 }
+      },
+      "required": ["project_id", "product_version_id", "material_ids", "submitted_by"],
+      "additionalProperties": false
+    },
+    "IntakeGapIdentifiedPayload": {
+      "type": "object",
+      "properties": {
+        "project_id": { "$ref": "#/$defs/Uuid" },
+        "product_version_id": { "$ref": "#/$defs/Uuid" },
+        "gap_ids": { "$ref": "#/$defs/UuidList" },
+        "question_count": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["project_id", "product_version_id", "gap_ids", "question_count"],
+      "additionalProperties": false
+    },
+    "ProfileConfirmedPayload": {
+      "type": "object",
+      "properties": {
+        "project_id": { "$ref": "#/$defs/Uuid" },
+        "product_version_id": { "$ref": "#/$defs/Uuid" },
+        "profile_id": { "$ref": "#/$defs/Uuid" },
+        "confirmed_by": { "type": "string", "minLength": 1 }
+      },
+      "required": ["project_id", "product_version_id", "profile_id", "confirmed_by"],
+      "additionalProperties": false
+    },
+    "EvaluationRunStartedPayload": {
+      "type": "object",
+      "properties": {
+        "project_id": { "$ref": "#/$defs/Uuid" },
+        "product_version_id": { "$ref": "#/$defs/Uuid" },
+        "run_manifest_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" },
+        "run_manifest_sha256": { "$ref": "#/$defs/Sha256" },
+        "standard_version": { "type": "string", "minLength": 1 }
+      },
+      "required": ["project_id", "product_version_id", "run_manifest_version", "run_manifest_sha256", "standard_version"],
+      "additionalProperties": false
+    },
+    "TaskDispatchedPayload": {
+      "type": "object",
+      "properties": {
+        "task_id": { "$ref": "#/$defs/Uuid" },
+        "stage_code": { "$ref": "#/$defs/StageCode" },
+        "agent_identity_ref": { "type": "string", "minLength": 1 },
+        "skill_ref": { "type": "string", "minLength": 1 },
+        "skill_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" }
+      },
+      "required": ["task_id", "stage_code", "agent_identity_ref", "skill_ref", "skill_version"],
+      "additionalProperties": false
+    },
+    "EvidenceCapturedPayload": {
+      "type": "object",
+      "properties": {
+        "evidence_id": { "$ref": "#/$defs/Uuid" },
+        "source_type": {
+          "type": "string",
+          "enum": ["MATERIAL", "PUBLIC_RESEARCH", "AUTHENTICATED_RESEARCH", "DERIVED"]
+        },
+        "sha256": { "$ref": "#/$defs/Sha256" },
+        "trust_level": {
+          "type": "string",
+          "enum": ["E0", "E1", "E2", "E3", "E4", "E5"]
+        }
+      },
+      "required": ["evidence_id", "source_type", "sha256", "trust_level"],
+      "additionalProperties": false
+    },
+    "FindingSubmittedPayload": {
+      "type": "object",
+      "properties": {
+        "finding_id": { "$ref": "#/$defs/Uuid" },
+        "dimension_code": { "$ref": "#/$defs/DimensionCode" },
+        "evidence_ids": { "$ref": "#/$defs/UuidList" },
+        "grade": { "$ref": "#/$defs/FindingGrade" },
+        "is_hypothesis": { "type": "boolean" }
+      },
+      "required": ["finding_id", "dimension_code", "evidence_ids", "grade", "is_hypothesis"],
+      "additionalProperties": false
+    },
+    "EvidenceAuditCompletedPayload": {
+      "type": "object",
+      "properties": {
+        "audit_id": { "$ref": "#/$defs/Uuid" },
+        "evidence_id": { "$ref": "#/$defs/Uuid" },
+        "decision": {
+          "type": "string",
+          "enum": ["ACCEPTED", "DOWNGRADED", "REJECTED", "NEEDS_MORE_EVIDENCE"]
+        }
+      },
+      "required": ["audit_id", "evidence_id", "decision"],
+      "additionalProperties": false
+    },
+    "ApprovalRequestedPayload": {
+      "type": "object",
+      "properties": {
+        "approval_request_id": { "$ref": "#/$defs/Uuid" },
+        "action": { "type": "string", "minLength": 1 },
+        "parameters_sha256": { "$ref": "#/$defs/Sha256" },
+        "expires_at": { "type": "string", "format": "date-time" },
+        "estimated_cost": { "type": "number", "minimum": 0 }
+      },
+      "required": ["approval_request_id", "action", "parameters_sha256", "expires_at", "estimated_cost"],
+      "additionalProperties": false
+    },
+    "ApprovalResolvedPayload": {
+      "type": "object",
+      "properties": {
+        "approval_request_id": { "$ref": "#/$defs/Uuid" },
+        "decision": { "type": "string", "enum": ["APPROVED", "REJECTED", "EXPIRED"] },
+        "resolved_by": { "type": "string", "minLength": 1 }
+      },
+      "required": ["approval_request_id", "decision", "resolved_by"],
+      "additionalProperties": false
+    },
+    "RunNeedsAttentionPayload": {
+      "type": "object",
+      "properties": {
+        "reason_code": { "type": "string", "minLength": 1 },
+        "failure_class": { "$ref": "#/$defs/FailureClass" },
+        "retry_blocked": { "type": "boolean", "const": true }
+      },
+      "required": ["reason_code", "failure_class", "retry_blocked"],
+      "additionalProperties": false
+    },
+    "DecisionSynthesizedPayload": {
+      "type": "object",
+      "properties": {
+        "decision_id": { "$ref": "#/$defs/Uuid" },
+        "recommendation": { "type": "string", "enum": ["PROCEED", "VALIDATE_FURTHER", "ADJUST", "PAUSE"] },
+        "standard_version": { "type": "string", "minLength": 1 },
+        "finding_ids": { "$ref": "#/$defs/UuidList" },
+        "blocking_count": { "type": "integer", "minimum": 0 }
+      },
+      "required": ["decision_id", "recommendation", "standard_version", "finding_ids", "blocking_count"],
+      "additionalProperties": false
+    },
+    "DossierCommittedPayload": {
+      "type": "object",
+      "properties": {
+        "dossier_id": { "$ref": "#/$defs/Uuid" },
+        "project_id": { "$ref": "#/$defs/Uuid" },
+        "product_version_id": { "$ref": "#/$defs/Uuid" },
+        "report_id": { "$ref": "#/$defs/Uuid" }
+      },
+      "required": ["dossier_id", "project_id", "product_version_id", "report_id"],
+      "additionalProperties": false
+    },
+    "VersionRegressionCompletedPayload": {
+      "type": "object",
+      "properties": {
+        "project_id": { "$ref": "#/$defs/Uuid" },
+        "base_version_id": { "$ref": "#/$defs/Uuid" },
+        "candidate_version_id": { "$ref": "#/$defs/Uuid" },
+        "standard_version": { "type": "string", "minLength": 1 },
+        "result": { "type": "string", "enum": ["PASS", "FAIL", "INSUFFICIENT_EVIDENCE"] }
+      },
+      "required": ["project_id", "base_version_id", "candidate_version_id", "standard_version", "result"],
+      "additionalProperties": false
+    },
+    "RunCompletedPayload": {
+      "type": "object",
+      "properties": {
+        "decision_id": { "$ref": "#/$defs/Uuid" },
+        "standard_version": { "type": "string", "minLength": 1 },
+        "completed_stage_count": { "type": "integer", "minimum": 1, "maximum": 10 }
+      },
+      "required": ["decision_id", "standard_version", "completed_stage_count"],
+      "additionalProperties": false
+    },
+    "RunFailedPayload": {
+      "type": "object",
+      "properties": {
+        "failure_class": { "$ref": "#/$defs/FailureClass" },
+        "reason_code": { "type": "string", "minLength": 1 },
+        "retry_permitted": { "type": "boolean" }
+      },
+      "required": ["failure_class", "reason_code", "retry_permitted"],
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "failure_class": { "const": "SUBMISSION_UNKNOWN" }
+        }
+      },
+      "then": {
+        "properties": {
+          "retry_permitted": { "const": false }
+        }
+      }
+    },
+    "ProjectCreated": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "project.created" },
+            "payload": { "$ref": "#/$defs/ProjectCreatedPayload" }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    },
+    "ProductVersionSubmitted": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "product_version.submitted" },
+            "payload": { "$ref": "#/$defs/ProductVersionSubmittedPayload" }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    },
+    "IntakeGapIdentified": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "intake.gap_identified" },
+            "payload": { "$ref": "#/$defs/IntakeGapIdentifiedPayload" }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    },
+    "ProfileConfirmed": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "profile.confirmed" },
+            "payload": { "$ref": "#/$defs/ProfileConfirmedPayload" }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    },
+    "EvaluationRunStarted": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "evaluation.run.started" },
+            "payload": { "$ref": "#/$defs/EvaluationRunStartedPayload" }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    },
+    "TaskDispatched": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "task.dispatched" },
+            "task_id": { "$ref": "#/$defs/Uuid" },
+            "payload": { "$ref": "#/$defs/TaskDispatchedPayload" }
+          },
+          "required": ["event_type", "task_id"]
+        }
+      ]
+    },
+    "EvidenceCaptured": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "evidence.captured" },
+            "payload": { "$ref": "#/$defs/EvidenceCapturedPayload" }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    },
+    "FindingSubmitted": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "finding.submitted" },
+            "payload": { "$ref": "#/$defs/FindingSubmittedPayload" }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    },
+    "EvidenceAuditCompleted": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "evidence.audit_completed" },
+            "payload": { "$ref": "#/$defs/EvidenceAuditCompletedPayload" }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    },
+    "ApprovalRequested": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "approval.requested" },
+            "payload": { "$ref": "#/$defs/ApprovalRequestedPayload" }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    },
+    "ApprovalResolved": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "approval.resolved" },
+            "payload": { "$ref": "#/$defs/ApprovalResolvedPayload" }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    },
+    "RunNeedsAttention": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "run.needs_attention" },
+            "payload": { "$ref": "#/$defs/RunNeedsAttentionPayload" }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    },
+    "DecisionSynthesized": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "decision.synthesized" },
+            "payload": { "$ref": "#/$defs/DecisionSynthesizedPayload" }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    },
+    "DossierCommitted": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "dossier.committed" },
+            "payload": { "$ref": "#/$defs/DossierCommittedPayload" }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    },
+    "VersionRegressionCompleted": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "version.regression_completed" },
+            "payload": { "$ref": "#/$defs/VersionRegressionCompletedPayload" }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    },
+    "RunCompleted": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "run.completed" },
+            "payload": { "$ref": "#/$defs/RunCompletedPayload" }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    },
+    "RunFailed": {
+      "allOf": [
+        { "$ref": "envelope.schema.json#/$defs/EventEnvelope" },
+        {
+          "type": "object",
+          "properties": {
+            "event_type": { "const": "run.failed" },
+            "payload": { "$ref": "#/$defs/RunFailedPayload" }
+          },
+          "required": ["event_type"]
+        }
+      ]
+    }
+  },
+  "examples": [
+    {
+      "event_type": "project.created",
+      "event_id": "10000000-0000-4000-8000-000000000001",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000001",
+      "task_id": null,
+      "correlation_id": "40000000-0000-4000-8000-000000000001",
+      "causation_id": null,
+      "idempotency_key": "project-create-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:00:00Z",
+      "payload": {
+        "project_id": "50000000-0000-4000-8000-000000000001",
+        "workspace_id": "60000000-0000-4000-8000-000000000001",
+        "name": "Unselected product validation project"
+      }
+    },
+    {
+      "event_type": "product_version.submitted",
+      "event_id": "10000000-0000-4000-8000-000000000002",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000001",
+      "task_id": null,
+      "correlation_id": "40000000-0000-4000-8000-000000000001",
+      "causation_id": "10000000-0000-4000-8000-000000000001",
+      "idempotency_key": "product-version-submit-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:01:00Z",
+      "payload": {
+        "project_id": "50000000-0000-4000-8000-000000000001",
+        "product_version_id": "70000000-0000-4000-8000-000000000001",
+        "material_ids": ["80000000-0000-4000-8000-000000000001"],
+        "submitted_by": "human:workspace-owner"
+      }
+    },
+    {
+      "event_type": "intake.gap_identified",
+      "event_id": "10000000-0000-4000-8000-000000000003",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000001",
+      "task_id": null,
+      "correlation_id": "40000000-0000-4000-8000-000000000001",
+      "causation_id": "10000000-0000-4000-8000-000000000002",
+      "idempotency_key": "gap-identify-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:02:00Z",
+      "payload": {
+        "project_id": "50000000-0000-4000-8000-000000000001",
+        "product_version_id": "70000000-0000-4000-8000-000000000001",
+        "gap_ids": ["90000000-0000-4000-8000-000000000001"],
+        "question_count": 1
+      }
+    },
+    {
+      "event_type": "profile.confirmed",
+      "event_id": "10000000-0000-4000-8000-000000000004",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000001",
+      "task_id": null,
+      "correlation_id": "40000000-0000-4000-8000-000000000001",
+      "causation_id": "10000000-0000-4000-8000-000000000003",
+      "idempotency_key": "profile-confirm-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:03:00Z",
+      "payload": {
+        "project_id": "50000000-0000-4000-8000-000000000001",
+        "product_version_id": "70000000-0000-4000-8000-000000000001",
+        "profile_id": "91000000-0000-4000-8000-000000000001",
+        "confirmed_by": "human:workspace-owner"
+      }
+    },
+    {
+      "event_type": "evaluation.run.started",
+      "event_id": "10000000-0000-4000-8000-000000000005",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000001",
+      "task_id": null,
+      "correlation_id": "40000000-0000-4000-8000-000000000001",
+      "causation_id": "10000000-0000-4000-8000-000000000004",
+      "idempotency_key": "run-start-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:04:00Z",
+      "payload": {
+        "project_id": "50000000-0000-4000-8000-000000000001",
+        "product_version_id": "70000000-0000-4000-8000-000000000001",
+        "run_manifest_version": "1.0",
+        "run_manifest_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "standard_version": "1.0"
+      }
+    },
+    {
+      "event_type": "task.dispatched",
+      "event_id": "10000000-0000-4000-8000-000000000006",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000001",
+      "task_id": "92000000-0000-4000-8000-000000000001",
+      "correlation_id": "40000000-0000-4000-8000-000000000001",
+      "causation_id": "10000000-0000-4000-8000-000000000005",
+      "idempotency_key": "task-dispatch-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:05:00Z",
+      "payload": {
+        "task_id": "92000000-0000-4000-8000-000000000001",
+        "stage_code": "PLANNING",
+        "agent_identity_ref": "evaluation-manager",
+        "skill_ref": "intake-gap-diagnosis",
+        "skill_version": "1.0"
+      }
+    },
+    {
+      "event_type": "evidence.captured",
+      "event_id": "10000000-0000-4000-8000-000000000007",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000001",
+      "task_id": "92000000-0000-4000-8000-000000000001",
+      "correlation_id": "40000000-0000-4000-8000-000000000001",
+      "causation_id": "10000000-0000-4000-8000-000000000006",
+      "idempotency_key": "evidence-capture-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:06:00Z",
+      "payload": {
+        "evidence_id": "93000000-0000-4000-8000-000000000001",
+        "source_type": "MATERIAL",
+        "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "trust_level": "E3"
+      }
+    },
+    {
+      "event_type": "finding.submitted",
+      "event_id": "10000000-0000-4000-8000-000000000008",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000001",
+      "task_id": "92000000-0000-4000-8000-000000000001",
+      "correlation_id": "40000000-0000-4000-8000-000000000001",
+      "causation_id": "10000000-0000-4000-8000-000000000007",
+      "idempotency_key": "finding-submit-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:07:00Z",
+      "payload": {
+        "finding_id": "94000000-0000-4000-8000-000000000001",
+        "dimension_code": "PRODUCT_IMPLEMENTATION",
+        "evidence_ids": ["93000000-0000-4000-8000-000000000001"],
+        "grade": "INSUFFICIENT_EVIDENCE",
+        "is_hypothesis": false
+      }
+    },
+    {
+      "event_type": "evidence.audit_completed",
+      "event_id": "10000000-0000-4000-8000-000000000009",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000001",
+      "task_id": "92000000-0000-4000-8000-000000000001",
+      "correlation_id": "40000000-0000-4000-8000-000000000001",
+      "causation_id": "10000000-0000-4000-8000-000000000008",
+      "idempotency_key": "evidence-audit-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:08:00Z",
+      "payload": {
+        "audit_id": "95000000-0000-4000-8000-000000000001",
+        "evidence_id": "93000000-0000-4000-8000-000000000001",
+        "decision": "ACCEPTED"
+      }
+    },
+    {
+      "event_type": "approval.requested",
+      "event_id": "10000000-0000-4000-8000-000000000010",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000001",
+      "task_id": "92000000-0000-4000-8000-000000000001",
+      "correlation_id": "40000000-0000-4000-8000-000000000001",
+      "causation_id": "10000000-0000-4000-8000-000000000009",
+      "idempotency_key": "approval-request-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:09:00Z",
+      "payload": {
+        "approval_request_id": "96000000-0000-4000-8000-000000000001",
+        "action": "public-research.read",
+        "parameters_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "expires_at": "2026-08-05T09:09:00Z",
+        "estimated_cost": 0
+      }
+    },
+    {
+      "event_type": "approval.resolved",
+      "event_id": "10000000-0000-4000-8000-000000000011",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000001",
+      "task_id": "92000000-0000-4000-8000-000000000001",
+      "correlation_id": "40000000-0000-4000-8000-000000000001",
+      "causation_id": "10000000-0000-4000-8000-000000000010",
+      "idempotency_key": "approval-resolve-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:10:00Z",
+      "payload": {
+        "approval_request_id": "96000000-0000-4000-8000-000000000001",
+        "decision": "APPROVED",
+        "resolved_by": "human:reviewer"
+      }
+    },
+    {
+      "event_type": "run.needs_attention",
+      "event_id": "10000000-0000-4000-8000-000000000012",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000001",
+      "task_id": "92000000-0000-4000-8000-000000000001",
+      "correlation_id": "40000000-0000-4000-8000-000000000001",
+      "causation_id": "10000000-0000-4000-8000-000000000011",
+      "idempotency_key": "run-attention-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:11:00Z",
+      "payload": {
+        "reason_code": "provider-result-unknown",
+        "failure_class": "SUBMISSION_UNKNOWN",
+        "retry_blocked": true
+      }
+    },
+    {
+      "event_type": "decision.synthesized",
+      "event_id": "10000000-0000-4000-8000-000000000013",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000001",
+      "task_id": null,
+      "correlation_id": "40000000-0000-4000-8000-000000000001",
+      "causation_id": "10000000-0000-4000-8000-000000000009",
+      "idempotency_key": "decision-synthesize-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:12:00Z",
+      "payload": {
+        "decision_id": "97000000-0000-4000-8000-000000000001",
+        "recommendation": "VALIDATE_FURTHER",
+        "standard_version": "1.0",
+        "finding_ids": ["94000000-0000-4000-8000-000000000001"],
+        "blocking_count": 0
+      }
+    },
+    {
+      "event_type": "dossier.committed",
+      "event_id": "10000000-0000-4000-8000-000000000014",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000001",
+      "task_id": null,
+      "correlation_id": "40000000-0000-4000-8000-000000000001",
+      "causation_id": "10000000-0000-4000-8000-000000000013",
+      "idempotency_key": "dossier-commit-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:13:00Z",
+      "payload": {
+        "dossier_id": "98000000-0000-4000-8000-000000000001",
+        "project_id": "50000000-0000-4000-8000-000000000001",
+        "product_version_id": "70000000-0000-4000-8000-000000000001",
+        "report_id": "99000000-0000-4000-8000-000000000001"
+      }
+    },
+    {
+      "event_type": "version.regression_completed",
+      "event_id": "10000000-0000-4000-8000-000000000015",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000001",
+      "task_id": null,
+      "correlation_id": "40000000-0000-4000-8000-000000000001",
+      "causation_id": "10000000-0000-4000-8000-000000000014",
+      "idempotency_key": "version-regression-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:14:00Z",
+      "payload": {
+        "project_id": "50000000-0000-4000-8000-000000000001",
+        "base_version_id": "70000000-0000-4000-8000-000000000001",
+        "candidate_version_id": "70000000-0000-4000-8000-000000000002",
+        "standard_version": "1.0",
+        "result": "INSUFFICIENT_EVIDENCE"
+      }
+    },
+    {
+      "event_type": "run.completed",
+      "event_id": "10000000-0000-4000-8000-000000000016",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000001",
+      "task_id": null,
+      "correlation_id": "40000000-0000-4000-8000-000000000001",
+      "causation_id": "10000000-0000-4000-8000-000000000015",
+      "idempotency_key": "run-complete-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:15:00Z",
+      "payload": {
+        "decision_id": "97000000-0000-4000-8000-000000000001",
+        "standard_version": "1.0",
+        "completed_stage_count": 10
+      }
+    },
+    {
+      "event_type": "run.failed",
+      "event_id": "10000000-0000-4000-8000-000000000017",
+      "tenant_id": "20000000-0000-4000-8000-000000000001",
+      "run_id": "30000000-0000-4000-8000-000000000002",
+      "task_id": null,
+      "correlation_id": "40000000-0000-4000-8000-000000000002",
+      "causation_id": null,
+      "idempotency_key": "run-failed-1",
+      "schema_version": "1.0",
+      "occurred_at": "2026-08-05T08:16:00Z",
+      "payload": {
+        "failure_class": "SUBMISSION_UNKNOWN",
+        "reason_code": "result-status-unknown",
+        "retry_permitted": false
+      }
+    }
+  ]
+}
