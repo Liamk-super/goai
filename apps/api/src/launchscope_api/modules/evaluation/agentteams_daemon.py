@@ -234,6 +234,12 @@ def matrix_listener() -> None:
                         with urllib.request.urlopen(request, timeout=30) as response:
                             response.read(65_537)
                     except urllib.error.HTTPError as exc:
+                        if exc.code == 404:
+                            print(
+                                f"Skipping Matrix event {event.get('event_id')}: Run/Task no longer exists",
+                                file=sys.stderr,
+                            )
+                            continue
                         if exc.code not in {400, 422}:
                             raise
                         failure = {
@@ -253,8 +259,17 @@ def matrix_listener() -> None:
                         failure_request = urllib.request.Request(
                             ingress, data=failure_body, method="POST", headers=dict(request.headers)
                         )
-                        with urllib.request.urlopen(failure_request, timeout=30) as response:
-                            response.read(65_537)
+                        try:
+                            with urllib.request.urlopen(failure_request, timeout=30) as response:
+                                response.read(65_537)
+                        except urllib.error.HTTPError as failure_exc:
+                            if failure_exc.code == 404:
+                                print(
+                                    f"Skipping invalid Matrix event {event.get('event_id')}: Run/Task no longer exists",
+                                    file=sys.stderr,
+                                )
+                                continue
+                            raise
                         print(
                             f"Matrix event {event.get('event_id')} was persisted as structured VALIDATION failure",
                             file=sys.stderr,
