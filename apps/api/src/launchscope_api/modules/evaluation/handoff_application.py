@@ -40,6 +40,8 @@ from launchscope_orchestrator.agentteams_bridge import (
     MatrixSenderDirectory,
 )
 
+from .task_dispatch import enqueue_ready_tasks, provider_usage_required
+
 _DIMENSIONS = (
     "PRODUCT_IMPLEMENTATION", "USER_USAGE", "BUSINESS_INVESTMENT", "GEO_POLICY_TREND",
 )
@@ -70,11 +72,16 @@ class HandoffApplication:
         sessions: sessionmaker[Session],
         objects: S3QuarantineObjectStore,
         directory: MatrixSenderDirectory,
+        *,
+        require_provider_usage: bool | None = None,
     ) -> None:
         self._sessions = sessions
         self._objects = objects
         self._directory = directory
         self._bridge = AgentTeamsBridge()
+        self._require_provider_usage = (
+            provider_usage_required() if require_provider_usage is None else require_provider_usage
+        )
 
     def consume(self, actor: Actor, raw_event: dict[str, object], *, run_id: UUID, task_id: UUID) -> HandoffResult:
         now = datetime.now(UTC)
@@ -89,6 +96,8 @@ class HandoffApplication:
             accepted = self._bridge.accept_matrix_event(
                 raw_event, self._directory, expected_run_id=run_id, expected_task_id=task_id
             )
+            if accepted.handoff.tenant_id != actor.tenant_id:
+                raise ValueError("handoff Tenant does not match the authenticated routing scope")
             prior = session.execute(
                 select(matrix_event_receipt.c.payload_sha256).where(
                     matrix_event_receipt.c.tenant_id == actor.tenant_id,
@@ -122,7 +131,8 @@ class HandoffApplication:
                 payload_sha256=accepted.payload_sha256, created_at=now,
             ))
             usage_failure = self._record_provider_usage(
-                session, actor.tenant_id, run_id, task_id, raw_event, now
+                session, actor.tenant_id, run_id, task_id, raw_event, now,
+                required=self._require_provider_usage,
             )
             if usage_failure is not None:
                 failure, reason = usage_failure
@@ -167,10 +177,12 @@ class HandoffApplication:
     @staticmethod
     def _record_provider_usage(
         session: Session, tenant_id: UUID, run_id: UUID, task_id: UUID,
-        raw_event: dict[str, object], now: datetime,
+        raw_event: dict[str, object], now: datetime, *, required: bool,
     ) -> tuple[str, str] | None:
         content = raw_event.get("content")
         usage = content.get("provider_usage") if isinstance(content, dict) else None
+        if usage is None and not required:
+            return None
         if (
             not isinstance(usage, dict)
             or usage.get("submission_known") is not True
@@ -267,14 +279,17 @@ class HandoffApplication:
             self._complete_stage(session, tenant_id, run_id, stage_code, now)
             self._unlock(session, tenant_id, run_id, "DOMAIN_REVIEW", now)
             self._current_stage(session, tenant_id, run_id, "DOMAIN_REVIEW", now)
+            enqueue_ready_tasks(session, tenant_id, run_id, "DOMAIN_REVIEW")
         elif stage_code == "DOMAIN_REVIEW" and self._stage_all_succeeded(session, tenant_id, run_id, stage_code):
             self._complete_stage(session, tenant_id, run_id, stage_code, now)
             self._unlock(session, tenant_id, run_id, "EVIDENCE_AUDIT", now)
             self._current_stage(session, tenant_id, run_id, "EVIDENCE_AUDIT", now)
+            enqueue_ready_tasks(session, tenant_id, run_id, "EVIDENCE_AUDIT")
         elif stage_code == "EVIDENCE_AUDIT":
             self._complete_stage(session, tenant_id, run_id, stage_code, now)
             self._unlock(session, tenant_id, run_id, "RULE_SYNTHESIS", now)
             self._current_stage(session, tenant_id, run_id, "RULE_SYNTHESIS", now)
+            enqueue_ready_tasks(session, tenant_id, run_id, "RULE_SYNTHESIS")
         elif stage_code == "RULE_SYNTHESIS":
             report_id = self._synthesize(session, tenant_id, run_id, now)
             self._complete_stage(session, tenant_id, run_id, stage_code, now)

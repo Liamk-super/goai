@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import logging
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, Request
@@ -11,9 +12,11 @@ from pydantic import BaseModel, Field
 from launchscope_api.modules.identity_tenant.application import Actor
 
 from .application import ProjectDossierApplication
+from .model_extraction import IntakeModelExtractor
 from .persistent_application import PersistentProjectDossierApplication
 
 router = APIRouter(tags=["Projects", "Product versions", "Materials", "Intake"])
+logger = logging.getLogger(__name__)
 
 
 class CreateProjectRequest(BaseModel):
@@ -41,6 +44,11 @@ class ConfirmProfileRequest(BaseModel):
     acknowledge_model_inference: bool
 
 
+class ExtractIntakeRequest(BaseModel):
+    raw_content: str = Field(min_length=1, max_length=30_000)
+    allow_external_processing: bool
+
+
 def get_dossier(request: Request) -> ProjectDossierApplication | PersistentProjectDossierApplication:
     configured = getattr(request.app.state, "control_plane", None)
     if configured is not None:
@@ -59,6 +67,38 @@ def get_actor(
 
 def correlation_id(x_correlation_id: UUID = Header(alias="X-Correlation-Id")) -> UUID:
     return x_correlation_id
+
+
+@router.post("/intake:extract")
+def extract_intake(request: ExtractIntakeRequest, _actor: Actor = Depends(get_actor)) -> dict[str, object]:
+    """Return a model-inferred draft; this endpoint deliberately persists no fact."""
+    try:
+        draft = IntakeModelExtractor().extract(
+            request.raw_content,
+            allow_external_processing=request.allow_external_processing,
+        )
+    except Exception:
+        logger.warning(
+            "intake model extraction failed",
+            extra={"tenant_id": str(_actor.tenant_id), "actor_id": _actor.actor_id},
+        )
+        raise
+    logger.info(
+        "intake model extraction completed",
+        extra={
+            "tenant_id": str(_actor.tenant_id),
+            "actor_id": _actor.actor_id,
+            "model_id": draft.model_id,
+            "missing_field_count": len(draft.missing_fields),
+        },
+    )
+    return {
+        "source": "MODEL_INFERENCE",
+        "model_id": draft.model_id,
+        "extracted_fields": draft.fields,
+        "missing_fields": draft.missing_fields,
+        "confirmation_required": True,
+    }
 
 
 @router.post("/projects", status_code=201)

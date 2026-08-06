@@ -13,7 +13,7 @@ from datetime import datetime
 from typing import Any, cast
 from uuid import UUID
 
-from sqlalchemy import Select, select
+from sqlalchemy import Select, func, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from launchscope_api.infrastructure.db.schema import (
@@ -23,6 +23,7 @@ from launchscope_api.infrastructure.db.schema import (
     decision_finding,
     evaluation_run,
     evidence,
+    evidence_audit,
     finding,
     finding_evidence,
     matrix_event_receipt,
@@ -31,8 +32,10 @@ from launchscope_api.infrastructure.db.schema import (
     project,
     report,
     run_status_history,
+    skill_invocation,
     stage,
     task,
+    tool_invocation,
     workspace_member,
 )
 from launchscope_api.infrastructure.db.session import tenant_transaction
@@ -196,9 +199,15 @@ class ExperienceReadApplication:
             ).scalar_one_or_none()
             dimension_results = self._dimension_results(decision_row["dimension_grades"], baseline_grades, chain)
             action_links = self._action_links(report_row["action_items"], dimension_results)
+            calibration_rows = session.execute(
+                select(evidence_audit.c.finding_id, evidence_audit.c.decision, evidence_audit.c.reason)
+                .where(evidence_audit.c.tenant_id == actor.tenant_id, evidence_audit.c.run_id == run_id)
+                .order_by(evidence_audit.c.audited_at)
+            ).mappings().all()
             return {
                 "report_id": str(report_row["id"]),
                 "run_id": str(run_id),
+                "project_id": str(run_row["project_id"]),
                 "decision_id": str(decision_row["id"]),
                 "recommendation": decision_row["recommendation"],
                 "standard_version": decision_row["standard_version"],
@@ -209,6 +218,15 @@ class ExperienceReadApplication:
                 "dimension_results": dimension_results,
                 "key_contradictions": list(decision_row["hard_blocks"])[:5],
                 "geo_trend": self._geo_trend(dimension_results),
+                "information_gaps": [
+                    dimension for dimension, result in dimension_results.items()
+                    if result["grade"] == "INSUFFICIENT_EVIDENCE"
+                ],
+                "calibration_results": [
+                    {"finding_id": str(item["finding_id"]), "decision": item["decision"], "reason": item["reason"]}
+                    for item in calibration_rows
+                    if item["decision"] != "APPROVED"
+                ],
                 "created_at": _iso(report_row["created_at"]),
                 "evidence_chain": chain,
             }
@@ -240,7 +258,8 @@ class ExperienceReadApplication:
             )).mappings().first()
             tasks = session.execute(select(
                 task.c.id, task.c.stage_code, task.c.agent_identity_ref, task.c.status,
-                task.c.tool_allowlist, task.c.updated_at,
+                task.c.tool_allowlist, task.c.evidence_requirement, task.c.last_error,
+                task.c.last_failure_class, task.c.side_effect_started, task.c.updated_at,
             ).where(task.c.tenant_id == actor.tenant_id, task.c.run_id == run_id).order_by(
                 task.c.created_at, task.c.id
             )).mappings().all()
@@ -276,17 +295,46 @@ class ExperienceReadApplication:
                      "completed_at": _iso(item["completed_at"]) if item["completed_at"] else None}
                     for item in stages
                 ],
-                "tasks": [
-                    {**dict(item), "id": str(item["id"]),
-                     "updated_at": _iso(item["updated_at"]) if item["updated_at"] else None}
-                    for item in tasks
-                ],
+                "tasks": [self._task_projection(session, actor.tenant_id, item) for item in tasks],
                 "handoff_count": handoff_count, "matrix_event_count": receipt_count,
                 "budget": {
                     "currency": "USD", "limit": str(budget["limit_amount"]),
                     "consumed": str(budget["consumed_amount"]), "status": budget["status"],
                 } if budget else None,
             }
+
+    @staticmethod
+    def _task_projection(session: Session, tenant_id: UUID, item: Any) -> dict[str, object]:
+        evidence_count = session.execute(
+            select(func.count()).select_from(evidence).where(
+                evidence.c.tenant_id == tenant_id, evidence.c.task_id == item["id"]
+            )
+        ).scalar_one()
+        tools = session.execute(
+            select(tool_invocation.c.tool_code, tool_invocation.c.status)
+            .join(
+                skill_invocation,
+                (skill_invocation.c.tenant_id == tool_invocation.c.tenant_id)
+                & (skill_invocation.c.id == tool_invocation.c.skill_invocation_id),
+            )
+            .where(skill_invocation.c.tenant_id == tenant_id, skill_invocation.c.task_id == item["id"])
+            .order_by(tool_invocation.c.created_at)
+        ).mappings().all()
+        result = dict(item)
+        result.update(
+            id=str(item["id"]),
+            summary=item["evidence_requirement"],
+            evidence_count=evidence_count,
+            failure_reason=item["last_error"],
+            retryable=(
+                item["last_failure_class"] in {"TRANSIENT", "VALIDATION"}
+                and not item["side_effect_started"]
+            ),
+            needs_human_review=item["status"] in {"WAITING_FOR_USER", "WAITING_FOR_APPROVAL"},
+            tool_invocations=[dict(tool) for tool in tools],
+            updated_at=_iso(item["updated_at"]) if item["updated_at"] else None,
+        )
+        return result
 
     def evidence_object_key(self, actor: Actor, evidence_id: UUID) -> str:
         """Resolve an object key only after tenant membership and project visibility checks."""

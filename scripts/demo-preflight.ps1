@@ -10,14 +10,16 @@ $root = Get-DemoRoot
 Import-DemoEnvironment (Join-Path $root $EnvironmentFile)
 $checks = [System.Collections.Generic.List[object]]::new()
 function Add-Check([string]$Name, [string]$Status, [string]$Detail) {
-    $checks.Add([ordered]@{ name=$Name; status=$Status; detail=$Detail })
+    $checks.Add([pscustomobject][ordered]@{ name=$Name; status=$Status; detail=$Detail })
 }
 function Command-Check([string]$Name, [string]$Command) {
     $found = Get-Command $Command -ErrorAction SilentlyContinue
     Add-Check $Name $(if($found){'PASS'}else{'FAIL'}) $(if($found){$found.Source}else{'not found'})
 }
 Command-Check 'PowerShell 7' 'pwsh'; Command-Check 'Docker' 'docker'; Command-Check 'Python' 'python'
-Command-Check 'Node' 'node'; Command-Check 'pnpm' 'pnpm.cmd'; Command-Check 'AgentTeams CLI' 'agt'
+Command-Check 'Node' 'node'; Command-Check 'pnpm' 'pnpm.cmd'
+Add-Check 'AgentTeams CLI' $(if(Test-AgentTeamsCliAvailable){'PASS'}else{'FAIL'}) `
+    $(if(Get-Command agt -ErrorAction SilentlyContinue){'host agt'}elseif(Test-AgentTeamsCliAvailable){'agentteams-controller container'}else{'not found'})
 if ($PSVersionTable.PSVersion.Major -lt 7) { Add-Check 'PowerShell version' 'FAIL' $PSVersionTable.PSVersion.ToString() }
 else { Add-Check 'PowerShell version' 'PASS' $PSVersionTable.PSVersion.ToString() }
 $drive = Get-PSDrive -Name ([IO.Path]::GetPathRoot($root).TrimEnd(':\'))
@@ -25,13 +27,19 @@ Add-Check 'Free disk >= 10 GB' $(if($drive.Free -ge 10GB){'PASS'}else{'FAIL'}) (
 foreach($pair in @(@('Web',3000),@('Ops',3001),@('API',8100),@('PostgreSQL',[int]$env:POSTGRES_PORT),@('MinIO',[int]$env:MINIO_API_PORT),@('RocketMQ Proxy',[int]$env:ROCKETMQ_PROXY_PORT))) {
     Add-Check "$($pair[0]) port" $(if(Test-TcpPort '127.0.0.1' $pair[1]){'PASS'}else{'NOT_RUNNING'}) "127.0.0.1:$($pair[1])"
 }
-foreach($pair in @(
-    @('AgentTeams Controller',[uri]$env:AGENTTEAMS_CONTROLLER_URL),
-    @('AgentTeams Manager',[uri]$env:AGENTTEAMS_MANAGER_URL),
-    @('Matrix',[uri]$env:AGENTTEAMS_MATRIX_URL),
-    @('Element',[uri]$env:AGENTTEAMS_ELEMENT_URL)
+foreach($endpoint in @(
+    [pscustomobject]@{ Name='AgentTeams Controller'; Value=$env:AGENTTEAMS_CONTROLLER_URL },
+    [pscustomobject]@{ Name='AgentTeams Manager'; Value=$env:AGENTTEAMS_MANAGER_URL },
+    [pscustomobject]@{ Name='Matrix'; Value=$env:AGENTTEAMS_MATRIX_URL },
+    [pscustomobject]@{ Name='Element'; Value=$env:AGENTTEAMS_ELEMENT_URL }
 )) {
-    Add-Check $pair[0] $(if(Test-TcpPort $pair[1].Host $pair[1].Port){'PASS'}else{'NOT_RUNNING'}) "$($pair[1].Host):$($pair[1].Port)"
+    $uri = $null
+    $valid = [uri]::TryCreate([string]$endpoint.Value, [UriKind]::Absolute, [ref]$uri)
+    if (-not $valid -or -not $uri.Host -or $uri.Port -le 0) {
+        Add-Check $endpoint.Name 'FAIL' 'URL missing or invalid'
+        continue
+    }
+    Add-Check $endpoint.Name $(if(Test-TcpPort $uri.Host $uri.Port){'PASS'}else{'NOT_RUNNING'}) "$($uri.Host):$($uri.Port)"
 }
 foreach($name in @('DATABASE_URL','POSTGRES_PASSWORD','LAUNCHSCOPE_S3_ACCESS_KEY','LAUNCHSCOPE_S3_SECRET_KEY','LAUNCHSCOPE_MCP_CONSUMER_TOKEN','LAUNCHSCOPE_AGENTTEAMS_BRIDGE_TOKEN')) {
     $present = -not [string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($name))
@@ -63,11 +71,11 @@ if (Test-Path -LiteralPath $python) {
     $migrationDetail = if($LASTEXITCODE -ne 0){'database unavailable'}elseif($migrationStatus -eq 'PASS'){"$migration".Trim()}else{"schema is behind head: $($migration.Trim())"}
     Add-Check 'Database migration head' $migrationStatus $migrationDetail
 }
-$agt = Get-Command agt -ErrorAction SilentlyContinue
-if ($agt) {
+if (Test-AgentTeamsCliAvailable) {
     try {
-        $workerJson = & $agt.Source get workers -o json 2>$null
-        $workers = @($workerJson | ConvertFrom-Json)
+        $workerJson = & (Join-Path $PSScriptRoot 'invoke-agentteams-cli.ps1') @('get','workers','-o','json') 2>$null
+        $workerPayload = $workerJson | ConvertFrom-Json
+        $workers = if ($null -ne $workerPayload.workers) { @($workerPayload.workers) } else { @($workerPayload) }
         $launchscopeWorkers = @($workers | Where-Object { $_.metadata.name -like 'launchscope-*' })
         Add-Check 'Six AgentTeams Workers' $(if($launchscopeWorkers.Count -eq 6){'PASS'}else{'NOT_RUNNING'}) "$($launchscopeWorkers.Count) observed"
     } catch { Add-Check 'Six AgentTeams Workers' 'NOT_RUNNING' 'AgentTeams API unavailable' }

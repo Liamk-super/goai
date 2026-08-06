@@ -157,7 +157,7 @@ class McpEvidenceApplication:
 
     def context_get(self, actor: Actor, run_id: UUID, task_id: UUID) -> dict[str, object]:
         with tenant_transaction(self._sessions, TenantScope(actor.tenant_id), actor_id=actor.actor_id) as session:
-            assignment = self._require_assignment(session, actor.tenant_id, run_id, task_id)
+            assignment = self._require_assignment(session, actor.tenant_id, run_id, task_id, actor.actor_id)
             run = session.execute(
                 select(evaluation_run.c.product_version_id, evaluation_run.c.standard_version).where(
                     evaluation_run.c.tenant_id == actor.tenant_id, evaluation_run.c.id == run_id
@@ -296,7 +296,7 @@ class McpEvidenceApplication:
         key = f"tenant/{actor.tenant_id}/run/{run_id}/task/{task_id}/evidence/{evidence_id}.{extension}"
         digest = self._objects.put_private(key, payload, mime_type)
         with tenant_transaction(self._sessions, TenantScope(actor.tenant_id), actor_id=actor.actor_id) as session:
-            self._require_assignment(session, actor.tenant_id, run_id, task_id)
+            self._require_assignment(session, actor.tenant_id, run_id, task_id, actor.actor_id)
             session.execute(
                 evidence.insert().values(
                     id=evidence_id, tenant_id=actor.tenant_id, run_id=run_id, task_id=task_id,
@@ -309,7 +309,9 @@ class McpEvidenceApplication:
         return evidence_id
 
     @staticmethod
-    def _require_assignment(session: Session, tenant_id: UUID, run_id: UUID, task_id: UUID) -> str:
+    def _require_assignment(
+        session: Session, tenant_id: UUID, run_id: UUID, task_id: UUID, actor_id: str | None = None
+    ) -> str:
         found = session.execute(
             select(task.c.agent_identity_ref).where(
                 task.c.tenant_id == tenant_id, task.c.run_id == run_id, task.c.id == task_id
@@ -317,6 +319,10 @@ class McpEvidenceApplication:
         ).scalar_one_or_none()
         if found is None:
             raise NotFoundError("Run/Task assignment was not found")
+        if actor_id and actor_id.startswith("agent:"):
+            assigned_agent = found.split("@", 1)[0]
+            if assigned_agent != actor_id.removeprefix("agent:"):
+                raise NotFoundError("Run/Task assignment was not found")
         return found
 
     def _mark_unknown(self, actor: Actor, run_id: UUID, reason: str) -> None:
@@ -333,7 +339,7 @@ class McpEvidenceApplication:
         self, actor: Actor, run_id: UUID, task_id: UUID, source_type: str, *, maximum: int
     ) -> None:
         with tenant_transaction(self._sessions, TenantScope(actor.tenant_id), actor_id=actor.actor_id) as session:
-            self._require_assignment(session, actor.tenant_id, run_id, task_id)
+            self._require_assignment(session, actor.tenant_id, run_id, task_id, actor.actor_id)
             used = session.execute(
                 select(evidence.c.id).where(
                     evidence.c.tenant_id == actor.tenant_id, evidence.c.run_id == run_id,

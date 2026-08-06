@@ -37,17 +37,19 @@ export type DimensionResult = {
   trend_signal?: string | null;
 };
 export type Report = {
-  report_id: string; run_id: string; decision_id: string; recommendation: string;
+  report_id: string; run_id: string; project_id: string; decision_id: string; recommendation: string;
   standard_version: string; dimension_grades: Record<string, string>; blocking_reasons: string[];
   action_items: string[]; created_at: string; evidence_chain: EvidenceNode[];
   dimension_results?: Record<string, DimensionResult>; key_contradictions?: string[];
   action_links?: { action: string; dimension: string | null; evidence_ids: string[] }[];
   geo_trend?: { signal: string; region: string | null; as_of: string | null; valid_until: string | null; evidence_ids: string[] };
+  information_gaps?: string[];
+  calibration_results?: { finding_id: string; decision: string; reason: string }[];
 };
 export type AgentTeamsRun = {
   run_id: string; team: { name: string; agentteams_version: string; binding_status: string; team_room_id?: string | null };
   stages: { code: string; status: string; ordinal: number }[];
-  tasks: { id: string; stage_code: string; agent_identity_ref: string; status: string; tool_allowlist: string[] }[];
+  tasks: { id: string; stage_code: string; agent_identity_ref: string; status: string; tool_allowlist: string[]; evidence_count?: number; summary?: string | null; failure_reason?: string | null; retryable?: boolean; needs_human_review?: boolean; tool_invocations?: { tool_code: string; status: string }[] }[];
   handoff_count: number; matrix_event_count: number;
   budget?: { currency: string; limit: string; consumed: string; status: string } | null;
 };
@@ -91,6 +93,13 @@ export class LaunchScopeApi {
   getAgentTeamsRun(runId: string) { return this.request<AgentTeamsRun>(`/experience/runs/${runId}/agentteams`); }
   evidenceReadUrl(evidenceId: string) { return this.request<{ read_url: string; expires_in_seconds: number }>(`/experience/evidence/${evidenceId}/read-url`); }
   compare(projectId: string, runId: string) { return this.request<Record<string, unknown>>(`/experience/projects/${projectId}/compare/${runId}`); }
+  extractIntake(rawContent: string) {
+    return this.request<{ source: "MODEL_INFERENCE"; model_id: string; extracted_fields: Record<string, string | null>; missing_fields: string[]; confirmation_required: true }>(
+      "/intake:extract",
+      { method: "POST", body: JSON.stringify({ raw_content: rawContent, allow_external_processing: true }) },
+      true,
+    );
+  }
   createProject(workspaceId: string, name: string) {
     return this.request<{ project_id: string }>("/projects", { method: "POST", body: JSON.stringify({ workspace_id: workspaceId, name }) }, true).then(async created => {
       const visible = await this.listProjects();

@@ -45,7 +45,13 @@ def test_dispatch_freezes_twenty_dollar_manifest_graph_and_outbox(
         event = session.execute(
             select(outbox_message).where(
                 outbox_message.c.tenant_id == tenant_id,
-                outbox_message.c.event_type == "evaluation.run.dispatched.v1",
+                outbox_message.c.event_type == "evaluation.task.ready.v1",
             )
         ).mappings().one()
         assert event["publish_status"] == "PENDING"
+        envelope = event["payload"]
+        assert envelope["task_id"]
+        assert envelope["payload"]["agent_code"] == "evaluation-manager"
+        assert envelope["payload"]["context_token"]
+        assert envelope["payload"]["handoff_schema"]["type"] == "object"
+        assert "material_only" in envelope["payload"]["research_policy"]

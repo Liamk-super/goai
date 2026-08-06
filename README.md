@@ -1,9 +1,15 @@
-# LaunchScope / 势能引擎 V0.2 Demo
+# LaunchScope / 势能引擎 V0.3 Demo
 
 LaunchScope is an evidence-driven product validation control plane. V0.2 adds
 a browser-local Demo identity, the frozen AgentTeams v1.2.0 1+5 topology,
 RocketMQ 5.x Proxy dispatch, Matrix handoffs, controlled browser/search/context
 MCP, deterministic four-dimension synthesis and a USD 20 hard Run limit.
+
+V0.3 adds the light four-ring project workbench, four-section intake studio,
+explicit model-assisted extraction drafts, human profile confirmation, critical
+gap questions, richer 1+5 Agent projections, calibrated reports and V1/V2
+regression surfaces. Model extraction is opt-in per request and never writes a
+confirmed ProductProfile by itself.
 
 ## Local prerequisites
 
@@ -26,6 +32,17 @@ pwsh -File scripts/demo-bootstrap.ps1 -InstallAgentTeams
 pwsh -File scripts/demo-preflight.ps1 -RequireExternalCase
 pwsh -File scripts/demo-start.ps1
 ```
+
+For an OpenAI-compatible model gateway, configure only the untracked local file:
+
+```text
+AGENTTEAMS_MODEL_BASE_URL=https://provider.example/v1
+AGENTTEAMS_MODEL_API_KEY=...
+AGENTTEAMS_MODEL_ID=...
+```
+
+The browser never receives this key. Free-text extraction requires an explicit
+checkbox before the material is sent to the configured provider.
 
 Open `http://127.0.0.1:3000/demo-login`. A nickname creates a random local Demo
 tenant/workspace. The browser stores only the versioned Demo identifiers; it

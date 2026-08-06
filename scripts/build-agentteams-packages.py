@@ -42,8 +42,8 @@ def validate(documents: list[dict], contracts: dict[str, dict]) -> list[dict]:
     for worker in workers:
         spec = worker["spec"]
         code = worker["metadata"]["annotations"]["launchscope.io/agent-code"]
-        if spec.get("runtime") != "qwenpaw" or not str(spec.get("model", "")).startswith("__LAUNCHSCOPE_MODEL_"):
-            raise ValueError(f"{code} must use qwenpaw and a rendered model placeholder")
+        if spec.get("runtime") != "copaw" or not str(spec.get("model", "")).startswith("__LAUNCHSCOPE_MODEL_"):
+            raise ValueError(f"{code} must use copaw and a rendered model placeholder")
         if code not in spec.get("package", ""):
             raise ValueError(f"{code} must use its role-specific package")
         configured_mcp = {item["name"] for item in spec.get("mcpServers", [])}
@@ -73,16 +73,28 @@ def package_files(contract: dict) -> dict[str, str]:
     agents = (
         "# AGENTS\n\n"
         + "\n".join(f"- {item}" for item in contract["responsibilities"])
-        + "\n\nAllowed tools: "
+        + "\n\nRuntime MCP tools always include `launchscope-context.get.v1`; role-specific tools: "
         + json.dumps(contract["allowed_tools"])
         + "\n"
     )
     skill = (
         f"# LaunchScope {code} handoff v1\n\n"
-        "Return only AgentHandoffV1. Link every claim to Evidence IDs. "
-        "Copy tenant_id/run_id/task_id only from the assignment. Never fabricate provider usage: "
-        "AgentTeams/Higress must attach its immutable provider_usage receipt; absence freezes the Run. "
-        "Never write Run, Task, Decision, Report, or long-term memory state.\n"
+        "The Human assignment is authoritative and contains tenant_id, run_id, task_id, agent_code, "
+        "context_token, handoff_schema, and usage_policy. First call `launchscope-context.get.v1` with the "
+        "assignment's exact context_token. Pass the same token to any other assigned MCP tool. Never copy "
+        "routing values from prior chat messages.\n\n"
+        "Obey research_policy. When material_only is true, browser and public-search tools are optional: use the "
+        "registered MATERIAL Evidence, complete the review, and mark claims that lack direct support as hypotheses. "
+        "Do not block merely because an optional external research backend or URL is unavailable.\n\n"
+        "Return exactly one raw JSON object and no prose or Markdown. It must validate against the supplied "
+        "handoff_schema. Copy tenant_id/run_id/task_id/agent_code exactly from this assignment. Link every "
+        "non-hypothesis claim to Evidence IDs returned by MCP; never invent Evidence. If evidence is inadequate, "
+        "mark the claim as a hypothesis or return status BLOCKED. On any refusal, tool error, policy conflict, or "
+        "other failure, still return the same structured object with status BLOCKED or FAILED, an explicit "
+        "failure_class and next_action, and empty claims/evidence where appropriate.\n\n"
+        "Never fabricate provider_usage. Include it only when an actual immutable receipt is supplied by the "
+        "runtime. When usage_policy.required is false, omit provider_usage and continue. Never write Run, Task, "
+        "Decision, Report, or long-term memory state.\n"
     )
     return {
         "IDENTITY.md": identity,

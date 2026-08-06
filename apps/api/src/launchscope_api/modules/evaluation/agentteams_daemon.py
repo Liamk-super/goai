@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sys
 import time
 import urllib.error
 import urllib.parse
@@ -25,15 +26,20 @@ from launchscope_orchestrator.agentteams_bridge import AgentTeamsBridge
 
 
 class MatrixHumanClient:
-    def __init__(self, base_url: str, room_id: str, access_token: str) -> None:
+    def __init__(self, base_url: str, access_token: str, agent_rooms: dict[str, str]) -> None:
         self.base_url = base_url.rstrip("/")
-        self.room_id = room_id
         self.access_token = access_token
+        self.agent_rooms = agent_rooms
 
     def send_assignment(self, event: EventEnvelope) -> tuple[str, str]:
         assignment = AgentTeamsBridge().assignment_from_dispatch(event.to_dict())
+        agent_code = str(assignment.body["agent_code"])
+        try:
+            room_id = self.agent_rooms[agent_code]
+        except KeyError as exc:
+            raise RuntimeError(f"no Matrix direct room configured for Agent {agent_code}") from exc
         transaction_id = urllib.parse.quote(str(event.event_id), safe="")
-        room = urllib.parse.quote(self.room_id, safe="")
+        room = urllib.parse.quote(room_id, safe="")
         url = f"{self.base_url}/_matrix/client/v3/rooms/{room}/send/m.room.message/{transaction_id}"
         payload = json.dumps({
             "msgtype": "m.text", "body": json.dumps(assignment.body, separators=(",", ":")),
@@ -48,7 +54,7 @@ class MatrixHumanClient:
         event_id = str(result.get("event_id", ""))
         if not event_id:
             raise RuntimeError("Matrix send returned no event_id")
-        return self.room_id, event_id
+        return room_id, event_id
 
 
 def _event(value: dict[str, object]) -> EventEnvelope:
@@ -83,11 +89,14 @@ def dispatch_bridge() -> None:
     consumer = SimpleConsumer(
         ClientConfiguration(os.environ["ROCKETMQ_ENDPOINTS"], Credentials()),
         os.getenv("LAUNCHSCOPE_ROCKETMQ_CONSUMER_GROUP", "launchscope-agentteams-bridge-v1"),
-        {topic: FilterExpression("evaluation.run.dispatched.v1")}, await_duration=20,
+        {topic: FilterExpression("evaluation.task.ready.v1")}, await_duration=20,
     )
+    agent_rooms = json.loads(os.environ["LAUNCHSCOPE_MATRIX_AGENT_ROOMS_JSON"])
+    if not isinstance(agent_rooms, dict):
+        raise RuntimeError("LAUNCHSCOPE_MATRIX_AGENT_ROOMS_JSON must be an object")
     matrix = MatrixHumanClient(
-        os.environ["AGENTTEAMS_MATRIX_URL"], os.environ["AGENTTEAMS_TEAM_ROOM_ID"],
-        os.environ["AGENTTEAMS_HUMAN_ACCESS_TOKEN"],
+        os.environ["AGENTTEAMS_MATRIX_URL"], os.environ["AGENTTEAMS_HUMAN_ACCESS_TOKEN"],
+        {str(key): str(value) for key, value in agent_rooms.items()},
     )
     consumer.startup()
     try:
@@ -97,12 +106,18 @@ def dispatch_bridge() -> None:
                 scope = TenantScope(UUID(str(event.tenant_id)))
                 with sessions() as session:
                     def handle(db_session: Session, current: EventEnvelope) -> None:
-                        room_id, _ = matrix.send_assignment(current)
+                        assigned_room_id, _ = matrix.send_assignment(current)
+                        leader_room_id = (
+                            assigned_room_id
+                            if current.payload.get("agent_code") == "evaluation-manager"
+                            else os.environ["AGENTTEAMS_LEADER_ROOM_ID"]
+                        )
                         db_session.execute(update(agentteams_run_binding).where(
                             agentteams_run_binding.c.tenant_id == current.tenant_id,
                             agentteams_run_binding.c.run_id == current.run_id,
                         ).values(
-                            team_room_id=room_id, binding_status="MANAGER_DISPATCHED",
+                            team_room_id=os.environ["AGENTTEAMS_TEAM_ROOM_ID"], leader_room_id=leader_room_id,
+                            binding_status="TASKS_DISPATCHED",
                             updated_at=datetime.now().astimezone(),
                         ))
 
@@ -129,15 +144,48 @@ def _handoff_content(content: object) -> dict[str, object] | None:
     if not isinstance(content, dict):
         return None
     candidate = content.get("launchscope_handoff")
-    if isinstance(candidate, dict):
+    required = ("tenant_id", "run_id", "task_id", "agent_code", "status")
+    if isinstance(candidate, dict) and candidate.get("schema_version") == "1.0" and all(candidate.get(key) for key in required):
         return candidate
     body = content.get("body")
-    if isinstance(body, str) and body.lstrip().startswith("{"):
+    if isinstance(body, str):
+        candidate_body = body.strip()
+        if candidate_body.startswith("```"):
+            lines = candidate_body.splitlines()
+            if len(lines) >= 3 and lines[-1].strip() == "```":
+                candidate_body = "\n".join(lines[1:-1]).strip()
+        if not candidate_body.startswith("{"):
+            return None
         try:
-            parsed = json.loads(body)
+            parsed = json.loads(candidate_body)
         except json.JSONDecodeError:
             return None
-        return parsed if isinstance(parsed, dict) and parsed.get("schema_version") == "1.0" else None
+        if isinstance(parsed, dict) and parsed.get("status") == "COMPLETED":
+            parsed["status"] = "SUCCEEDED"
+        if isinstance(parsed, dict) and parsed.get("risk") not in {"LOW", "MEDIUM", "HIGH", "CRITICAL"}:
+            parsed["risk"] = "HIGH"
+        if isinstance(parsed, dict) and isinstance(parsed.get("claims"), list):
+            for claim in parsed["claims"]:
+                if isinstance(claim, dict) and not claim.get("hypothesis") and not claim.get("evidence_ids"):
+                    claim["hypothesis"] = True
+        if isinstance(parsed, dict):
+            expected_dimensions = {
+                "product-engineering": "PRODUCT_IMPLEMENTATION",
+                "user-evidence": "USER_USAGE",
+                "business-investment": "BUSINESS_INVESTMENT",
+                "geo-policy-trend": "GEO_POLICY_TREND",
+                "evidence-auditor": "EVIDENCE_AUDIT",
+            }
+            expected_dimension = expected_dimensions.get(str(parsed.get("agent_code", "")))
+            if expected_dimension is not None:
+                parsed["dimension"] = expected_dimension
+        return (
+            parsed
+            if isinstance(parsed, dict)
+            and parsed.get("schema_version") == "1.0"
+            and all(parsed.get(key) for key in required)
+            else None
+        )
     return None
 
 
@@ -182,8 +230,35 @@ def matrix_listener() -> None:
                             "X-LaunchScope-Task-Id": task_id,
                         },
                     )
-                    with urllib.request.urlopen(request, timeout=30) as response:
-                        response.read(65_537)
+                    try:
+                        with urllib.request.urlopen(request, timeout=30) as response:
+                            response.read(65_537)
+                    except urllib.error.HTTPError as exc:
+                        if exc.code not in {400, 422}:
+                            raise
+                        failure = {
+                            "schema_version": "1.0", "tenant_id": tenant_id,
+                            "run_id": run_id, "task_id": task_id,
+                            "agent_code": str(handoff.get("agent_code", "")),
+                            "status": "BLOCKED", "dimension": str(handoff.get("dimension", "CONTROL")),
+                            "claims": [], "evidence_refs": [], "risk": "HIGH", "confidence": 0.0,
+                            "needs_human_approval": True, "failure_class": "VALIDATION",
+                            "next_action": "Agent output failed the frozen handoff contract; inspect the immutable Matrix event.",
+                            "audit_results": [],
+                        }
+                        failure_body = json.dumps({
+                            "event_id": event.get("event_id"), "room_id": room_id,
+                            "sender": event.get("sender"), "content": failure,
+                        }, separators=(",", ":")).encode("utf-8")
+                        failure_request = urllib.request.Request(
+                            ingress, data=failure_body, method="POST", headers=dict(request.headers)
+                        )
+                        with urllib.request.urlopen(failure_request, timeout=30) as response:
+                            response.read(65_537)
+                        print(
+                            f"Matrix event {event.get('event_id')} was persisted as structured VALIDATION failure",
+                            file=sys.stderr,
+                        )
             next_batch = str(result.get("next_batch", ""))
             if not next_batch:
                 raise RuntimeError("Matrix sync returned no next_batch cursor")

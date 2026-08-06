@@ -70,7 +70,11 @@ services:
     depends_on:
       rocketmq-namesrv:
         condition: service_healthy
-    command: ["sh", "mqbroker"]
+    user: "0:0"
+    command:
+      - sh
+      - -lc
+      - chown -R rocketmq:rocketmq /home/rocketmq/store && exec runuser -u rocketmq -- sh mqbroker
     environment:
       NAMESRV_ADDR: rocketmq-namesrv:9876
     ports:
@@ -80,7 +84,11 @@ services:
     volumes:
       - rocketmq-store:/home/rocketmq/store
     healthcheck:
-      test: ["CMD-SHELL", "test -f /home/rocketmq/logs/rocketmqlogs/broker.log"]
+      test:
+        [
+          "CMD-SHELL",
+          "sh mqadmin clusterList -n rocketmq-namesrv:9876 2>/dev/null | grep -q DefaultCluster",
+        ]
       interval: 5s
       timeout: 5s
       retries: 24

@@ -32,7 +32,7 @@ def test_team_references_six_independent_workers_with_one_leader() -> None:
     team = next(item for item in documents if item["kind"] == "Team")
     human = next(item for item in documents if item["kind"] == "Human")
     assert len(workers) == 6
-    assert all(worker["spec"]["runtime"] == "qwenpaw" for worker in workers)
+    assert all(worker["spec"]["runtime"] == "copaw" for worker in workers)
     assert len(team["spec"]["workerMembers"]) == 6
     assert sum(item["role"] == "team_leader" for item in team["spec"]["workerMembers"]) == 1
     assert human["metadata"]["name"] == "launchscope-human-coordinator"

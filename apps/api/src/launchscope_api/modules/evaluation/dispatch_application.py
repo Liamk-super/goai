@@ -17,19 +17,21 @@ from launchscope_api.infrastructure.db.schema import (
     agent_identity,
     agentteams_run_binding,
     budget_reservation,
+    evidence,
     evaluation_run,
+    material,
     run_manifest,
     run_status_history,
     stage,
     task,
 )
 from launchscope_api.infrastructure.db.session import tenant_transaction
-from launchscope_api.infrastructure.messaging.outbox import OutboxRepository
 from launchscope_api.modules.identity_tenant.application import Actor, NotFoundError
-from launchscope_domain.events import EventEnvelope
 from launchscope_domain.value_objects import TenantScope
 from launchscope_orchestrator.manifest_loader import AgentManifestLoader
 from launchscope_skills import SkillRegistry
+
+from .task_dispatch import enqueue_ready_tasks, provider_usage_required
 
 
 @dataclass(frozen=True, slots=True)
@@ -113,11 +115,11 @@ class DispatchApplication:
                 "model_pricing": {
                     "input_usd_per_million_tokens": os.getenv("LAUNCHSCOPE_MODEL_INPUT_USD_PER_MILLION"),
                     "output_usd_per_million_tokens": os.getenv("LAUNCHSCOPE_MODEL_OUTPUT_USD_PER_MILLION"),
-                    "required_before_submission": True,
+                    "required_before_submission": provider_usage_required(),
                 },
                 "failure_policy": {
                     "SUBMISSION_UNKNOWN": "NEEDS_ATTENTION_NO_RETRY",
-                    "USAGE_UNKNOWN": "NEEDS_ATTENTION_NO_RETRY",
+                    "USAGE_UNKNOWN": "NEEDS_ATTENTION_NO_RETRY" if provider_usage_required() else "OPTIONAL_DEMO",
                     "TOOL_SIDE_EFFECT_UNKNOWN": "NEEDS_ATTENTION_NO_RETRY",
                 },
             }
@@ -182,6 +184,21 @@ class DispatchApplication:
                         created_at=now, updated_at=now,
                     )
                 )
+            validated_materials = session.execute(select(material).where(
+                material.c.tenant_id == actor.tenant_id,
+                material.c.product_version_id == row["product_version_id"],
+                material.c.ingest_status == "VALIDATED",
+            )).mappings().all()
+            for source in validated_materials:
+                session.execute(evidence.insert().values(
+                    id=uuid4(), tenant_id=actor.tenant_id, run_id=run_id, task_id=None,
+                    material_id=source["id"], source_type="MATERIAL", object_key=source["object_key"],
+                    sha256=source["sha256"], size_bytes=source["size_bytes"], mime_type=source["mime_type"],
+                    evidence_level="E1", trust_level=source["trust_level"],
+                    summary=f"Validated project material: {source['display_name']}"[:4000],
+                    published_at=None, fetched_at=source["submitted_at"], valid_from=None, valid_until=None,
+                    region=None, simulated=False, supersedes_id=None, created_at=now,
+                ))
             session.execute(
                 update(evaluation_run)
                 .where(evaluation_run.c.tenant_id == actor.tenant_id, evaluation_run.c.id == run_id)
@@ -193,17 +210,8 @@ class DispatchApplication:
                     from_status="PLANNED", to_status="RUNNING", reason="AgentTeams dispatch committed", occurred_at=now,
                 )
             )
-            scope = TenantScope(actor.tenant_id)
-            event = EventEnvelope(
-                event_type="evaluation.run.dispatched.v1", tenant_id=actor.tenant_id, run_id=run_id,
-                payload={
-                    "manifest_sha256": manifest_sha,
-                    "team_name": "launchscope-potential-review",
-                    "task_count": len(_TASKS),
-                },
-                correlation_id=row["correlation_id"], idempotency_key=idempotency_key,
-            )
-            OutboxRepository(session).enqueue(event, aggregate_id=run_id, aggregate_type="evaluation_run", scope=scope)
+            if enqueue_ready_tasks(session, actor.tenant_id, run_id, "LEADER_PLANNING") != 1:
+                raise RuntimeError("dispatch must create exactly one ready Leader task")
             return DispatchResult(run_id, "RUNNING", manifest_sha, len(_TASKS))
 
     @staticmethod

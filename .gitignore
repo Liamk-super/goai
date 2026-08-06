@@ -36,3 +36,7 @@ infra/agentteams/generated/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Local browser snapshots and generated test screenshots
+/.playwright-cli/
+/output/playwright/

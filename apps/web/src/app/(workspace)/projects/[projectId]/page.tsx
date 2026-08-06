@@ -1,19 +1,16 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import { browserApi, type Run } from "../../../../lib/api-client";
-import { PageHeader, StatusPill } from "../../../../components/shell/AppShell";
+import { browserApi, type AgentTeamsRun, type Project, type Run } from "../../../../lib/api-client";
+import { MomentumWorkbench } from "../../../../components/workspace/MomentumWorkbench";
 import { useI18n } from "../../../../components/i18n/LocaleProvider";
 
 export default function ProjectPage({ params }: { params: Promise<{ projectId: string }> }) {
   const { t } = useI18n();
-  const { projectId } = use(params); const [runs, setRuns] = useState<Run[]>([]); const [error, setError] = useState<string>();
-  useEffect(() => { void browserApi().listRuns(projectId).then(result => setRuns(result.items)).catch(cause => setError(cause.message)); }, [projectId]);
-  return <main><PageHeader eyebrow={t("Dossier / {id}", { id: projectId.slice(0, 8) })} title={t("A thesis under pressure.")} description={t("Versions share one project identity and one evidence standard. Every run adds history; none erase it.")} action={<a className="button" href={`/projects/${projectId}/new-evaluation`}>{t("New evaluation")}</a>} />
-    {error && <p role="alert">{error}</p>}
-    <section className="panel reveal"><div className="panel-header"><div><p className="panel-kicker">{t("Run ledger")}</p><h2>{t("Durable evaluations")}</h2></div><span>{t("{count} total", { count: runs.length })}</span></div>
-      {runs.length === 0 ? <div className="empty-state"><strong>{t("No run has crossed intake.")}</strong><p>{t("Submit one product version to begin the evidence chain.")}</p></div> : <ul className="run-list">{runs.map(run => <li key={run.run_id}><div><a href={`/runs/${run.run_id}`}>{run.run_id}</a><p>{run.current_stage ?? t("Awaiting stage")} · {t("standard {standard}", { standard: run.standard_version })}</p></div><StatusPill value={run.status} /></li>)}</ul>}
-    </section>
-    {runs.length > 1 && <p><a className="button secondary" href={`/projects/${projectId}/compare/${runs[0].run_id}`}>{t("Compare latest to prior")}</a></p>}
-  </main>;
+  const { projectId } = use(params); const [runs, setRuns] = useState<Run[]>([]); const [project, setProject] = useState<Project>(); const [team, setTeam] = useState<AgentTeamsRun>(); const [error, setError] = useState<string>();
+  useEffect(() => { const api = browserApi(); void Promise.all([api.listProjects(), api.listRuns(projectId)]).then(async ([projects, runResult]) => {
+    setProject(projects.items.find(item => item.project_id === projectId)); setRuns(runResult.items);
+    if (runResult.items[0] && runResult.items[0].status !== "PLANNED") setTeam(await api.getAgentTeamsRun(runResult.items[0].run_id));
+  }).catch(cause => setError(cause instanceof Error ? cause.message : t("Project signal unavailable"))); }, [projectId, t]);
+  return <main className="workspace-main"><header className="workspace-toolbar"><div><p>势能引擎 · 项目操作台</p><strong>{project?.name ?? "加载项目…"}</strong></div><nav><a href="/projects">切换项目</a><a href={`/projects/${projectId}/new-evaluation`}>提交新版本</a>{runs.length > 1 && <a href={`/projects/${projectId}/compare/${runs[0].run_id}`}>V1 / V2 对比</a>}</nav></header>{error && <p role="alert">{error}</p>}{project && <MomentumWorkbench project={project} runs={runs} team={team} />}</main>;
 }

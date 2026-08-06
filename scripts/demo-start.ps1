@@ -1,14 +1,20 @@
-param([string]$EnvironmentFile = '.env.demo.local', [switch]$RecordedOnly)
+param(
+    [string]$EnvironmentFile = '.env.demo.local',
+    [switch]$RecordedOnly,
+    [switch]$MaterialOnly
+)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'demo-common.ps1')
 $root = Get-DemoRoot
 Import-DemoEnvironment (Join-Path $root $EnvironmentFile)
 Assert-LocalDemo
+if ($MaterialOnly) { [Environment]::SetEnvironmentVariable('LAUNCHSCOPE_MATERIAL_ONLY', 'true', 'Process') }
 if (-not $RecordedOnly) {
-    & pwsh -NoProfile -File (Join-Path $PSScriptRoot 'demo-preflight.ps1') `
-        -EnvironmentFile $EnvironmentFile -RequireExternalCase
-    if ($LASTEXITCODE -ne 0) { throw 'Live Demo preflight failed; use -RecordedOnly only for the labelled fallback' }
+    $preflightArguments = @('-NoProfile','-File',(Join-Path $PSScriptRoot 'demo-preflight.ps1'),'-EnvironmentFile',$EnvironmentFile)
+    if (-not $MaterialOnly) { $preflightArguments += '-RequireExternalCase' }
+    & pwsh @preflightArguments
+    if ($LASTEXITCODE -ne 0) { throw 'Live Demo preflight failed; use -MaterialOnly for an authorized private-material run or -RecordedOnly for the labelled fallback' }
 }
 $state = Join-Path $root '.demo\run'; $logs = Join-Path $root '.demo\logs'
 New-Item -ItemType Directory -Force -Path $state,$logs | Out-Null
@@ -30,8 +36,7 @@ try {
         & .venv\Scripts\python.exe scripts/build-agentteams-packages.py
         if ($LASTEXITCODE -ne 0) { throw 'AgentTeams package validation failed' }
         if (-not $RecordedOnly) {
-            $agt = Get-Command agt -ErrorAction SilentlyContinue
-            if (-not $agt) { throw 'agt CLI is required; run demo-bootstrap.ps1 -InstallAgentTeams first' }
+            if (-not (Test-AgentTeamsCliAvailable)) { throw 'AgentTeams CLI is required; run demo-bootstrap.ps1 -InstallAgentTeams first' }
             $resource = Get-Content -LiteralPath 'infra/agentteams/resources/launchscope-team.yaml' -Raw
             foreach($role in @('EVALUATION_MANAGER','PRODUCT_ENGINEERING','USER_EVIDENCE','BUSINESS_INVESTMENT','GEO_POLICY_TREND','EVIDENCE_AUDITOR')) {
                 $override = [Environment]::GetEnvironmentVariable("AGENTTEAMS_MODEL_$role")
@@ -40,10 +45,23 @@ try {
             }
             $rendered = Join-Path $root 'infra/agentteams/generated/launchscope-team.rendered.yaml'
             $resource | Set-Content -LiteralPath $rendered -Encoding utf8
+            $humanPayload = & (Join-Path $PSScriptRoot 'invoke-agentteams-cli.ps1') @('get','humans','-o','json') | ConvertFrom-Json
+            $applyPath = $rendered
+            if (@($humanPayload.humans | Where-Object name -eq 'launchscope-human-coordinator').Count -gt 0) {
+                $documents = @($resource -split '(?m)^---\s*$' | Where-Object { $_ -notmatch '(?m)^kind:\s*Human\s*$' })
+                $applyPath = Join-Path $root 'infra/agentteams/generated/launchscope-team.existing-human.yaml'
+                ($documents -join "`n---`n") | Set-Content -LiteralPath $applyPath -Encoding utf8
+            }
             Push-Location (Join-Path $root 'infra/agentteams')
-            try { & $agt.Source apply -f generated/launchscope-team.rendered.yaml }
+            try { & (Join-Path $PSScriptRoot 'invoke-agentteams-cli.ps1') @('apply','-f',(Resolve-Path -Relative $applyPath)) }
             finally { Pop-Location }
             if ($LASTEXITCODE -ne 0) { throw 'Applying the frozen 1+5 AgentTeams resources failed' }
+        }
+
+        foreach ($port in @(8100, [int]$env:LAUNCHSCOPE_MCP_PORT, 3000, 3001)) {
+            if (Test-TcpPort '127.0.0.1' $port) {
+                throw "Refusing to start over an occupied Demo application port: 127.0.0.1:$port"
+            }
         }
 
         $python = Join-Path $root '.venv\Scripts\python.exe'
@@ -64,12 +82,18 @@ try {
         if (-not $ready) { Start-Sleep -Seconds 2 }
     } until ($ready -or (Get-Date) -ge $deadline)
     if (-not $ready) { throw "Demo processes did not become healthy; inspect $logs" }
+    $deadRecords = @(Get-ChildItem -LiteralPath $state -Filter '*.pid.json' -File | Where-Object {
+        $record = Get-Content -LiteralPath $_.FullName -Raw | ConvertFrom-Json
+        -not (Get-Process -Id ([int]$record.pid) -ErrorAction SilentlyContinue)
+    })
+    if ($deadRecords.Count -gt 0) { throw "A Demo launcher exited before readiness: $($deadRecords.Name -join ', ')" }
     Write-Host 'LaunchScope Demo ready:'
     Write-Host '  Workspace  http://127.0.0.1:3000/demo-login'
     Write-Host '  Ops        http://127.0.0.1:3001/audit/events'
     Write-Host '  API        http://127.0.0.1:8100/docs'
     Write-Host "  MCP        http://127.0.0.1:$($env:LAUNCHSCOPE_MCP_PORT)"
     if ($RecordedOnly) { Write-Warning 'Recorded-only mode: no AgentTeams/RocketMQ bridge was started; use the labelled snapshot page only.' }
+    elseif ($MaterialOnly) { Write-Warning 'Material-only live mode: AgentTeams is real, but public research remains fail-closed until authorized URL/search credentials are configured.' }
 } finally {
     if ($lock) { $lock.Dispose() }
     Remove-Item -LiteralPath $lockPath -Force -ErrorAction SilentlyContinue

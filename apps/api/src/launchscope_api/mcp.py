@@ -22,6 +22,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 from .infrastructure.db.session import DatabaseSettings, create_database_engine, session_factory
 from .infrastructure.object_store import S3QuarantineObjectStore
 from .modules.evidence.mcp_application import McpEvidenceApplication, configured_browser_domains
+from .modules.evidence.task_capability import verify_task_capability
 from .modules.identity_tenant.application import Actor
 
 
@@ -49,11 +50,19 @@ def application() -> McpEvidenceApplication:
     )
 
 
-def _routing() -> _Routing:
+def _routing(context_token: str = "") -> _Routing:
     value = _routing_context.get()
-    if value is None:
-        raise RuntimeError("MCP routing context is unavailable")
-    return value
+    if value is not None:
+        return value
+    if os.getenv("LAUNCHSCOPE_DEMO_MODE", "").lower() == "true":
+        capability = verify_task_capability(context_token)
+        return _Routing(
+            capability.tenant_id,
+            f"agent:{capability.agent_code}",
+            capability.run_id,
+            capability.task_id,
+        )
+    raise RuntimeError("MCP routing context is unavailable")
 
 
 class _ConsumerCredentialMiddleware:
@@ -64,6 +73,9 @@ class _ConsumerCredentialMiddleware:
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        if os.getenv("LAUNCHSCOPE_DEMO_MODE", "").lower() == "true":
             await self.app(scope, receive, send)
             return
         headers = {key.decode("latin-1").lower(): value.decode("latin-1") for key, value in scope["headers"]}
@@ -106,8 +118,8 @@ context_server = _server("launchscope-context")
 
 
 @context_server.tool(name="launchscope-context.get.v1", structured_output=True)
-def context_get() -> dict[str, object]:
-    route = _routing()
+def context_get(context_token: str) -> dict[str, object]:
+    route = _routing(context_token)
     return application().context_get(Actor(route.tenant_id, route.actor_id), route.run_id, route.task_id)
 
 
@@ -115,8 +127,8 @@ browser_server = _server("browser-audit")
 
 
 @browser_server.tool(name="browser-audit.v1", structured_output=True)
-def browser_audit(url: str) -> dict[str, object]:
-    route = _routing()
+def browser_audit(url: str, context_token: str) -> dict[str, object]:
+    route = _routing(context_token)
     return application().browser_audit(Actor(route.tenant_id, route.actor_id), route.run_id, route.task_id, url)
 
 
@@ -125,9 +137,9 @@ search_server = _server("public-research-search")
 
 @search_server.tool(name="public-research-search.v1", structured_output=True)
 def public_research_search(
-    query: str, region: str = "GLOBAL", max_results: int = 5, days: int | None = None
+    query: str, context_token: str, region: str = "GLOBAL", max_results: int = 5, days: int | None = None
 ) -> dict[str, object]:
-    route = _routing()
+    route = _routing(context_token)
     return application().public_research_search(
         Actor(route.tenant_id, route.actor_id), route.run_id, route.task_id,
         query=query, region=region, max_results=max_results, days=days,

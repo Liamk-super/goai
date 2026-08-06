@@ -58,7 +58,8 @@ def test_matrix_handoffs_are_idempotent_and_unlock_rule_owned_report(
         event = {
             "event_id": f"$event-{index}", "room_id": f"!run-{run_id}:local",
             "sender": f"@{agent}:local", "content": {
-                "schema_version": "1.0", "run_id": str(run_id), "task_id": str(task_id),
+                "schema_version": "1.0", "tenant_id": str(tenant_id),
+                "run_id": str(run_id), "task_id": str(task_id),
                 "agent_code": agent, "status": "SUCCEEDED", "dimension": dimension,
                 "claims": claims, "evidence_refs": [str(evidence_id)] if claims else [],
                 "risk": "LOW", "confidence": 0.7, "needs_human_approval": False,
@@ -129,14 +130,16 @@ def test_missing_or_over_budget_provider_usage_freezes_without_advancing(
             task.c.run_id == run_id, task.c.stage_code == "LEADER_PLANNING"
         )).scalar_one()
     content = {
-        "schema_version": "1.0", "run_id": str(run_id), "task_id": str(task_id),
+        "schema_version": "1.0", "tenant_id": str(tenant_id), "run_id": str(run_id), "task_id": str(task_id),
         "agent_code": "evaluation-manager", "status": "SUCCEEDED", "dimension": "CONTROL",
         "claims": [], "evidence_refs": [], "risk": "LOW", "confidence": 0.7,
         "needs_human_approval": False, "next_action": "Continue",
     }
     if usage is not None:
         content["provider_usage"] = usage
-    result = HandoffApplication(sessions, _Objects(), _Directory()).consume(  # type: ignore[arg-type]
+    result = HandoffApplication(
+        sessions, _Objects(), _Directory(), require_provider_usage=True  # type: ignore[arg-type]
+    ).consume(
         actor,
         {"event_id": f"$usage-{failure}", "room_id": "!run:local", "sender": "@evaluation-manager:local",
          "content": content},
@@ -146,3 +149,64 @@ def test_missing_or_over_budget_provider_usage_freezes_without_advancing(
     with tenant_transaction(sessions, tenant_records["scope"]) as session:
         row = session.execute(select(task.c.status, task.c.last_failure_class).where(task.c.id == task_id)).one()
         assert row == ("NEEDS_ATTENTION", failure)
+
+
+def test_demo_can_explicitly_accept_a_handoff_without_provider_usage(
+    database, runtime_engine, tenant_records
+) -> None:
+    tenant_id, run_id = tenant_records["tenant_id"], tenant_records["run_id"]
+    with database.begin() as connection:
+        connection.execute(text("UPDATE evaluation_run SET status='PLANNED' WHERE id=:id"), {"id": run_id})
+    actor = Actor(tenant_id, "local-demo:test")
+    sessions = session_factory(runtime_engine)
+    DispatchApplication(sessions).dispatch(actor, run_id, idempotency_key="demo-no-usage")
+    with tenant_transaction(sessions, tenant_records["scope"]) as session:
+        task_id = session.execute(select(task.c.id).where(
+            task.c.run_id == run_id, task.c.stage_code == "LEADER_PLANNING"
+        )).scalar_one()
+    content = {
+        "schema_version": "1.0", "tenant_id": str(tenant_id), "run_id": str(run_id),
+        "task_id": str(task_id), "agent_code": "evaluation-manager", "status": "SUCCEEDED",
+        "dimension": "CONTROL", "claims": [], "evidence_refs": [], "risk": "LOW",
+        "confidence": 0.7, "needs_human_approval": False, "next_action": "Delegate domain tasks",
+    }
+    result = HandoffApplication(
+        sessions, _Objects(), _Directory(), require_provider_usage=False  # type: ignore[arg-type]
+    ).consume(
+        actor, {"event_id": "$demo-no-usage", "room_id": "!run:local",
+                "sender": "@evaluation-manager:local", "content": content},
+        run_id=run_id, task_id=task_id,
+    )
+    assert result.task_status == "SUCCEEDED" and result.run_status == "RUNNING"
+
+
+def test_demo_structured_agent_failure_is_persisted_as_needs_attention(
+    database, runtime_engine, tenant_records
+) -> None:
+    tenant_id, run_id = tenant_records["tenant_id"], tenant_records["run_id"]
+    with database.begin() as connection:
+        connection.execute(text("UPDATE evaluation_run SET status='PLANNED' WHERE id=:id"), {"id": run_id})
+    actor = Actor(tenant_id, "local-demo:test")
+    sessions = session_factory(runtime_engine)
+    DispatchApplication(sessions).dispatch(actor, run_id, idempotency_key="demo-structured-failure")
+    with tenant_transaction(sessions, tenant_records["scope"]) as session:
+        task_id = session.execute(select(task.c.id).where(
+            task.c.run_id == run_id, task.c.stage_code == "LEADER_PLANNING"
+        )).scalar_one()
+    content = {
+        "schema_version": "1.0", "tenant_id": str(tenant_id), "run_id": str(run_id),
+        "task_id": str(task_id), "agent_code": "evaluation-manager", "status": "BLOCKED",
+        "dimension": "CONTROL", "claims": [], "evidence_refs": [], "risk": "MEDIUM",
+        "confidence": 0.0, "needs_human_approval": True, "failure_class": "VALIDATION",
+        "next_action": "Correct the assignment or tool configuration",
+    }
+    result = HandoffApplication(
+        sessions, _Objects(), _Directory(), require_provider_usage=False  # type: ignore[arg-type]
+    ).consume(
+        actor, {"event_id": "$demo-structured-failure", "room_id": "!run:local",
+                "sender": "@evaluation-manager:local", "content": content},
+        run_id=run_id, task_id=task_id,
+    )
+    assert result.task_status == "NEEDS_ATTENTION" and result.run_status == "NEEDS_ATTENTION"
+    with tenant_transaction(sessions, tenant_records["scope"]) as session:
+        assert session.execute(select(task.c.last_failure_class).where(task.c.id == task_id)).scalar_one() == "VALIDATION"

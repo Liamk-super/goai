@@ -220,6 +220,31 @@ paths:
       responses:
         '200': {description: Material is VALIDATED or REJECTED}
         '403': {$ref: '#/components/responses/PolicyBlocked'}
+  /intake:extract:
+    post:
+      tags: [Intake]
+      operationId: extractIntakeDraft
+      summary: Use the configured model to create a non-authoritative product profile draft
+      description: The caller must explicitly allow external processing. The response is never persisted as a confirmed fact.
+      parameters:
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/WriteCorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtractIntakeRequest'
+      responses:
+        '200':
+          description: Editable MODEL_INFERENCE draft; explicit profile confirmation is still required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtractIntakeResponse'
+        '422': {$ref: '#/components/responses/PolicyBlocked'}
   /product-versions/{versionId}/gap-questions:
     post:
       tags: [Intake]
@@ -575,6 +600,29 @@ components:
         mime_type:
           type: string
           enum: [application/json, application/pdf, image/jpeg, image/png, image/webp, text/plain]
+      additionalProperties: false
+    ExtractIntakeRequest:
+      type: object
+      required: [raw_content, allow_external_processing]
+      properties:
+        raw_content: {type: string, minLength: 1, maxLength: 30000}
+        allow_external_processing: {type: boolean, const: true}
+      additionalProperties: false
+    ExtractIntakeResponse:
+      type: object
+      required: [source, model_id, extracted_fields, missing_fields, confirmation_required]
+      properties:
+        source: {type: string, const: MODEL_INFERENCE}
+        model_id: {type: string, minLength: 1}
+        extracted_fields:
+          type: object
+          additionalProperties:
+            type: [string, 'null']
+        missing_fields:
+          type: array
+          uniqueItems: true
+          items: {type: string}
+        confirmation_required: {type: boolean, const: true}
       additionalProperties: false
     AnswerGapQuestionsRequest:
       type: object

@@ -24,6 +24,7 @@ def _headers(token: str = "consumer-token") -> dict[str, str]:
 
 
 def test_mcp_requires_consumer_credential_and_exposes_only_named_capability(monkeypatch) -> None:
+    monkeypatch.setenv("LAUNCHSCOPE_DEMO_MODE", "false")
     monkeypatch.setenv("LAUNCHSCOPE_MCP_CONSUMER_TOKEN", "consumer-token")
     monkeypatch.setattr(mcp_module, "application", lambda: FakeMcpApplication())
     body = {"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}
@@ -38,7 +39,7 @@ def test_mcp_requires_consumer_credential_and_exposes_only_named_capability(monk
             headers=_headers(),
             json={
                 "jsonrpc": "2.0", "id": "context", "method": "tools/call",
-                "params": {"name": "launchscope-context.get.v1", "arguments": {}},
+                "params": {"name": "launchscope-context.get.v1", "arguments": {"context_token": "unused"}},
             },
         )
         assert response.status_code == 200

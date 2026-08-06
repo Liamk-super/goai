@@ -11,7 +11,7 @@ function Stop-VerifiedDescendants([int]$ParentPid) {
     foreach($child in $children) {
         Stop-VerifiedDescendants ([int]$child.ProcessId)
         if ($child.CommandLine -and $child.CommandLine.Contains($root,[StringComparison]::OrdinalIgnoreCase)) {
-            Stop-Process -Id ([int]$child.ProcessId) -ErrorAction SilentlyContinue
+            Stop-Process -Id ([int]$child.ProcessId) -Force -ErrorAction SilentlyContinue
         } else {
             Write-Warning "Refusing to stop descendant PID $($child.ProcessId): command line is outside the Demo root"
         }
@@ -22,14 +22,20 @@ if (Test-Path -LiteralPath $state) {
         $record = Get-Content -LiteralPath $recordPath.FullName -Raw | ConvertFrom-Json
         $process = Get-Process -Id ([int]$record.pid) -ErrorAction SilentlyContinue
         if (-not $process) { Remove-Item -LiteralPath $recordPath.FullName -Force; continue }
-        $actualStart = $process.StartTime.ToUniversalTime().ToString('o')
+        $actualStart = $process.StartTime.ToUniversalTime()
+        $recordedStart = ([datetime]$record.started_at).ToUniversalTime()
         $actualPath = $process.Path
-        if ($actualStart -ne $record.started_at -or $actualPath -ne $record.executable -or $record.marker -ne 'launchscope-local-demo') {
+        $commandLine = (Get-CimInstance Win32_Process -Filter "ProcessId=$($process.Id)").CommandLine
+        $pathMatches = if ([string]::IsNullOrWhiteSpace([string]$record.executable)) {
+            -not [string]::IsNullOrWhiteSpace([string]$record.requested_executable) -and
+            (Test-Path -LiteralPath ([string]$record.requested_executable) -PathType Leaf)
+        } else { $actualPath -eq $record.executable }
+        if ([math]::Abs(($actualStart - $recordedStart).TotalSeconds) -gt 1 -or -not $pathMatches -or $record.marker -ne 'launchscope-local-demo') {
             Write-Warning "PID $($record.pid) no longer matches $($record.name); refusing to stop it"
             continue
         }
         Stop-VerifiedDescendants $process.Id
-        Stop-Process -Id $process.Id
+        Stop-Process -Id $process.Id -Force
         Remove-Item -LiteralPath $recordPath.FullName -Force
         Write-Host "Stopped $($record.name) (PID $($process.Id))"
     }

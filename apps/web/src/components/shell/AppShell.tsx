@@ -11,11 +11,11 @@ export function AppShell({ children }: { children: ReactNode }) {
     setDisplayName(loadDemoSession(window.localStorage)?.displayName ?? "Demo user");
   }, []);
   return <div className="app-frame">
-    <div className="demo-identity-banner"><strong>Local Demo Identity</strong><span>{displayName} · not production authentication</span><button className="text-button" onClick={() => { clearDemoSession(window.localStorage); window.location.assign("/demo-login"); }}>Exit Demo</button></div>
+    <div className="demo-identity-banner"><strong>本地体验身份</strong><span>{displayName} · 非生产登录</span><button className="text-button" onClick={() => { clearDemoSession(window.localStorage); window.location.assign("/demo-login"); }}>退出体验</button></div>
     <header className="topbar">
       <a className="brand" href="/projects" aria-label={t("LaunchScope projects")}>
         <span className="brand-mark" aria-hidden="true">LS</span>
-        <span><strong>LaunchScope</strong><small>{t("evidence command")}</small></span>
+        <span><strong>势能引擎</strong><small>LaunchScope · evidence command</small></span>
       </a>
       <nav aria-label={t("Primary navigation")}>
         <a href="/projects">{t("Projects")}</a>
@@ -27,7 +27,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="live-indicator"><i /> {t("PostgreSQL truth")}</div>
       </div>
     </header>
-    <div className="coordinate" aria-hidden="true">22.3193° N · 114.1694° E / V0.2</div>
+    <div className="coordinate" aria-hidden="true">22.3193° N · 114.1694° E / V0.3</div>
     {children}
     <footer><span>{t("Evidence before assertion.")}</span><span>{t("Read-only by default · fail-closed always.")}</span></footer>
   </div>;

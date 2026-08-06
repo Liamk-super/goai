@@ -25,11 +25,10 @@ try {
     if ([int]$running -gt 0 -or [int]$claimed -gt 0) {
         throw "Refusing reset: unsafe Run/claim state exists (runs=$running, claimed=$claimed)"
     }
-    $agt = Get-Command agt -ErrorAction SilentlyContinue
     $rendered = Join-Path $root 'infra/agentteams/generated/launchscope-team.rendered.yaml'
-    if ($agt -and (Test-Path -LiteralPath $rendered)) {
+    if ((Test-AgentTeamsCliAvailable) -and (Test-Path -LiteralPath $rendered)) {
         Push-Location (Join-Path $root 'infra/agentteams')
-        try { & $agt.Source delete -f generated/launchscope-team.rendered.yaml }
+        try { & (Join-Path $PSScriptRoot 'invoke-agentteams-cli.ps1') @('delete','-f','generated/launchscope-team.rendered.yaml') }
         finally { Pop-Location }
     }
     & docker @compose down --volumes --remove-orphans
