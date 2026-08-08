@@ -1,6 +1,0 @@
-{
-  "workspace_id": "de9e15b3-0ee5-4a95-8aca-e66014deea6d",
-  "tenant_id": "fe4792d5-e506-4d84-b161-6278b725b70f",
-  "environment": "local PostgreSQL/RLS",
-  "actor_id": "actor-local-acceptance"
-}

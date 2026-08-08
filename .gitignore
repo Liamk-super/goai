@@ -39,4 +39,6 @@ Thumbs.db
 
 # Local browser snapshots and generated test screenshots
 /.playwright-cli/
-/output/playwright/
+/.playwright-mcp/
+/output/
+/artifacts/
