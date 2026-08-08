@@ -1,17 +1,17 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useState } from "react";
 import type { AgentTeamsRun, Project, Run } from "../../lib/api-client";
-import { StatusPill } from "../shell/AppShell";
+import { Compass, type CompassNeedle, type CompassSector } from "./Compass";
 
-const intakeSections = [
-  ["产品材料", "产品解决的问题、核心功能与可检查材料"],
-  ["团队信息", "角色、能力边界与交付约束"],
-  ["用户与经营", "使用者、付费者、数据与商业假设"],
-  ["时间与地域", "目标市场、政策、平台规则与时效"],
+const INTAKE_SECTIONS = [
+  ["I", "产品材料", "产品解决的问题、核心功能与可检查材料", 3],
+  ["II", "团队信息", "角色、能力边界与交付约束", 2],
+  ["III", "用户与经营", "使用者、付费者、数据与商业假设", 3],
+  ["IV", "时间与地域", "目标市场、政策、平台规则与时效", 2],
 ] as const;
 
-const defaultAgents = [
+const DEFAULT_AGENTS = [
   "势能评审主管",
   "产品与团队专家",
   "用户共创 Agent",
@@ -20,68 +20,180 @@ const defaultAgents = [
   "证据校准 Agent",
 ];
 
+const TRUST_BOUNDARY = [
+  "不把猜测当事实",
+  "所有判断保留证据",
+  "敏感信息不进入报告",
+  "代码仓库只读",
+  "支持同标准复验",
+  "高风险操作人工确认",
+];
+
+/** 一整周 = 一次完整评审。走完一周，V1 归档。 */
+const NOTCHES_PER_REVOLUTION = 32;
+
 function readable(value: string | null | undefined) {
   return (value ?? "DRAFT").replaceAll("_", " ");
 }
 
-export function MomentumWorkbench({ project, runs, team }: { project: Project; runs: Run[]; team?: AgentTeamsRun }) {
+export function MomentumWorkbench({
+  project,
+  runs,
+  team,
+}: {
+  project: Project;
+  runs: Run[];
+  team?: AgentTeamsRun;
+}) {
   const latest = runs[0];
-  const [activeSection, setActiveSection] = useState(0);
-  const [panelOpen, setPanelOpen] = useState(true);
-  const agents = useMemo(() => {
-    if (!team?.tasks.length) return defaultAgents.map((name, index) => ({ name, status: index === 0 && latest ? latest.status : "IDLE", evidence: 0 }));
-    const taskAgents = team.tasks.map(item => ({
-      name: item.agent_identity_ref.split("@")[0].replaceAll("-", " "),
-      status: item.status,
-      evidence: item.evidence_count ?? 0,
-    }));
-    return [{ name: "势能评审主管", status: latest?.status ?? "IDLE", evidence: 0 }, ...taskAgents].slice(0, 6);
+  const [activeSector, setActiveSector] = useState(0);
+
+  const needles = useMemo<CompassNeedle[]>(() => {
+    if (!team?.tasks.length) {
+      return DEFAULT_AGENTS.map((name, index) => ({
+        key: `${name}-${index}`,
+        name,
+        status: index === 0 && latest ? latest.status : "IDLE",
+        evidence: 0,
+      }));
+    }
+    const byAgent = new Map<string, CompassNeedle>();
+    for (const item of team.tasks) {
+      const code = item.agent_identity_ref.split("@")[0];
+      const current = byAgent.get(code);
+      byAgent.set(code, {
+        key: code,
+        name: code === "evaluation-manager" ? "势能评审主管" : code.replaceAll("-", " "),
+        status: code === "evaluation-manager" ? (latest?.status ?? item.status) : item.status,
+        evidence: (current?.evidence ?? 0) + (item.evidence_count ?? 0),
+      });
+    }
+    return [...byAgent.values()];
   }, [latest, team]);
+
+  /** 已落库的证据总数 —— 唯一让盘面前进的东西。没有证据，盘面不动。 */
+  const evidenceCount = useMemo(
+    () => needles.reduce((sum, n) => sum + n.evidence, 0),
+    [needles],
+  );
+  const notch = Math.min(evidenceCount, NOTCHES_PER_REVOLUTION);
+
+  const sectors = useMemo<CompassSector[]>(
+    () =>
+      INTAKE_SECTIONS.map(([code, name, , total]) => ({
+        key: name,
+        code,
+        name,
+        filled: runs.length ? total : 0,
+        total,
+      })),
+    [runs.length],
+  );
+
   const version = runs.length ? `V${runs.length}` : "V1 草稿";
   const stage = latest?.current_stage ?? (runs.length ? latest.status : "资料收集");
   const completion = runs.length ? 100 : 0;
+  const active = INTAKE_SECTIONS[activeSector];
 
-  return <section className={`momentum-layout ${panelOpen ? "panel-open" : ""}`}>
-    <div className="momentum-stage">
-      <div className="trust-orbit" aria-label="系统信任边界">
-        {[
-          "不把猜测当事实", "所有判断保留证据", "敏感信息不进入报告", "代码仓库只读", "支持同标准复验", "高风险操作人工确认",
-        ].map((label, index) => <span key={label} style={{ "--i": index } as CSSProperties}>{label}</span>)}
+  const primaryHref = latest
+    ? `/runs/${latest.run_id}`
+    : `/projects/${project.project_id}/new-evaluation`;
+  const primaryLabel =
+    latest?.status === "COMPLETED" ? "查看报告与证据" : latest ? "查看 Agent 运行" : "开始补充资料";
+
+  return (
+    <section className="binnacle">
+      <div className="binnacle-plate">
+        <div className="compass">
+          <Compass
+            sectors={sectors}
+            needles={needles}
+            notch={notch}
+            notches={NOTCHES_PER_REVOLUTION}
+            activeSector={activeSector}
+            onSelectSector={setActiveSector}
+            inscription={TRUST_BOUNDARY}
+          />
+          <div className="core-read">
+            <span className="core-rev">{version}</span>
+            <strong className="core-name">{project.name}</strong>
+            <span className="core-stage">{readable(stage)}</span>
+            <span className="core-figure">
+              <b>{completion}</b>
+              <i>%</i>
+            </span>
+            <span className="core-figure-label">证据完整度</span>
+            <a className="button core-cta" href={primaryHref}>
+              {primaryLabel}
+            </a>
+          </div>
+        </div>
       </div>
-      <div className="agent-orbit" aria-label="Agent 运行状态">
-        {agents.map((agent, index) => <button key={`${agent.name}-${index}`} className={`agent-node status-${agent.status.toLowerCase()}`} style={{ "--i": index } as CSSProperties} onClick={() => setPanelOpen(true)}>
-          <i /><strong>{agent.name}</strong><small>{readable(agent.status)} · {agent.evidence} 证据</small>
-        </button>)}
-      </div>
-      <div className="intake-orbit" aria-label="四类资料">
-        {intakeSections.map(([title], index) => <button key={title} className={activeSection === index ? "active" : ""} style={{ "--i": index } as CSSProperties} onClick={() => { setActiveSection(index); setPanelOpen(true); }}>
-          <span>0{index + 1}</span><strong>{title}</strong><small>{runs.length ? "已归档" : "未开始"}</small>
-        </button>)}
-      </div>
-      <div className="project-core">
-        <span className="core-version">{version}</span>
-        <h1>{project.name}</h1>
-        <p>{readable(stage)}</p>
-        <div className="completion"><i style={{ width: `${completion}%` }} /></div>
-        <small>资料完整度 {completion}%</small>
-        <a className="button core-action" href={latest ? `/runs/${latest.run_id}` : `/projects/${project.project_id}/new-evaluation`}>
-          {latest?.status === "COMPLETED" ? "查看报告与证据" : latest ? "查看 Agent 运行" : "开始补充资料"}
-        </a>
-      </div>
-    </div>
-    <aside className="context-drawer" aria-label="项目上下文面板">
-      <button className="drawer-close" aria-label="关闭面板" onClick={() => setPanelOpen(false)}>×</button>
-      <p className="panel-kicker">项目助手 · {runs.length ? "运行阶段" : "资料阶段"}</p>
-      <h2>{intakeSections[activeSection][0]}</h2>
-      <p>{intakeSections[activeSection][1]}</p>
-      {!runs.length ? <>
-        <div className="drawer-note"><strong>为什么需要它？</strong><span>这部分信息会影响评审任务的边界、证据要求和后续追问。</span></div>
-        <a className="button" href={`/projects/${project.project_id}/new-evaluation?section=${activeSection}`}>打开资料抽屉</a>
-      </> : <>
-        <div className="drawer-note"><strong>当前真实状态</strong><span>运行与 Agent 状态来自 PostgreSQL / AgentTeams 投影，不展示模型私密推理。</span></div>
-        {latest && <><StatusPill value={latest.status} /><p className="mono-note">Run {latest.run_id.slice(0, 12)}</p></>}
-      </>}
-      <div className="drawer-history"><h3>版本历史</h3>{runs.length ? runs.map((run, index) => <a key={run.run_id} href={`/runs/${run.run_id}`}><span>V{runs.length - index}</span><strong>{readable(run.status)}</strong></a>) : <p>第一轮正式评审完成后会在这里形成不可覆盖的 V1 档案。</p>}</div>
-    </aside>
-  </section>;
+
+      <aside className="binnacle-side" aria-label="项目读数">
+        <div className="plate">
+          <p className="plate-kicker">当前扇区 · {active[0]}</p>
+          <h2>{active[1]}</h2>
+          <p>{active[2]}</p>
+        </div>
+
+        <div className="plate plate-quiet">
+          <p className="plate-kicker">证据推进</p>
+          {/* 棘轮刻度条：每一格对应一条真实证据落库。
+              没有事件就不亮 —— 这不是进度条动画。 */}
+          <div className="detent-bar" aria-label={`已推进 ${notch} / ${NOTCHES_PER_REVOLUTION} 格`}>
+            {Array.from({ length: NOTCHES_PER_REVOLUTION }, (_, i) => (
+              <i key={i} data-lit={i < notch} />
+            ))}
+          </div>
+          <dl className="readout" style={{ marginTop: 16 }}>
+            <dt>NOTCH</dt>
+            <dd>
+              {String(notch).padStart(2, "0")} / {NOTCHES_PER_REVOLUTION}
+            </dd>
+          </dl>
+          <dl className="readout">
+            <dt>EVIDENCE</dt>
+            <dd>{evidenceCount}</dd>
+          </dl>
+          <dl className="readout">
+            <dt>SOURCE</dt>
+            <dd>PostgreSQL</dd>
+          </dl>
+        </div>
+
+        <div className="plate plate-quiet">
+          <p className="plate-kicker">网盘指针 · 1+5</p>
+          <ul className="record-list">
+            {needles.map((n) => (
+              <li key={n.key}>
+                <span>{n.name}</span>
+                <span className="status" data-state={n.status.toLowerCase()}>
+                  {n.evidence ? `${n.evidence} 证据` : readable(n.status)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="plate plate-quiet">
+          <p className="plate-kicker">版本历史</p>
+          {runs.length ? (
+            <ul className="record-list">
+              {runs.map((run, index) => (
+                <li key={run.run_id}>
+                  <a href={`/runs/${run.run_id}`}>V{runs.length - index}</a>
+                  <span className="status" data-state={run.status.toLowerCase()}>
+                    {readable(run.status)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>第一轮正式评审完成后，会在这里形成不可覆盖的 V1 档案。</p>
+          )}
+        </div>
+      </aside>
+    </section>
+  );
 }

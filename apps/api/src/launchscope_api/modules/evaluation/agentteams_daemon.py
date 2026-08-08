@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import time
 import urllib.error
@@ -24,20 +25,48 @@ from launchscope_domain.events import EventEnvelope
 from launchscope_domain.value_objects import TenantScope
 from launchscope_orchestrator.agentteams_bridge import AgentTeamsBridge
 
+_TRANSIENT_RECEIVE_MARKERS = (
+    "DEADLINE_EXCEEDED",
+    "no new message",
+    "NO_NEW_MESSAGE",
+    "MESSAGE_NOT_FOUND",
+    "UNAVAILABLE",
+    "Stream removed",
+)
+
+
+def _is_transient_receive_error(exc: BaseException) -> bool:
+    """An idle or briefly unavailable RocketMQ long-poll must not kill the daemon."""
+    text = f"{type(exc).__name__}: {exc}"
+    return any(marker.lower() in text.lower() for marker in _TRANSIENT_RECEIVE_MARKERS)
+
 
 class MatrixHumanClient:
-    def __init__(self, base_url: str, access_token: str, agent_rooms: dict[str, str]) -> None:
+    def __init__(self, base_url: str, access_token: str, agent_mxids: dict[str, str]) -> None:
         self.base_url = base_url.rstrip("/")
         self.access_token = access_token
-        self.agent_rooms = agent_rooms
+        self.agent_mxids = agent_mxids
 
     def send_assignment(self, event: EventEnvelope) -> tuple[str, str]:
         assignment = AgentTeamsBridge().assignment_from_dispatch(event.to_dict())
         agent_code = str(assignment.body["agent_code"])
         try:
-            room_id = self.agent_rooms[agent_code]
+            agent_mxid = self.agent_mxids[agent_code]
         except KeyError as exc:
-            raise RuntimeError(f"no Matrix direct room configured for Agent {agent_code}") from exc
+            raise RuntimeError(f"no Matrix identity configured for Agent {agent_code}") from exc
+        create_payload = json.dumps({
+            "invite": [agent_mxid], "is_direct": True, "preset": "trusted_private_chat",
+            "name": f"LaunchScope {agent_code} task {event.task_id}",
+        }, separators=(",", ":")).encode("utf-8")
+        create_request = urllib.request.Request(
+            f"{self.base_url}/_matrix/client/v3/createRoom", data=create_payload, method="POST",
+            headers={"Authorization": f"Bearer {self.access_token}", "Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(create_request, timeout=20) as response:
+            created = json.loads(response.read(65_537))
+        room_id = str(created.get("room_id", ""))
+        if not room_id:
+            raise RuntimeError("Matrix task-room creation returned no room_id")
         transaction_id = urllib.parse.quote(str(event.event_id), safe="")
         room = urllib.parse.quote(room_id, safe="")
         url = f"{self.base_url}/_matrix/client/v3/rooms/{room}/send/m.room.message/{transaction_id}"
@@ -91,17 +120,28 @@ def dispatch_bridge() -> None:
         os.getenv("LAUNCHSCOPE_ROCKETMQ_CONSUMER_GROUP", "launchscope-agentteams-bridge-v1"),
         {topic: FilterExpression("evaluation.task.ready.v1")}, await_duration=20,
     )
-    agent_rooms = json.loads(os.environ["LAUNCHSCOPE_MATRIX_AGENT_ROOMS_JSON"])
-    if not isinstance(agent_rooms, dict):
-        raise RuntimeError("LAUNCHSCOPE_MATRIX_AGENT_ROOMS_JSON must be an object")
+    directory = json.loads(os.environ["LAUNCHSCOPE_MATRIX_AGENT_DIRECTORY_JSON"])
+    if not isinstance(directory, dict):
+        raise RuntimeError("LAUNCHSCOPE_MATRIX_AGENT_DIRECTORY_JSON must be an object")
+    agent_mxids = {str(agent_code): str(mxid) for mxid, agent_code in directory.items()}
     matrix = MatrixHumanClient(
         os.environ["AGENTTEAMS_MATRIX_URL"], os.environ["AGENTTEAMS_HUMAN_ACCESS_TOKEN"],
-        {str(key): str(value) for key, value in agent_rooms.items()},
+        agent_mxids,
     )
     consumer.startup()
     try:
         while True:
-            for message in consumer.receive(16, 30):
+            try:
+                batch = consumer.receive(16, 30)
+            except Exception as exc:  # noqa: BLE001
+                # An idle RocketMQ long-poll surfaces as DEADLINE_EXCEEDED / no-new-message.
+                # That is normal back-pressure, not a dispatch failure: keep consuming.
+                if not _is_transient_receive_error(exc):
+                    raise
+                print(f"dispatch-bridge: idle receive ({type(exc).__name__}); continuing", file=sys.stderr)
+                time.sleep(1)
+                continue
+            for message in batch:
                 event = _event(json.loads(message.body))
                 scope = TenantScope(UUID(str(event.tenant_id)))
                 with sessions() as session:
@@ -145,11 +185,18 @@ def _handoff_content(content: object) -> dict[str, object] | None:
         return None
     candidate = content.get("launchscope_handoff")
     required = ("tenant_id", "run_id", "task_id", "agent_code", "status")
-    if isinstance(candidate, dict) and candidate.get("schema_version") == "1.0" and all(candidate.get(key) for key in required):
+    if (
+        isinstance(candidate, dict)
+        and candidate.get("schema_version") == "1.0"
+        and all(candidate.get(key) for key in required)
+    ):
         return candidate
     body = content.get("body")
     if isinstance(body, str):
         candidate_body = body.strip()
+        fenced_blocks = re.findall(r"```(?:json)?\s*\n([\s\S]*?)\n```", candidate_body, flags=re.IGNORECASE)
+        if len(fenced_blocks) == 1:
+            candidate_body = fenced_blocks[0].strip()
         if candidate_body.startswith("```"):
             lines = candidate_body.splitlines()
             if len(lines) >= 3 and lines[-1].strip() == "```":
@@ -179,6 +226,12 @@ def _handoff_content(content: object) -> dict[str, object] | None:
             expected_dimension = expected_dimensions.get(str(parsed.get("agent_code", "")))
             if expected_dimension is not None:
                 parsed["dimension"] = expected_dimension
+            if parsed.get("agent_code") == "geo-policy-trend" and isinstance(parsed.get("claims"), list):
+                for claim in parsed["claims"]:
+                    if isinstance(claim, dict):
+                        for key in ("region", "fetched_at", "valid_until", "trend_signal"):
+                            if not claim.get(key):
+                                claim[key] = "UNKNOWN"
         return (
             parsed
             if isinstance(parsed, dict)
@@ -243,13 +296,23 @@ def matrix_listener() -> None:
                         if exc.code not in {400, 422}:
                             raise
                         failure = {
-                            "schema_version": "1.0", "tenant_id": tenant_id,
-                            "run_id": run_id, "task_id": task_id,
+                            "schema_version": "1.0",
+                            "tenant_id": tenant_id,
+                            "run_id": run_id,
+                            "task_id": task_id,
                             "agent_code": str(handoff.get("agent_code", "")),
-                            "status": "BLOCKED", "dimension": str(handoff.get("dimension", "CONTROL")),
-                            "claims": [], "evidence_refs": [], "risk": "HIGH", "confidence": 0.0,
-                            "needs_human_approval": True, "failure_class": "VALIDATION",
-                            "next_action": "Agent output failed the frozen handoff contract; inspect the immutable Matrix event.",
+                            "status": "BLOCKED",
+                            "dimension": str(handoff.get("dimension", "CONTROL")),
+                            "claims": [],
+                            "evidence_refs": [],
+                            "risk": "HIGH",
+                            "confidence": 0.0,
+                            "needs_human_approval": True,
+                            "failure_class": "VALIDATION",
+                            "next_action": (
+                                "Agent output failed the frozen handoff contract; "
+                                "inspect the immutable Matrix event."
+                            ),
                             "audit_results": [],
                         }
                         failure_body = json.dumps({

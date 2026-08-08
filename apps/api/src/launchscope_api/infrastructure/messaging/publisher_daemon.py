@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import socket
+import sys
 import time
 from uuid import UUID
 
@@ -35,15 +36,32 @@ def main() -> None:
     topic = os.getenv("LAUNCHSCOPE_ROCKETMQ_TOPIC", "launchscope-evaluation-events-v1")
     publisher_id = f"publisher-{socket.gethostname().lower()}-{os.getpid()}"[:119]
     transport = RocketMQTransport(endpoints, (topic,))
+    backoff = 1.0
     try:
         while True:
-            with sessions() as session:
-                tenants = pending_tenants(session)
-            publisher = OutboxPublisher(
-                sessions, transport, publisher_id=publisher_id, topic=topic
-            )
-            for tenant_id in tenants:
-                publisher.publish_scope(TenantScope(tenant_id), limit=50)
+            try:
+                with sessions() as session:
+                    tenants = pending_tenants(session)
+                publisher = OutboxPublisher(
+                    sessions, transport, publisher_id=publisher_id, topic=topic
+                )
+                for tenant_id in tenants:
+                    publisher.publish_scope(TenantScope(tenant_id), limit=50)
+            except KeyboardInterrupt:
+                raise
+            except Exception as exc:  # noqa: BLE001
+                # A transient broker or database error must not permanently stall dispatch.
+                # Claimed rows stay recoverable, so retry with bounded backoff instead of exiting.
+                print(
+                    f"outbox-publisher: transient publish cycle failure ({type(exc).__name__}: {exc});"
+                    f" retrying in {backoff:.0f}s",
+                    file=sys.stderr,
+                    flush=True,
+                )
+                time.sleep(backoff)
+                backoff = min(backoff * 2, 30.0)
+                continue
+            backoff = 1.0
             time.sleep(1 if tenants else 2)
     except KeyboardInterrupt:
         pass

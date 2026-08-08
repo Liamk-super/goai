@@ -4,8 +4,8 @@ from uuid import uuid4
 
 import pytest
 
-from launchscope_api.modules.evidence.task_capability import issue_task_capability, verify_task_capability
 from launchscope_api.mcp import _routing
+from launchscope_api.modules.evidence.task_capability import issue_task_capability, verify_task_capability
 
 
 def test_task_capability_binds_tenant_run_task_and_agent(monkeypatch) -> None:

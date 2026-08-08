@@ -22,7 +22,7 @@ class TaskCapability:
 
 
 def _secret() -> bytes:
-    value = os.getenv("LAUNCHSCOPE_MCP_CAPABILITY_SECRET") or os.getenv("LAUNCHSCOPE_MCP_CONSUMER_TOKEN", "")
+    value = os.getenv("LAUNCHSCOPE_MCP_CAPABILITY_SECRET") or os.getenv("LAUNCHSCOPE_MCP_CONSUMER_TOKEN") or ""
     if len(value) < 16:
         raise ValueError("LAUNCHSCOPE_MCP_CAPABILITY_SECRET must contain at least 16 characters")
     return value.encode("utf-8")

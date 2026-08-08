@@ -10,9 +10,29 @@ const snapshots = [
 ] as const;
 
 export default function RecordedSnapshotPage() {
-  return <main>
-    <header className="page-header reveal"><div><p className="eyebrow">Fallback / read only</p><h1>Recorded acceptance snapshot</h1><p className="lede">A non-interactive, sanitized fallback from the previously accepted local V1/V2 flow. It never dispatches a Run and is not evidence of live AgentTeams, Matrix, model, browser-provider, or search execution.</p></div><span className="status-pill danger"><i />BLOCKED NO AUTHORIZED CASE</span></header>
-    <section className="panel reveal"><p className="panel-kicker">Recorded facts</p><h2>Local evidence, clearly bounded.</h2><div className="dimension-grid">{snapshots.map(snapshot=><article className="dimension" key={snapshot.label}><small>{snapshot.label}</small><strong>{snapshot.result}</strong><span>{snapshot.folder}</span><code>{snapshot.hash}</code></article>)}</div></section>
-    <section className="panel reveal"><p className="panel-kicker">External acceptance</p><h2>Not substituted by this page.</h2><p role="alert">BLOCKED_NO_AUTHORIZED_CASE — provide an authorized URL plus model and search credentials before claiming real v0.2 E2E.</p></section>
+  return <main className="workspace-main">
+    <header className="page-head enters">
+      <span className="bearing">Fallback / read only</span>
+      <div className="page-head-row">
+        <h1>Recorded acceptance snapshot</h1>
+        <span className="pill danger"><i />BLOCKED NO AUTHORIZED CASE</span>
+      </div>
+      <p>A non-interactive, sanitized fallback from the previously accepted local V1/V2 flow. It never dispatches a Run and is not evidence of live AgentTeams, Matrix, model, browser-provider, or search execution.</p>
+    </header>
+    <section className="plate enters">
+      <p className="plate-kicker">Recorded facts</p>
+      <h2>Local evidence, clearly bounded.</h2>
+      <div className="grid-auto">{snapshots.map(snapshot=>
+        <dl className="readout" key={snapshot.label}>
+          <dt>{snapshot.label}</dt>
+          <dd>{snapshot.result}<span className="bearing" style={{ marginTop: 6 }}>{snapshot.folder}</span><span className="bearing">{snapshot.hash}</span></dd>
+        </dl>)}
+      </div>
+    </section>
+    <section className="plate plate-quiet enters">
+      <p className="plate-kicker">External acceptance</p>
+      <h2>Not substituted by this page.</h2>
+      <p role="alert">BLOCKED_NO_AUTHORIZED_CASE — provide an authorized URL plus model and search credentials before claiming real v0.2 E2E.</p>
+    </section>
   </main>;
 }

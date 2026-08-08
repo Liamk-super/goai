@@ -34,7 +34,10 @@ def _decode_json_object(message: object) -> dict[str, Any]:
         raise ValueError("model response content is empty or not text")
     stripped = message.strip()
     candidates = [stripped]
-    candidates.extend(match.group(1).strip() for match in re.finditer(r"```(?:json)?\s*(.*?)```", stripped, re.I | re.S))
+    candidates.extend(
+        match.group(1).strip()
+        for match in re.finditer(r"```(?:json)?\s*(.*?)```", stripped, re.I | re.S)
+    )
     decoder = json.JSONDecoder()
     for candidate in candidates:
         try:

@@ -17,7 +17,20 @@ export default function NewProjectPage() {
       window.location.assign(`/projects/${project.project_id}`);
     } catch (cause) { setError(cause instanceof Error ? cause.message : t("Project creation failed")); setBusy(false); }
   }
-  return <main><PageHeader eyebrow={t("Signal intake / 00")} title={t("Name the question.")} description={t("A Project persists across V1, V2 and every later challenge to the thesis. Keep the name stable; let evidence change the answer.")} />
-    <section className="panel reveal"><form onSubmit={create}><label>{t("Project name")}<input autoFocus required minLength={2} maxLength={200} value={name} onChange={event => setName(event.target.value)} placeholder={t("e.g. Merchant onboarding engine")} /></label>{error && <p role="alert">{error}</p>}<div className="form-actions"><button disabled={busy}>{busy ? t("Committing…") : t("Create durable dossier")}</button><a className="button secondary" href="/projects">{t("Cancel")}</a></div></form></section>
+  return <main className="workspace-main"><PageHeader eyebrow={t("Signal intake / 00")} title={t("Name the question.")} description={t("A Project persists across V1, V2 and every later challenge to the thesis. Keep the name stable; let evidence change the answer.")} />
+    <section className="plate enters">
+      <form onSubmit={create}>
+        <label>
+          <span className="field-name">{t("Project name")}</span>
+          <span className="field-hint">同一个名字会贯穿 V1、V2 及之后每一次复验，保持稳定。</span>
+          <input autoFocus required minLength={2} maxLength={200} value={name} onChange={event => setName(event.target.value)} placeholder={t("e.g. Merchant onboarding engine")} />
+        </label>
+        {error && <p role="alert">{error}</p>}
+        <div className="form-actions">
+          <button disabled={busy}>{busy ? t("Committing…") : t("Create durable dossier")}</button>
+          <a className="button secondary" href="/projects">{t("Cancel")}</a>
+        </div>
+      </form>
+    </section>
   </main>;
 }

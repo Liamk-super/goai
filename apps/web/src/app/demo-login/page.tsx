@@ -32,18 +32,29 @@ export default function DemoLoginPage() {
     }
   }
 
-  return <main className="demo-login">
-    <section className="page-header reveal">
-      <div><p className="eyebrow">LaunchScope v0.3</p><h1>进入产品证据室。</h1><p className="lede">输入一个昵称，系统会为本次体验创建隔离的本地租户与工作区。</p></div>
-    </section>
-    <section className="panel reveal">
-      <div className="demo-warning"><strong>本地体验身份</strong><span>身份只缓存在当前浏览器，不是正式 OAuth、OIDC 或生产登录。</span></div>
+  return <main className="harbor">
+    <div className="harbor-inner enters">
+      <span className="bearing">LaunchScope v0.3</span>
+      <h1>进入产品证据室。</h1>
+      <p>输入一个昵称，系统会为本次体验创建隔离的本地租户与工作区。</p>
+
+      <div className="harbor-note">
+        <strong>本地体验身份</strong>
+        <span>身份只缓存在当前浏览器，不是正式 OAuth、OIDC 或生产登录。</span>
+      </div>
+
       <form onSubmit={submit}>
-        <label>昵称<input autoFocus minLength={2} maxLength={40} value={displayName} onChange={event => setDisplayName(event.target.value)} placeholder="2—40 个字符" required /></label>
-        {error && <div role="alert">{error}</div>}
-        <div className="form-actions"><button disabled={busy}>{busy ? "正在创建工作区…" : "开始本地体验"}</button></div>
+        <label>
+          <span className="field-name">昵称</span>
+          <span className="field-hint">用于标识本次体验的工作区，2—40 个字符。</span>
+          <input autoFocus minLength={2} maxLength={40} value={displayName} onChange={event => setDisplayName(event.target.value)} placeholder="给这次体验起个名字" required />
+        </label>
+        {error && <p role="alert">{error}</p>}
+        <div className="form-actions">
+          <button disabled={busy}>{busy ? "正在创建工作区…" : "开始本地体验"}</button>
+          <a className="button secondary" href="/recorded-snapshot">打开只读验收快照</a>
+        </div>
       </form>
-      <p><a href="/recorded-snapshot">打开已标注的只读验收快照</a></p>
-    </section>
+    </div>
   </main>;
 }

@@ -1,4 +1,4 @@
-"""Validate the 1+5 CR bundle and build deterministic role-specific Worker packages."""
+﻿"""Validate the 1+5 CR bundle and build deterministic role-specific Worker packages."""
 
 from __future__ import annotations
 
@@ -6,6 +6,7 @@ import argparse
 import json
 import zipfile
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -16,11 +17,11 @@ OUTPUT_ROOT = ROOT / "infra" / "agentteams" / "generated" / "packages"
 API_VERSION = "agentteams.io/v1beta1"
 
 
-def load_documents() -> list[dict]:
+def load_documents() -> list[dict[str, Any]]:
     return [item for item in yaml.safe_load_all(CR_PATH.read_text(encoding="utf-8")) if item]
 
 
-def load_contracts() -> dict[str, dict]:
+def load_contracts() -> dict[str, dict[str, Any]]:
     return {
         document["code"]: document
         for path in CONTRACT_ROOT.glob("*.v1.yaml")
@@ -28,7 +29,7 @@ def load_contracts() -> dict[str, dict]:
     }
 
 
-def validate(documents: list[dict], contracts: dict[str, dict]) -> list[dict]:
+def validate(documents: list[dict[str, Any]], contracts: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
     if any(document.get("apiVersion") != API_VERSION for document in documents):
         raise ValueError(f"all AgentTeams resources must use {API_VERSION}")
     workers = [document for document in documents if document["kind"] == "Worker"]
@@ -63,7 +64,7 @@ def validate(documents: list[dict], contracts: dict[str, dict]) -> list[dict]:
     return workers
 
 
-def package_files(contract: dict) -> dict[str, str]:
+def package_files(contract: dict[str, Any]) -> dict[str, str]:
     code = contract["code"]
     identity = (
         f"# IDENTITY\n\nAgent code: `{code}`\nVersion: `{contract['version']}`\n"
@@ -104,7 +105,7 @@ def package_files(contract: dict) -> dict[str, str]:
     }
 
 
-def build(workers: list[dict], contracts: dict[str, dict]) -> None:
+def build(workers: list[dict[str, Any]], contracts: dict[str, dict[str, Any]]) -> None:
     OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
     for worker in workers:
         code = worker["metadata"]["annotations"]["launchscope.io/agent-code"]

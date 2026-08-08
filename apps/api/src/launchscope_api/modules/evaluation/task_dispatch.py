@@ -21,6 +21,12 @@ def provider_usage_required() -> bool:
     return os.getenv("LAUNCHSCOPE_REQUIRE_PROVIDER_USAGE", "true").strip().lower() in {"1", "true", "yes"}
 
 
+def _as_list(value: object) -> list[object]:
+    if isinstance(value, (list, tuple)):
+        return list(value)
+    return []
+
+
 def enqueue_ready_tasks(session: Session, tenant_id: UUID, run_id: UUID, stage_code: str) -> int:
     run = session.execute(select(
         evaluation_run.c.correlation_id,
@@ -30,14 +36,25 @@ def enqueue_ready_tasks(session: Session, tenant_id: UUID, run_id: UUID, stage_c
     manifest_sha = session.execute(select(run_manifest.c.manifest_sha256).where(
         run_manifest.c.tenant_id == tenant_id, run_manifest.c.run_id == run_id,
     )).scalar_one()
-    rows: list[Mapping[str, object]] = list(session.execute(select(task).where(
-        task.c.tenant_id == tenant_id, task.c.run_id == run_id,
-        task.c.stage_code == stage_code, task.c.status == "READY",
-    ).order_by(task.c.created_at, task.c.id)).mappings())
+    rows: list[Mapping[str, object]] = [
+        dict(row)
+        for row in session.execute(
+            select(task)
+            .where(
+                task.c.tenant_id == tenant_id,
+                task.c.run_id == run_id,
+                task.c.stage_code == stage_code,
+                task.c.status == "READY",
+            )
+            .order_by(task.c.created_at, task.c.id)
+        ).mappings()
+    ]
     scope = TenantScope(tenant_id)
     for row in rows:
         agent_code = str(row["agent_identity_ref"]).split("@", 1)[0]
         task_id = UUID(str(row["id"]))
+        dependencies = _as_list(row["dependencies"])
+        tool_allowlist = _as_list(row["tool_allowlist"])
         event = EventEnvelope(
             event_type="evaluation.task.ready.v1",
             tenant_id=tenant_id,
@@ -49,8 +66,8 @@ def enqueue_ready_tasks(session: Session, tenant_id: UUID, run_id: UUID, stage_c
                 "agent_code": agent_code,
                 "stage_code": str(row["stage_code"]),
                 "skill_ref": str(row["skill_ref"]),
-                "dependencies": list(row["dependencies"] or []),
-                "tool_allowlist": list(row["tool_allowlist"] or []),
+                "dependencies": dependencies,
+                "tool_allowlist": tool_allowlist,
                 "evidence_requirement": str(row["evidence_requirement"]),
                 "context_token": issue_task_capability(tenant_id, run_id, task_id, agent_code),
                 "handoff_schema": AgentHandoffV1.model_json_schema(),

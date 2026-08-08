@@ -76,8 +76,11 @@ if (Test-AgentTeamsCliAvailable) {
         $workerJson = & (Join-Path $PSScriptRoot 'invoke-agentteams-cli.ps1') @('get','workers','-o','json') 2>$null
         $workerPayload = $workerJson | ConvertFrom-Json
         $workers = if ($null -ne $workerPayload.workers) { @($workerPayload.workers) } else { @($workerPayload) }
-        $launchscopeWorkers = @($workers | Where-Object { $_.metadata.name -like 'launchscope-*' })
-        Add-Check 'Six AgentTeams Workers' $(if($launchscopeWorkers.Count -eq 6){'PASS'}else{'NOT_RUNNING'}) "$($launchscopeWorkers.Count) observed"
+        $launchscopeWorkers = @($workers | Where-Object { $_.name -like 'launchscope-*' })
+        $runningWorkers = @($launchscopeWorkers | Where-Object { $_.phase -eq 'Running' })
+        $workerStatus = if ($runningWorkers.Count -eq 6) { 'PASS' } else { 'NOT_RUNNING' }
+        $workerDetail = "$($runningWorkers.Count)/$($launchscopeWorkers.Count) Running"
+        Add-Check 'Six AgentTeams Workers' $workerStatus $workerDetail
     } catch { Add-Check 'Six AgentTeams Workers' 'NOT_RUNNING' 'AgentTeams API unavailable' }
 }
 $result = [ordered]@{

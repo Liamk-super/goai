@@ -372,12 +372,20 @@ class ExperienceReadApplication:
             candidate = self._run_row(session, actor, run_id)
             if candidate["project_id"] != project_id:
                 raise NotFoundError("run is outside the requested project")
+            if candidate["status"] != "COMPLETED":
+                raise NotFoundError("a completed candidate run with a decision is required for comparison")
             baseline = (
                 session.execute(
                     self._visible_runs(actor)
+                    .join(
+                        decision,
+                        (decision.c.tenant_id == evaluation_run.c.tenant_id)
+                        & (decision.c.run_id == evaluation_run.c.id),
+                    )
                     .where(
                         evaluation_run.c.project_id == project_id,
                         evaluation_run.c.id != run_id,
+                        evaluation_run.c.status == "COMPLETED",
                         evaluation_run.c.created_at < candidate["created_at"],
                     )
                     .order_by(evaluation_run.c.created_at.desc())
@@ -387,7 +395,7 @@ class ExperienceReadApplication:
                 .first()
             )
             if baseline is None:
-                raise NotFoundError("a prior durable run is required for comparison")
+                raise NotFoundError("a prior completed run with a decision is required for comparison")
             comparable = baseline["standard_version"] == candidate["standard_version"]
             grade_rows = session.execute(select(decision.c.run_id, decision.c.dimension_grades).where(
                 decision.c.tenant_id == actor.tenant_id,
@@ -608,15 +616,23 @@ class ExperienceReadApplication:
     ) -> list[dict[str, object]]:
         rank = {"INSUFFICIENT_EVIDENCE": 0, "WEAK": 1, "MODERATE": 2, "STRONG": 3}
         weakest = sorted(dimensions, key=lambda item: (rank.get(str(dimensions[item]["grade"]), 0), item))
-        return [
-            {
+        def target_dimension(action: str, index: int) -> str | None:
+            normalized = " ".join(action.upper().replace("_", " ").split())
+            explicit = next(
+                (dimension for dimension in dimensions if dimension.replace("_", " ") in normalized),
+                None,
+            )
+            return explicit or (weakest[min(index, len(weakest) - 1)] if weakest else None)
+
+        links: list[dict[str, object]] = []
+        for index, action in enumerate(actions[:3]):
+            dimension = target_dimension(action, index)
+            links.append({
                 "action": action,
-                "dimension": weakest[min(index, len(weakest) - 1)] if weakest else None,
-                "evidence_ids": dimensions[weakest[min(index, len(weakest) - 1)]]["supporting_evidence"]
-                if weakest else [],
-            }
-            for index, action in enumerate(actions[:3])
-        ]
+                "dimension": dimension,
+                "evidence_ids": dimensions[dimension]["supporting_evidence"] if dimension else [],
+            })
+        return links
 
     @staticmethod
     def _first_claim_value(linked: list[dict[str, object]], key: str) -> object | None:

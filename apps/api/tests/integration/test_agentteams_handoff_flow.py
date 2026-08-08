@@ -209,4 +209,7 @@ def test_demo_structured_agent_failure_is_persisted_as_needs_attention(
     )
     assert result.task_status == "NEEDS_ATTENTION" and result.run_status == "NEEDS_ATTENTION"
     with tenant_transaction(sessions, tenant_records["scope"]) as session:
-        assert session.execute(select(task.c.last_failure_class).where(task.c.id == task_id)).scalar_one() == "VALIDATION"
+        failure_class = session.execute(
+            select(task.c.last_failure_class).where(task.c.id == task_id)
+        ).scalar_one()
+        assert failure_class == "VALIDATION"

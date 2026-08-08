@@ -108,6 +108,14 @@ class AgentTeamsBridge:
         )
         if not event.get("tenant_id") or not event.get("task_id") or any(not payload.get(key) for key in required):
             raise BridgePolicyError("task assignment lacks routing, schema, capability, or policy")
+        agent_code = str(payload.get("agent_code"))
+        audit_instruction = (
+            " For evidence-auditor, return exactly one audit_results item for every audit_findings item: "
+            "empty evidence_ids means NEEDS_MORE_EVIDENCE; hypothesis with evidence means DOWNGRADED; "
+            "non-hypothesis with evidence means ACCEPTED."
+            if agent_code == "evidence-auditor"
+            else ""
+        )
         return ManagerAssignment(
             run_id=run_id,
             team_name=self.TEAM_NAME,
@@ -118,7 +126,7 @@ class AgentTeamsBridge:
                 "task_id": str(event.get("task_id")),
                 "team_name": self.TEAM_NAME,
                 "manifest_sha256": str(payload.get("manifest_sha256")),
-                "agent_code": str(payload.get("agent_code")),
+                "agent_code": agent_code,
                 "stage_code": str(payload.get("stage_code")),
                 "skill_ref": str(payload.get("skill_ref")),
                 "context_token": str(payload.get("context_token")),
@@ -130,6 +138,7 @@ class AgentTeamsBridge:
                     "If research_policy.material_only is true, do not require browser/search: use registered material "
                     "Evidence and mark unsupported assertions as hypotheses. Return exactly one AgentHandoffV1 JSON "
                     "object, including structured BLOCKED/FAILED results."
+                    + audit_instruction
                 ),
             },
         )
