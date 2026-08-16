@@ -42,3 +42,4 @@ Thumbs.db
 /.playwright-mcp/
 /output/
 /artifacts/
+/reference/
