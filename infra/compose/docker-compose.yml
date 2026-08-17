@@ -77,10 +77,6 @@ services:
       - chown -R rocketmq:rocketmq /home/rocketmq/store && exec runuser -u rocketmq -- sh mqbroker
     environment:
       NAMESRV_ADDR: rocketmq-namesrv:9876
-    ports:
-      - "${ROCKETMQ_BROKER_VIP_PORT:-10909}:10909"
-      - "${ROCKETMQ_BROKER_PORT:-10911}:10911"
-      - "${ROCKETMQ_BROKER_HA_PORT:-10912}:10912"
     volumes:
       - rocketmq-store:/home/rocketmq/store
     healthcheck:
@@ -90,7 +86,7 @@ services:
           "sh mqadmin clusterList -n rocketmq-namesrv:9876 2>/dev/null | grep -q DefaultCluster",
         ]
       interval: 5s
-      timeout: 5s
+      timeout: 15s
       retries: 24
     networks: [launchscope]
     labels: *launchscope-labels

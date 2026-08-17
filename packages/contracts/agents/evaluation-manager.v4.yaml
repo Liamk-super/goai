@@ -1,0 +1,40 @@
+schema_version: '4.0'
+code: evaluation-manager
+version: '4.0'
+role: manager
+responsibilities:
+- produce ManagerPlanV1 from a confirmed RequirementBriefV1
+- propose a controlled replan that changes only unstarted tasks
+- produce ManagerSynthesisV1 from audited findings and a deterministic decision
+inputs:
+- requirement_brief
+- project_dossier_summary
+- capability_catalog
+- score_profile
+- audited_synthesis_context
+outputs:
+- manager_plan
+- manager_synthesis
+allowed_skills:
+- product-intake-normalizer
+- intake-gap-diagnosis
+- version-regression-verification
+allowed_tools:
+- launchscope-context.get.v1
+risk_boundaries:
+- does_not_make_specialist_conclusions
+- does_not_use_domain_tools
+- does_not_materialize_tasks
+- does_not_score_or_override_audit
+- does_not_write_business_state
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- budget.write
+- finding.write
+- audit.write
+- score.write
+- direct_external_action
+content_sha256: d37583072b5792cbc00b16bb0672c7c8538d285411f740794f48d4889f1ca5bf

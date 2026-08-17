@@ -21,7 +21,7 @@
 
 ## Open-source reuse decision
 
-The existing Next.js, FastAPI, Pydantic, AgentTeams, Matrix, RocketMQ, PostgreSQL, SSE and MCP stack remains the base. The current fixed 1+5 ring and state drawer stay lightweight because adding CopilotKit/AG-UI or React Flow now would duplicate the frozen state protocol. For the next conversational/approval phase, prefer an adapter to `assistant-ui` or AG-UI/CopilotKit; for a user-editable dynamic task DAG, prefer React Flow; for more complex state transitions, prefer Motion. Do not build those general-purpose primitives from scratch.
+The existing Next.js, FastAPI, Pydantic, AgentTeams, Matrix, RocketMQ, PostgreSQL, SSE and MCP stack remains the base. Historical Runs retain the fixed 1+5 projection; generation v4 uses the supervisor 1+4 projection resolved from its frozen Manifest. The ring and state drawer stay lightweight because adding CopilotKit/AG-UI or React Flow now would duplicate the frozen state protocol. For the next conversational/approval phase, prefer an adapter to `assistant-ui` or AG-UI/CopilotKit; for a user-editable dynamic task DAG, prefer React Flow; for more complex state transitions, prefer Motion. Do not build those general-purpose primitives from scratch.
 
 ## Verification performed
 

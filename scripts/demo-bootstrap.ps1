@@ -49,7 +49,12 @@ foreach ($line in Get-Content -LiteralPath $template) {
     $value = if ($composeValues.ContainsKey($name)) { $composeValues[$name] } else { $defaultValue }
     if (-not [string]::IsNullOrWhiteSpace($value)) { Ensure-LocalValue $name $value }
 }
-foreach ($name in @('LAUNCHSCOPE_MCP_CONSUMER_TOKEN','LAUNCHSCOPE_MCP_CAPABILITY_SECRET','LAUNCHSCOPE_AGENTTEAMS_BRIDGE_TOKEN')) {
+foreach ($name in @(
+    'LAUNCHSCOPE_MCP_CONSUMER_TOKEN',
+    'LAUNCHSCOPE_MCP_CAPABILITY_SECRET',
+    'LAUNCHSCOPE_AGENTTEAMS_BRIDGE_TOKEN',
+    'LAUNCHSCOPE_MODEL_GATEWAY_SECRET'
+)) {
     Ensure-LocalSecret $name
 }
 if ([string]::IsNullOrWhiteSpace($env:DATABASE_URL) -and -not [string]::IsNullOrWhiteSpace($env:POSTGRES_PASSWORD)) {
@@ -65,10 +70,12 @@ if (-not (Test-Path -LiteralPath $python)) { py -3 -m venv (Join-Path $root '.ve
     -e (Join-Path $root 'packages/skills') -e (Join-Path $root 'packages/observability') `
     -e (Join-Path $root 'apps/api') -e (Join-Path $root 'apps/orchestrator') -e (Join-Path $root 'apps/worker')
 if ($LASTEXITCODE -ne 0) { throw 'Python dependency bootstrap failed' }
+& $python -m playwright install chromium
+if ($LASTEXITCODE -ne 0) { throw 'Playwright Chromium bootstrap failed' }
 Push-Location $root
 try { & pnpm.cmd install --frozen-lockfile; if ($LASTEXITCODE -ne 0) { throw 'pnpm bootstrap failed' } }
 finally { Pop-Location }
-& $python (Join-Path $root 'scripts/build-agentteams-packages.py')
+& $python (Join-Path $root 'scripts/build-agentteams-packages.py') --generation (Get-AgentTeamsGeneration)
 
 $installer = Join-Path $cache 'agentteams-install-v1.2.0.ps1'
 $installerUrl = 'https://raw.githubusercontent.com/agentscope-ai/AgentTeams/v1.2.0/install/agentteams-install.ps1'
@@ -96,8 +103,8 @@ if ($InstallAgentTeams) {
     $env:AGENTTEAMS_ADMIN_USER = 'admin'
     $env:AGENTTEAMS_LLM_PROVIDER = 'openai-compat'
     $env:AGENTTEAMS_DEFAULT_MODEL = $env:AGENTTEAMS_MODEL_ID
-    $env:AGENTTEAMS_OPENAI_BASE_URL = $env:AGENTTEAMS_MODEL_BASE_URL
-    $env:AGENTTEAMS_LLM_API_KEY = $env:AGENTTEAMS_MODEL_API_KEY
+    $env:AGENTTEAMS_OPENAI_BASE_URL = "http://host.docker.internal:$($env:LAUNCHSCOPE_MODEL_GATEWAY_PORT)/v1"
+    $env:AGENTTEAMS_LLM_API_KEY = 'lsmg.v2.unassigned'
     $env:AGENTTEAMS_LOCAL_ONLY = '1'
     $env:AGENTTEAMS_PORT_GATEWAY = $env:AGENTTEAMS_GATEWAY_PORT
     $env:AGENTTEAMS_PORT_ELEMENT_WEB = $env:AGENTTEAMS_ELEMENT_PORT

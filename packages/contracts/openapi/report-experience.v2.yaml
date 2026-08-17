@@ -1,0 +1,62 @@
+openapi: 3.1.0
+info:
+  title: LaunchScope Immutable Report Experience API
+  version: 2.0.0
+paths:
+  /api/v1/experience/v2/runs/{run_id}/report:
+    get:
+      operationId: getImmutableSupervisorReportByRun
+      parameters:
+      - {$ref: '#/components/parameters/RunId'}
+      - {$ref: '#/components/parameters/TenantId'}
+      - {$ref: '#/components/parameters/ActorId'}
+      responses:
+        '200': {$ref: '#/components/responses/SupervisorReport'}
+        '404': {description: Run or committed v2 report not found}
+        '409': {description: Immutable object integrity mismatch}
+        '413': {description: Report exceeds the bounded read limit}
+  /api/v1/experience/v2/reports/{report_id}:
+    get:
+      operationId: getImmutableSupervisorReportById
+      parameters:
+      - {name: report_id, in: path, required: true, schema: {type: string, format: uuid}}
+      - {$ref: '#/components/parameters/TenantId'}
+      - {$ref: '#/components/parameters/ActorId'}
+      responses:
+        '200': {$ref: '#/components/responses/SupervisorReport'}
+        '404': {description: Committed v2 report not found}
+        '409': {description: Immutable object integrity mismatch}
+components:
+  parameters:
+    RunId: {name: run_id, in: path, required: true, schema: {type: string, format: uuid}}
+    TenantId: {name: X-Tenant-Id, in: header, required: true, schema: {type: string, format: uuid}}
+    ActorId: {name: X-Actor-Id, in: header, required: true, schema: {type: string, minLength: 1}}
+  responses:
+    SupervisorReport:
+      description: Hash-verified canonical supervisor report document
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/SupervisorReportProjection'}
+  schemas:
+    SupervisorReportProjection:
+      type: object
+      additionalProperties: false
+      required: [report_schema_version, document, integrity, projection]
+      properties:
+        report_schema_version: {const: '2.0'}
+        document: {$ref: '../reports/supervisor-report.v2.json'}
+        integrity: {$ref: '#/components/schemas/Integrity'}
+        projection:
+          type: object
+          additionalProperties: false
+          required: [view, created_at]
+          properties:
+            view: {const: FULL}
+            created_at: {type: string, format: date-time}
+    Integrity:
+      type: object
+      additionalProperties: false
+      required: [canonical_sha256, source_sha256]
+      properties:
+        canonical_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+        source_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}

@@ -35,7 +35,12 @@ class TaskStateMachine:
     """Legal Task transitions, including the explicit retry deny-list."""
 
     _transitions: dict[TaskStatus, frozenset[TaskStatus]] = {
-        TaskStatus.PENDING: frozenset({TaskStatus.BLOCKED, TaskStatus.LEASED}),
+        # A dispatched-but-unleased Task may also be parked: the control plane
+        # marks work ready and only learns it is blocked when the Agent answers
+        # with NEEDS_INPUT, so the question can arrive before any lease exists.
+        TaskStatus.PENDING: frozenset(
+            {TaskStatus.BLOCKED, TaskStatus.LEASED, TaskStatus.NEEDS_INPUT}
+        ),
         TaskStatus.BLOCKED: frozenset({TaskStatus.PENDING}),
         TaskStatus.LEASED: frozenset({TaskStatus.RUNNING, TaskStatus.EXPIRED}),
         TaskStatus.RUNNING: frozenset(
@@ -43,11 +48,13 @@ class TaskStateMachine:
                 TaskStatus.SUCCEEDED,
                 TaskStatus.FAILED,
                 TaskStatus.NEEDS_ATTENTION,
+                TaskStatus.NEEDS_INPUT,
                 TaskStatus.WAITING_FOR_APPROVAL,
                 TaskStatus.CANCELLED,
             }
         ),
         TaskStatus.WAITING_FOR_APPROVAL: frozenset({TaskStatus.RUNNING, TaskStatus.NEEDS_ATTENTION}),
+        TaskStatus.NEEDS_INPUT: frozenset({TaskStatus.PENDING, TaskStatus.CANCELLED}),
         TaskStatus.EXPIRED: frozenset({TaskStatus.PENDING}),
         TaskStatus.FAILED: frozenset({TaskStatus.PENDING}),
         TaskStatus.SUCCEEDED: frozenset(),
@@ -66,9 +73,18 @@ class TaskStateMachine:
         no_side_effect: bool = False,
         retry_available: bool = False,
         approval_valid: bool = False,
+        unanswered_information_request: bool = False,
+        information_requests_answered: bool = False,
+        demo_force_resume: bool = False,
     ) -> TaskTransitionCheck:
         current_status = TaskStatus(current)
         target_status = TaskStatus(target)
+        if (
+            demo_force_resume
+            and current_status in {TaskStatus.RUNNING, TaskStatus.NEEDS_ATTENTION}
+            and target_status is TaskStatus.PENDING
+        ):
+            return TaskTransitionCheck(True, current_status, target_status)
         if target_status not in cls._transitions[current_status]:
             return TaskTransitionCheck(
                 False,
@@ -76,6 +92,30 @@ class TaskStateMachine:
                 target_status,
                 "transition is not in the Task transition table",
                 "ILLEGAL_TRANSITION",
+            )
+        if (
+            current_status in {TaskStatus.RUNNING, TaskStatus.PENDING}
+            and target_status is TaskStatus.NEEDS_INPUT
+            and not unanswered_information_request
+        ):
+            return TaskTransitionCheck(
+                False,
+                current_status,
+                target_status,
+                "clarification requires at least one durable unanswered InformationRequest",
+                "INFORMATION_REQUEST_REQUIRED",
+            )
+        if (
+            current_status is TaskStatus.NEEDS_INPUT
+            and target_status is TaskStatus.PENDING
+            and not information_requests_answered
+        ):
+            return TaskTransitionCheck(
+                False,
+                current_status,
+                target_status,
+                "every InformationRequest must be answered before re-execution",
+                "INFORMATION_REQUEST_UNANSWERED",
             )
         if (
             current_status is TaskStatus.RUNNING
@@ -144,6 +184,9 @@ class TaskStateMachine:
         no_side_effect: bool = False,
         retry_available: bool = False,
         approval_valid: bool = False,
+        unanswered_information_request: bool = False,
+        information_requests_answered: bool = False,
+        demo_force_resume: bool = False,
     ) -> TaskStatus:
         check = cls.check(
             current,
@@ -153,6 +196,9 @@ class TaskStateMachine:
             no_side_effect=no_side_effect,
             retry_available=retry_available,
             approval_valid=approval_valid,
+            unanswered_information_request=unanswered_information_request,
+            information_requests_answered=information_requests_answered,
+            demo_force_resume=demo_force_resume,
         )
         if not check.allowed:
             raise InvalidTransitionError(check.current, check.target, reason=check.reason, details={"code": check.code})

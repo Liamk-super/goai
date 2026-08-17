@@ -5,11 +5,12 @@ from __future__ import annotations
 
 import os
 from datetime import UTC, datetime
+from pathlib import Path
 from urllib.parse import urlparse
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Header, Request
-from pydantic import BaseModel, Field, field_validator
+from fastapi import APIRouter, Header, HTTPException, Request
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from launchscope_api.modules.project_dossier.persistent_application import PersistentIdentityTenantApplication
 
@@ -29,6 +30,36 @@ class CreateDemoSessionRequest(BaseModel):
         if not 2 <= len(normalized) <= 40:
             raise ValueError("display_name must contain 2 to 40 non-whitespace characters")
         return normalized
+
+
+class DemoSessionBinding(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    schema_version: str = Field(alias="schemaVersion")
+    tenant_id: UUID = Field(alias="tenantId")
+    workspace_id: UUID = Field(alias="workspaceId")
+    actor_id: str = Field(alias="actorId", min_length=1, max_length=255)
+    display_name: str = Field(alias="displayName", min_length=1, max_length=40)
+    created_at: datetime = Field(alias="createdAt")
+
+    @field_validator("schema_version")
+    @classmethod
+    def validate_schema_version(cls, value: str) -> str:
+        if value != DEMO_SESSION_SCHEMA:
+            raise ValueError("unsupported Demo session binding schema")
+        return value
+
+
+def _default_session_binding() -> DemoSessionBinding:
+    path = Path(os.getenv("LAUNCHSCOPE_DEMO_DEFAULT_WORKSPACE_FILE", ".demo/default-workspace.json"))
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise HTTPException(status_code=503, detail="the fixed Demo workspace binding is unavailable") from exc
+    try:
+        return DemoSessionBinding.model_validate_json(raw)
+    except ValidationError as exc:
+        raise HTTPException(status_code=503, detail="the fixed Demo workspace binding is invalid") from exc
 
 
 def configured_demo_origins() -> frozenset[str]:
@@ -99,7 +130,21 @@ def build_demo_router() -> APIRouter:
             "actorId": x_actor_id,
         }
 
+    @router.get("/demo/default-session")
+    def restore_default_demo_session(request: Request) -> dict[str, object]:
+        _require_demo_origin(request)
+        binding = _default_session_binding()
+        if not binding.actor_id.startswith("local-demo:"):
+            raise HTTPException(status_code=503, detail="the fixed Demo actor is not a local Demo identity")
+        identity: IdentityTenantApplication | PersistentIdentityTenantApplication = get_identity(request)
+        identity.require_workspace_role(
+            Actor(binding.tenant_id, binding.actor_id),
+            binding.workspace_id,
+            WorkspaceRole.VIEWER,
+        )
+        return binding.model_dump(by_alias=True, mode="json")
+
     return router
 
 
-__all__ = ["DEMO_SESSION_SCHEMA", "build_demo_router", "configured_demo_origins"]
+__all__ = ["DEMO_SESSION_SCHEMA", "DemoSessionBinding", "build_demo_router", "configured_demo_origins"]

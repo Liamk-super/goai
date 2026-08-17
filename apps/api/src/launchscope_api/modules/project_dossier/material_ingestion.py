@@ -15,7 +15,17 @@ from launchscope_api.modules.identity_tenant.application import Actor, Authoriza
 
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
 _ALLOWED_MIME_TYPES = frozenset(
-    {"application/json", "application/pdf", "image/jpeg", "image/png", "image/webp", "text/markdown", "text/plain"}
+    {
+        "application/json",
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.launchscope.material-analysis+json",
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "text/markdown",
+        "text/plain",
+    }
 )
 MAX_MATERIAL_BYTES = 20 * 1024 * 1024
 
@@ -114,6 +124,8 @@ class MaterialIngestionApplication:
     ) -> UploadInitiation:
         normalized_sha = _sha256(sha256)
         _validate_metadata(size_bytes, mime_type)
+        if display_name.strip().lower().endswith(".doc"):
+            raise MaterialValidationError("UNSUPPORTED_LEGACY_DOC: convert the file to DOCX before uploading")
         if not display_name.strip() or len(display_name.strip()) > 255:
             raise MaterialValidationError("display_name must be a non-empty string up to 255 characters")
         material_id = uuid4()
@@ -206,6 +218,8 @@ class PersistentMaterialIngestionApplication:
     ) -> UploadInitiation:
         normalized_sha = _sha256(sha256)
         _validate_metadata(size_bytes, mime_type)
+        if display_name.strip().lower().endswith(".doc"):
+            raise MaterialValidationError("UNSUPPORTED_LEGACY_DOC: convert the file to DOCX before uploading")
         if not display_name.strip() or len(display_name.strip()) > 255:
             raise MaterialValidationError("display_name must be a non-empty string up to 255 characters")
         material_id = uuid4()

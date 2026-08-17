@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "version",
+    "rules"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "version": {
+      "const": "1.0.0"
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "agent",
+          "source_id",
+          "locator",
+          "kind",
+          "statement",
+          "automation",
+          "expected_effect"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9-]{4,99}$"
+          },
+          "agent": {
+            "type": "string"
+          },
+          "source_id": {
+            "type": "string"
+          },
+          "locator": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "MUST",
+              "MUST_NOT",
+              "IF_THEN"
+            ]
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "automation": {
+            "enum": [
+              "AUTOMATED",
+              "HUMAN"
+            ]
+          },
+          "expected_effect": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "action"
+            ],
+            "properties": {
+              "action": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

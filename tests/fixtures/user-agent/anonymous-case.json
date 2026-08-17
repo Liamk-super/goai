@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "fixture_id": "uvd-anonymous-synthetic-v1",
+  "privacy": "SYNTHETIC_NO_PERSONAL_DATA",
+  "input_path": "packages/user-validation-designer/examples/input.example.json",
+  "input_sha256": "274c0c2a4e9ede8fe4a337b5dc9c46f4f6903d432eeaea21497efcc40a4d0bbb",
+  "recorded_executor_path": "packages/user-validation-designer/tests/fixtures/reference-executor.mjs",
+  "network_allowed": false,
+  "external_actions_allowed": false
+}

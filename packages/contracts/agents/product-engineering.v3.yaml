@@ -1,0 +1,31 @@
+schema_version: '3.0'
+code: product-engineering
+version: '3.0'
+role: specialist
+responsibilities:
+- inspect product implementation evidence and technical feasibility
+inputs:
+- run_manifest
+- product_profile
+- evidence_refs
+- assigned_task
+outputs:
+- finding
+- state_change_request
+- information_request
+allowed_skills:
+- browser-product-audit
+allowed_tools:
+- launchscope-context.get.v1
+- browser-audit.v1
+risk_boundaries:
+- public_read_only
+- evidence_backed_findings_only
+- no_business_state_writes
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- direct_external_action
+content_sha256: 50bb8ce8d9a2b441673719b657a6799bac00dab164fc3186878cf16c07dd11b8

@@ -1,0 +1,160 @@
+{
+  "schema_version": "1.0",
+  "version": "1.0.0",
+  "dimensions": {
+    "model_selection": {
+      "suite_ids": [
+        "model-benchmark-v1"
+      ],
+      "case_ids": [
+        "T-TRANS-01",
+        "SOCIAL-HARD-01",
+        "ACADEMIC-HARD-01"
+      ],
+      "source_lock_ids": [
+        "ANCHOR-T-TRANS-01",
+        "ANCHOR-SOCIAL-HARD-01",
+        "ANCHOR-ACADEMIC-HARD-01"
+      ]
+    },
+    "single_agent_capability": {
+      "suite_ids": [
+        "agent-evaluation-manager-v1",
+        "agent-product-engineering-v1",
+        "agent-user-evidence-v1",
+        "agent-business-investment-v1",
+        "agent-geo-policy-trend-v1",
+        "agent-evidence-auditor-v1"
+      ],
+      "case_ids": [
+        "AG-SUP-01",
+        "AG-TEC-01",
+        "AG-USR-01",
+        "AG-INV-01",
+        "AG-CTX-01",
+        "AG-EVD-01"
+      ],
+      "source_lock_ids": [
+        "KB-SUP",
+        "KB-TEC",
+        "KB-USR",
+        "KB-INV",
+        "KB-CTX",
+        "KB-EVD"
+      ]
+    },
+    "multi_agent_dispatch": {
+      "suite_ids": [
+        "system-e2e-v1"
+      ],
+      "case_ids": [
+        "SYS-E2E-01",
+        "SYS-E2E-02",
+        "SYS-E2E-03",
+        "SYS-E2E-04"
+      ],
+      "source_lock_ids": [
+        "ARCH-BASELINE"
+      ]
+    },
+    "evidence_calibration": {
+      "suite_ids": [
+        "model-benchmark-v1",
+        "agent-evidence-auditor-v1"
+      ],
+      "case_ids": [
+        "MODEL-EVD-01",
+        "MODEL-EVD-08",
+        "AG-EVD-01",
+        "AG-EVD-16"
+      ],
+      "source_lock_ids": [
+        "KB-EVD"
+      ]
+    },
+    "prompt_regression": {
+      "suite_ids": [
+        "model-benchmark-v1",
+        "agent-product-engineering-v1",
+        "agent-geo-policy-trend-v1"
+      ],
+      "case_ids": [
+        "MODEL-TEC-02",
+        "AG-TEC-10",
+        "AG-CTX-12"
+      ],
+      "source_lock_ids": [
+        "KB-TEC",
+        "KB-CTX"
+      ]
+    },
+    "rag_regression": {
+      "suite_ids": [
+        "model-benchmark-v1",
+        "agent-evidence-auditor-v1",
+        "agent-geo-policy-trend-v1"
+      ],
+      "case_ids": [
+        "MODEL-EVD-04",
+        "MODEL-EVD-05",
+        "AG-EVD-05",
+        "AG-CTX-10"
+      ],
+      "source_lock_ids": [
+        "KB-EVD",
+        "KB-CTX"
+      ]
+    },
+    "skill_regression": {
+      "suite_ids": [
+        "agent-evaluation-manager-v1",
+        "agent-product-engineering-v1",
+        "agent-business-investment-v1",
+        "agent-evidence-auditor-v1"
+      ],
+      "case_ids": [
+        "AG-SUP-03",
+        "AG-TEC-03",
+        "AG-INV-01",
+        "AG-EVD-01",
+        "SYS-E2E-12"
+      ],
+      "source_lock_ids": [
+        "SKILL-PRODUCT-INTAKE",
+        "SKILL-INTAKE-GAP",
+        "SKILL-BROWSER-AUDIT",
+        "SKILL-BUSINESS-ASSESSMENT",
+        "SKILL-EVIDENCE-AUDIT",
+        "SKILL-VERSION-REGRESSION"
+      ]
+    },
+    "version_regression": {
+      "suite_ids": [
+        "system-e2e-v1"
+      ],
+      "case_ids": [
+        "SYS-E2E-09",
+        "SYS-E2E-12"
+      ],
+      "source_lock_ids": [
+        "ARCH-BASELINE",
+        "SKILL-VERSION-REGRESSION"
+      ]
+    },
+    "final_effectiveness": {
+      "suite_ids": [
+        "model-benchmark-v1",
+        "system-e2e-v1"
+      ],
+      "case_ids": [
+        "T-TRANS-01",
+        "SOCIAL-HARD-01",
+        "ACADEMIC-HARD-01",
+        "SYS-E2E-12"
+      ],
+      "source_lock_ids": [
+        "ARCH-BASELINE"
+      ]
+    }
+  }
+}

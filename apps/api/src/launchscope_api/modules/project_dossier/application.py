@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from uuid import UUID, uuid4
 
-from launchscope_api.modules.evaluation.intake_application import GapQuestion, IntakeApplication
+from launchscope_api.modules.evaluation.intake_application import GapQuestion, IntakeApplication, IntakeValidationError
 from launchscope_api.modules.identity_tenant.application import (
     Actor,
     AuthorizationError,
@@ -13,6 +13,7 @@ from launchscope_api.modules.identity_tenant.application import (
     NotFoundError,
     WorkspaceRole,
 )
+from launchscope_api.modules.supervisor.stage_admission import StageAdmissionError, evaluation_mode_for_stage
 from launchscope_domain import EvaluationRun
 
 from .material_ingestion import MaterialIngestionApplication, MaterialRecord, UploadInitiation
@@ -110,9 +111,23 @@ class ProjectDossierApplication:
         self.identity.require_workspace_role(actor, version.workspace_id, WorkspaceRole.EDITOR)
         return self.intake.confirm_profile(actor, version_id, acknowledge_model_inference=acknowledge_model_inference)
 
-    def plan(self, actor: Actor, version_id: UUID, correlation_id: UUID) -> EvaluationRun:
+    def plan(
+        self,
+        actor: Actor,
+        version_id: UUID,
+        correlation_id: UUID,
+        *,
+        locale: str = "zh-CN",
+        evaluation_mode: str | None = None,
+    ) -> EvaluationRun:
         version = self._version(actor, version_id)
         self.identity.require_workspace_role(actor, version.workspace_id, WorkspaceRole.EDITOR)
+        profile = self.intake.confirmed.get(version.product_version_id)
+        if profile is not None and evaluation_mode is not None:
+            try:
+                evaluation_mode_for_stage(profile.fields["stage"], requested_mode=evaluation_mode)
+            except StageAdmissionError as exc:
+                raise IntakeValidationError(str(exc)) from exc
         return self.intake.enter_planned(
             actor,
             workspace_id=version.workspace_id,

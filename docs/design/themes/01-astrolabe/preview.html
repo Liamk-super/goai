@@ -1,0 +1,1441 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>主题归档 · 01 星盘 / 航海罗经</title>
+<style>
+/* ============================================================================
+   LaunchScope / 势能引擎 — 视觉层
+   ----------------------------------------------------------------------------
+   隐喻：航海罗经（Marine Compass / Astrolabe）
+   一台可复验的测量仪器，不是一台抽奖机。刻度先于结论。
+
+   结构：两层 token。
+     L1 --sw-*    原子色板，只描述颜色本身，不带含义
+     L2 语义 token 引用 L1，组件只用语义 token
+   规则：
+     · 盘面全中性，颜色只承载状态（唯一强调 = 朱红）
+     · 阴影零饱和度（纯黑 alpha），不用彩色 glow
+     · 圆角只有 2 / 6 / 14px + 50%，没有胶囊按钮
+     · 中文字距为正，行高 ≥1.05；负字距只给拉丁与数字
+     · 只动 transform / opacity
+     · 字体全部 OFL / Apache-2.0，可商用零授权费
+   ========================================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+/* ─────────────────────── L1 · 原子色板 ─────────────────────── */
+
+:root {
+  /* 纸 —— 去黄的中性米，刻意避开 #faf9f5 那条奶油色路径 */
+  --sw-paper-000: #f4f3ef;
+  --sw-paper-050: #efeeea;
+  --sw-paper-100: #e7e6e1;
+  --sw-paper-150: #dcdbd5;
+  --sw-paper-200: #cdccc5;
+
+  /* 墨 —— 石墨，不用纯黑 */
+  --sw-ink-900: #16181a;
+  --sw-ink-800: #23262a;
+  --sw-ink-700: #33373c;
+  --sw-ink-500: #5c6167;
+  --sw-ink-400: #7d8288;
+  --sw-ink-300: #9b9fa4;
+
+  /* 黄铜 —— 航海仪器的金属，仅用于仪器构件与刻度权重 */
+  --sw-brass-600: #8a6f3d;
+  --sw-brass-500: #a98a4f;
+  --sw-brass-400: #c0a86b;
+  --sw-brass-300: #d9c9a3;
+  --sw-brass-100: #ece3cf;
+
+  /* 朱红 —— 全站唯一强调色。指针、需人工确认、当前读数 */
+  --sw-vermilion-600: #a8321c;
+  --sw-vermilion-500: #c2410c;
+  --sw-vermilion-300: #e8a08c;
+  --sw-vermilion-100: #f7e2da;
+
+  /* 靛蓝 —— 深海，用于反相区块（不用深绿，绿要留给"已校准"） */
+  --sw-abyss-900: #14201f;
+  --sw-abyss-800: #1c2b2a;
+  --sw-abyss-700: #263836;
+
+  /* 铜绿 —— 唯一语义：已校准的证据。不做品牌色 */
+  --sw-verdigris-600: #2f6b57;
+  --sw-verdigris-500: #3d8a70;
+  --sw-verdigris-200: #b3d6c8;
+
+  --sw-white: #ffffff;
+  --sw-black: #000000;
+}
+
+/* ─────────────────────── L2 · 语义 token ─────────────────────── */
+
+:root {
+  /* 表面 */
+  --surface-sunk: var(--sw-paper-100);
+  --surface-base: var(--sw-paper-000);
+  --surface-raised: #f8f7f4;
+  --surface-inverse: var(--sw-abyss-900);
+
+  /* 文字 */
+  --text-primary: var(--sw-ink-900);
+  --text-secondary: var(--sw-ink-700);
+  --text-tertiary: var(--sw-ink-500);
+  --text-faint: var(--sw-ink-400);
+  --text-on-inverse: #e8eae9;
+  --text-on-inverse-dim: #9aa5a3;
+
+  /* 线 —— 三档线宽建立层级，替代阴影 */
+  --rule-strong: var(--sw-ink-900);
+  --rule-mid: var(--sw-paper-200);
+  --rule-hair: var(--sw-paper-150);
+
+  /* 状态 —— 语义唯一，不复用 */
+  --state-attention: var(--sw-vermilion-500);
+  --state-attention-weak: var(--sw-vermilion-100);
+  --state-calibrated: var(--sw-verdigris-600);
+  --state-calibrated-weak: var(--sw-verdigris-200);
+  --state-idle: var(--sw-ink-300);
+
+  /* 仪器 */
+  --instrument-tick: rgba(22, 24, 26, 0.42);
+  --instrument-tick-minor: rgba(22, 24, 26, 0.16);
+  --instrument-plate: rgba(22, 24, 26, 0.05);
+  --instrument-brass: var(--sw-brass-500);
+  --instrument-brass-weak: var(--sw-brass-100);
+  --instrument-needle: var(--sw-vermilion-600);
+
+  /* 圆角 —— 只有三档 + 圆 */
+  --r-tight: 2px;
+  --r-base: 6px;
+  --r-soft: 14px;
+
+  /* 阴影 —— 零饱和度 */
+  --shadow-lift: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-panel: 0 1px 1px rgba(0, 0, 0, 0.03), 0 8px 24px rgba(0, 0, 0, 0.05);
+
+  /* 字体 —— 全部免费可商用 */
+  --font-serif: "Noto Serif SC", "Songti SC", serif;
+  --font-sans: "Noto Sans SC", -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
+
+  /* 动效 —— 三档时长 + 两条曲线 */
+  --dur-micro: 120ms;
+  --dur-move: 280ms;
+  --dur-stage: 620ms;
+  --ease-out: cubic-bezier(0.2, 0, 0.38, 0.9);
+  --ease-far: cubic-bezier(0.19, 1, 0.22, 1);
+  /* 棘轮咬合：走到位就停，不回弹（不越过 y=1） */
+  --ease-detent: cubic-bezier(0.16, 0.9, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-micro: 0s;
+    --dur-move: 0s;
+    --dur-stage: 0s;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ─────────────────────── 基础 ─────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--surface-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.68;
+  font-weight: 350;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* 海图网格：环境层，极低对比 */
+  background-image:
+    linear-gradient(rgba(22, 24, 26, 0.019) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(22, 24, 26, 0.019) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--state-attention);
+  outline-offset: 2px;
+}
+
+/* ─────────────────────── 排版 ─────────────────────── */
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  color: var(--text-primary);
+  /* 汉字是等宽方块，收紧只会糊成一坨 —— 字距为正 */
+  letter-spacing: 0.015em;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp(34px, 4.4vw, 62px);
+  line-height: 1.12;
+}
+h2 {
+  font-size: clamp(24px, 2.5vw, 34px);
+  line-height: 1.2;
+}
+h3 {
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+p {
+  margin: 0 0 1em;
+  color: var(--text-secondary);
+  max-width: 68ch;
+}
+
+a {
+  color: var(--text-primary);
+  text-decoration-color: var(--sw-paper-200);
+  text-underline-offset: 3px;
+  transition: text-decoration-color var(--dur-micro) var(--ease-out);
+}
+a:hover {
+  text-decoration-color: var(--state-attention);
+}
+
+/* 拉丁与数字：等宽 + 表格数字，读数必须对齐 */
+.mono,
+.numeral {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* 罗经方位标签 —— 替代 uppercase+letter-spacing 的 eyebrow 胶囊 */
+.bearing {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+}
+
+/* ─────────────────────── 按钮 ─────────────────────── */
+
+button,
+.button {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  /* 仪器按钮是方的，不是药丸 */
+  border-radius: var(--r-tight);
+  padding: 11px 20px;
+  border: 1px solid var(--rule-strong);
+  background: var(--text-primary);
+  color: var(--sw-paper-000);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition:
+    transform var(--dur-micro) var(--ease-out),
+    background-color var(--dur-micro) var(--ease-out),
+    border-color var(--dur-micro) var(--ease-out);
+}
+button:hover:not(:disabled),
+.button:hover {
+  transform: translateY(-1px);
+}
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+button:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+button.secondary,
+.button.secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border-color: var(--rule-mid);
+}
+button.secondary:hover:not(:disabled) {
+  border-color: var(--rule-strong);
+}
+
+button.quiet {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-tertiary);
+  padding: 6px 8px;
+}
+button.quiet:hover:not(:disabled) {
+  color: var(--text-primary);
+}
+
+/* ─────────────────────── 表单 · 航海日志 ─────────────────────── */
+/* 核心修正：待填字段是视觉主角。写字的地方是基线，不是盒子。 */
+
+label {
+  display: block;
+  margin-bottom: 22px;
+}
+
+/* 字段名 —— 深色、可读。旧版 #c9d0ca 在浅底上几乎隐形，是真 bug */
+.field-name {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.field-hint {
+  display: block;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-bottom: 10px;
+}
+
+input[type="text"],
+input[type="url"],
+input[type="email"],
+textarea,
+select {
+  width: 100%;
+  font-family: var(--font-sans);
+  /* 主角尺寸：填写是"书写"，不是"提交数据" */
+  font-size: 19px;
+  font-weight: 350;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: transparent;
+  border: 0;
+  /* 只留一条基线 */
+  border-bottom: 1px solid var(--rule-mid);
+  border-radius: 0;
+  padding: 8px 2px;
+  transition:
+    border-color var(--dur-micro) var(--ease-out),
+    background-color var(--dur-micro) var(--ease-out);
+}
+
+input:hover,
+textarea:hover {
+  border-bottom-color: var(--sw-ink-300);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-bottom-color: var(--state-attention);
+  border-bottom-width: 2px;
+  background: rgba(255, 255, 255, 0.5);
+  padding-bottom: 7px;
+}
+
+textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+/* 权重分层：重字段更大更高，轻字段收窄 */
+textarea.weight-primary {
+  font-size: 21px;
+  min-height: 116px;
+}
+input.weight-tertiary,
+textarea.weight-tertiary {
+  font-size: 15px;
+  min-height: 56px;
+  font-family: var(--font-mono);
+}
+
+::placeholder {
+  color: var(--sw-ink-300);
+  font-weight: 300;
+}
+
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--state-attention);
+}
+
+select {
+  font-size: 14px;
+  border: 1px solid var(--rule-mid);
+  border-radius: var(--r-tight);
+  padding: 7px 10px;
+  background: var(--surface-raised);
+}
+
+[role="alert"] {
+  color: var(--state-attention);
+  font-size: 13px;
+  border-left: 2px solid var(--state-attention);
+  padding-left: 12px;
+  margin: 16px 0;
+  background: var(--state-attention-weak);
+  padding: 10px 12px;
+}
+
+/* ─────────────────────── 面板 · 标尺线，不是圆角卡片 ─────────────────────── */
+/* 圆角白卡 + 彩色阴影是模板签名。仪器面板靠一条顶部标尺线分层。 */
+
+.plate {
+  padding: 22px 0 26px;
+  border-top: 1px solid var(--rule-strong);
+  background: transparent;
+}
+.plate-quiet {
+  border-top-color: var(--rule-hair);
+}
+.plate-kicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  margin: 0 0 12px;
+}
+
+/* 读数行 —— 名值对，靠基线对齐，不做卡片行（避开 stat_banner_row 检测） */
+.readout {
+  display: grid;
+  grid-template-columns: minmax(90px, 34%) 1fr;
+  gap: 4px 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--rule-hair);
+  align-items: baseline;
+}
+.readout dt,
+.readout .r-key {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  margin: 0;
+}
+.readout dd,
+.readout .r-val {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+/* ─────────────────────── 状态标记 ─────────────────────── */
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.status::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--state-idle);
+  flex: none;
+}
+.status[data-state="running"]::before {
+  background: var(--state-attention);
+  animation: tickPulse 1.9s var(--ease-out) infinite;
+}
+.status[data-state="completed"]::before,
+.status[data-state="validated"]::before,
+.status[data-state="proceed"]::before {
+  background: var(--state-calibrated);
+}
+.status[data-state="failed"]::before,
+.status[data-state="attention"]::before,
+.status[data-state="blocked"]::before {
+  background: var(--state-attention);
+}
+
+@keyframes tickPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.28;
+  }
+}
+
+/* ─────────────────────── 外壳 ─────────────────────── */
+
+.app-frame {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.demo-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 9px 20px;
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+.demo-banner a {
+  color: var(--sw-brass-300);
+  text-decoration-color: var(--sw-brass-600);
+}
+
+/* 顶栏：无毛玻璃（backdrop-filter 是 slop 检测项），实心纸面 + 一条线 */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  flex-wrap: wrap;
+  padding: 16px clamp(20px, 3vw, 44px);
+  background: var(--surface-base);
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  text-decoration: none;
+}
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  flex: none;
+}
+.brand-name {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  display: block;
+}
+.brand-sub {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  display: block;
+}
+
+.topnav {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.topnav a {
+  padding: 7px 13px;
+  font-size: 13px;
+  border-radius: var(--r-tight);
+  text-decoration: none;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  transition:
+    border-color var(--dur-micro) var(--ease-out),
+    color var(--dur-micro) var(--ease-out);
+}
+.topnav a:hover {
+  color: var(--text-primary);
+  border-color: var(--rule-mid);
+}
+.topnav a[aria-current="page"] {
+  border-color: var(--rule-strong);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.workspace-main {
+  flex: 1;
+  width: min(1520px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 40px 0 76px;
+}
+
+.app-footer {
+  border-top: 1px solid var(--rule-hair);
+  padding: 22px clamp(20px, 3vw, 44px);
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+}
+
+/* 页头 */
+.page-head {
+  margin-bottom: 34px;
+  padding-bottom: 26px;
+  border-bottom: 1px solid var(--rule-strong);
+}
+.page-head .bearing {
+  margin-bottom: 14px;
+}
+.page-head p {
+  margin: 16px 0 0;
+  font-size: 16px;
+  color: var(--text-tertiary);
+}
+.page-head-row {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+/* ─────────────────────── 罗经工作台 ─────────────────────── */
+
+.binnacle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 388px);
+  gap: 0;
+  align-items: start;
+  border-top: 1px solid var(--rule-strong);
+}
+.binnacle-plate {
+  position: relative;
+  min-width: 0;
+  padding: 12px 30px 30px 0;
+}
+.binnacle-side {
+  min-width: 0;
+  padding: 12px 0 30px 30px;
+  border-left: 1px solid var(--rule-hair);
+}
+
+/* 罗盘容器：SVG 自适应，不用硬编码 px 半径 */
+.compass {
+  position: relative;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  aspect-ratio: 1;
+}
+.compass svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* 刻度与铭文 —— 环境层，低对比，不与内容抢注意力 */
+.tick-major {
+  stroke: var(--instrument-tick);
+  stroke-width: 1.4;
+}
+.tick-minor {
+  stroke: var(--instrument-tick-minor);
+  stroke-width: 0.8;
+}
+.plate-ring {
+  fill: none;
+  stroke: var(--instrument-tick-minor);
+  stroke-width: 1;
+}
+.plate-ring-strong {
+  fill: none;
+  stroke: var(--instrument-tick);
+  stroke-width: 1.2;
+}
+.plate-face {
+  fill: var(--instrument-plate);
+}
+.rhumb {
+  stroke: var(--instrument-tick-minor);
+  stroke-width: 0.6;
+  stroke-dasharray: 2 6;
+}
+.degree-label,
+.point-label {
+  fill: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+.point-label-cardinal {
+  fill: var(--text-secondary);
+  font-weight: 600;
+  font-size: 13px;
+}
+.rim-inscription {
+  fill: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+}
+
+/* 可转层 —— 棘轮定格，走到位就停 */
+.rete {
+  transition: transform var(--dur-stage) var(--ease-detent);
+}
+.mater-ring {
+  transition: transform var(--dur-stage) var(--ease-detent);
+}
+
+/* 指针 */
+.needle {
+  cursor: pointer;
+}
+.needle-body {
+  fill: var(--surface-raised);
+  stroke: var(--instrument-tick);
+  stroke-width: 1.2;
+  transition:
+    fill var(--dur-micro) var(--ease-out),
+    stroke var(--dur-micro) var(--ease-out);
+}
+.needle:hover .needle-body {
+  stroke: var(--text-primary);
+  stroke-width: 1.6;
+}
+.needle[data-state="running"] .needle-body {
+  fill: var(--state-attention-weak);
+  stroke: var(--instrument-needle);
+  stroke-width: 1.6;
+}
+.needle[data-state="completed"] .needle-body,
+.needle[data-state="validated"] .needle-body {
+  fill: var(--state-calibrated-weak);
+  stroke: var(--state-calibrated);
+}
+.needle-caption {
+  fill: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-anchor: middle;
+  opacity: 0;
+  transition: opacity var(--dur-move) var(--ease-out);
+  pointer-events: none;
+}
+/* 默认只留剪影，凑近才读数 —— 盘面保持干净 */
+.needle:hover .needle-caption,
+.needle:focus-visible .needle-caption,
+.needle[data-open="true"] .needle-caption {
+  opacity: 1;
+}
+
+/* 扇区 —— 可点，落定有棘轮咬合感 */
+.sector {
+  cursor: pointer;
+}
+.sector-face {
+  fill: transparent;
+  stroke: var(--instrument-tick-minor);
+  stroke-width: 1;
+  transition:
+    fill var(--dur-micro) var(--ease-out),
+    stroke var(--dur-micro) var(--ease-out);
+}
+.sector:hover .sector-face {
+  fill: rgba(22, 24, 26, 0.028);
+  stroke: var(--instrument-tick);
+}
+.sector[data-active="true"] .sector-face {
+  fill: var(--state-attention-weak);
+  stroke: var(--instrument-needle);
+  stroke-width: 1.4;
+}
+.sector-num {
+  fill: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-anchor: middle;
+}
+.sector-name {
+  fill: var(--text-secondary);
+  font-family: var(--font-serif);
+  font-size: 15px;
+  letter-spacing: 0.03em;
+  text-anchor: middle;
+}
+.sector[data-active="true"] .sector-name {
+  fill: var(--instrument-needle);
+}
+.sector-fill {
+  fill: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-anchor: middle;
+}
+
+/* 中心读数 —— 整台仪器的结论，视线终点 */
+.compass-core {
+  fill: var(--surface-raised);
+  stroke: var(--text-primary);
+  stroke-width: 1.4;
+}
+.core-read {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 27%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+}
+.core-rev {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+}
+.core-name {
+  margin: 6px 0 0;
+  font-family: var(--font-serif);
+  font-size: clamp(13px, 1.15vw, 18px);
+  font-weight: 500;
+  line-height: 1.24;
+  letter-spacing: 0.02em;
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+.core-stage {
+  margin: 4px 0 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+.core-figure {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.core-figure b {
+  font-size: clamp(30px, 3.4vw, 52px);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.core-figure i {
+  font-style: normal;
+  font-size: 13px;
+  color: var(--text-faint);
+}
+.core-figure-label {
+  margin: 2px 0 0;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+}
+.core-cta {
+  margin-top: 14px;
+  pointer-events: auto;
+  font-size: 12px;
+  padding: 9px 15px;
+}
+
+/* 棘轮刻度条 —— 逐格揭示，每格对应一个真实事件 */
+.detent-bar {
+  display: flex;
+  gap: 3px;
+  margin: 14px 0 0;
+}
+.detent-bar i {
+  flex: 1;
+  height: 12px;
+  background: var(--sw-paper-150);
+  border-radius: 0;
+  transition:
+    background-color var(--dur-move) var(--ease-detent),
+    transform var(--dur-move) var(--ease-detent);
+  transform-origin: bottom;
+}
+.detent-bar i[data-lit="true"] {
+  background: var(--instrument-needle);
+  transform: scaleY(1.5);
+}
+
+/* ─────────────────────── 资料录入 · 航海日志 ─────────────────────── */
+
+.logbook {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr) 268px;
+  gap: 0;
+  border-top: 1px solid var(--rule-strong);
+  align-items: start;
+}
+
+/* 左舷刻度尺 —— 竖线 + 当前位置朱红标记，不是圆角选中卡片 */
+.log-rail {
+  padding: 20px 22px 30px 0;
+  border-right: 1px solid var(--rule-hair);
+}
+.log-rail button {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px 0 12px 18px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: var(--text-tertiary);
+  transition: color var(--dur-micro) var(--ease-out);
+}
+.log-rail button::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 1px;
+  background: var(--rule-mid);
+  transition:
+    background-color var(--dur-micro) var(--ease-out),
+    width var(--dur-micro) var(--ease-out);
+}
+.log-rail button:hover {
+  color: var(--text-primary);
+}
+.log-rail button[aria-current="true"] {
+  color: var(--text-primary);
+}
+.log-rail button[aria-current="true"]::before {
+  background: var(--instrument-needle);
+  width: 2px;
+}
+.log-rail .r-idx {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--text-faint);
+}
+.log-rail .r-title {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 3px 0 2px;
+}
+.log-rail .r-meta {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 中央书写区 */
+.log-sheet {
+  padding: 20px clamp(24px, 3vw, 44px) 40px;
+  min-width: 0;
+}
+.log-sheet-head {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--rule-hair);
+}
+.log-sheet-head h2 {
+  margin: 10px 0 8px;
+}
+.log-sheet-head > span {
+  display: block;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  max-width: 60ch;
+}
+
+.field-set {
+  display: grid;
+  gap: 4px;
+}
+
+.log-sheet details {
+  margin: 26px 0;
+  padding: 18px 0;
+  border-top: 1px solid var(--rule-hair);
+  border-bottom: 1px solid var(--rule-hair);
+}
+.log-sheet summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 14px;
+  color: var(--text-secondary);
+}
+
+.drop-zone {
+  position: relative;
+  display: block;
+}
+.drop-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.drop-zone > span {
+  display: block;
+  padding: 20px;
+  border: 1px dashed var(--rule-mid);
+  border-radius: var(--r-tight);
+  color: var(--text-tertiary);
+  font-size: 12px;
+  transition: border-color var(--dur-micro) var(--ease-out);
+}
+.drop-zone:hover > span {
+  border-color: var(--text-faint);
+}
+
+.consent-row {
+  display: grid !important;
+  grid-template-columns: 18px 1fr;
+  gap: 10px;
+  align-items: start;
+  margin: 18px 0;
+}
+.consent-row span {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-tertiary);
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid var(--rule-strong);
+}
+
+.file-status {
+  margin: 10px 0 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--state-calibrated);
+}
+
+/* 右舷助手 —— 去掉深色块，同色纸面 + 分隔线（深块会抢走表单注意力） */
+.log-aside {
+  padding: 20px 0 30px 26px;
+  border-left: 1px solid var(--rule-hair);
+  min-width: 0;
+}
+.log-aside h3 {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  margin: 10px 0 12px;
+}
+.log-aside > p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-tertiary);
+}
+.boundary-list {
+  margin: 26px 0 0;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--rule-hair);
+}
+.boundary-list strong {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.boundary-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 11px;
+}
+.boundary-list li {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-tertiary);
+  padding-left: 16px;
+  position: relative;
+}
+.boundary-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 6px;
+  height: 1px;
+  background: var(--state-calibrated);
+}
+
+/* 画像复核 */
+.profile-review {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 30px;
+}
+.question-stack {
+  display: grid;
+  gap: 8px;
+}
+.question-stack label {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.planned-state {
+  min-height: 440px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 14px;
+}
+.planned-state .seal {
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1.4px solid var(--state-calibrated);
+  color: var(--state-calibrated);
+  font-size: 24px;
+}
+
+/* ─────────────────────── 通用网格与列表 ─────────────────────── */
+
+.grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 0 32px;
+}
+
+.record-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.record-list > li,
+.record-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+.record-row:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* 时间线 */
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.timeline li {
+  position: relative;
+  padding: 0 0 22px 24px;
+  border-left: 1px solid var(--rule-mid);
+}
+.timeline li::before {
+  content: "";
+  position: absolute;
+  left: -3.5px;
+  top: 7px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-faint);
+}
+.timeline li:last-child {
+  border-left-color: transparent;
+}
+.timeline pre {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  overflow-x: auto;
+  color: var(--text-tertiary);
+  margin: 6px 0 0;
+}
+
+/* 证据链 */
+.evidence-chain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: ev;
+}
+.evidence-chain > li {
+  counter-increment: ev;
+  border-bottom: 1px solid var(--rule-hair);
+}
+.evidence-chain summary {
+  cursor: pointer;
+  padding: 14px 0;
+  font-size: 14px;
+}
+.evidence-chain summary::marker {
+  color: var(--text-faint);
+}
+.evidence-chain dl {
+  margin: 0 0 16px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  font-size: 13px;
+}
+.evidence-chain dt {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+}
+.evidence-chain dd {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* 空态 */
+.empty-state {
+  padding: 70px 0;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+/* 登录 */
+.harbor {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 40px 20px;
+}
+.harbor-inner {
+  width: min(520px, 100%);
+}
+.harbor h1 {
+  margin: 14px 0 12px;
+}
+.harbor-note {
+  border-left: 2px solid var(--instrument-brass);
+  padding: 12px 0 12px 14px;
+  margin: 26px 0;
+  background: var(--instrument-brass-weak);
+  padding-right: 14px;
+}
+.harbor-note strong {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 4px;
+  color: var(--sw-brass-600);
+}
+.harbor-note span {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  line-height: 1.6;
+}
+
+/* 表格 */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th,
+td {
+  text-align: left;
+  padding: 11px 12px 11px 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+td {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 入场：极端 ease-out，不越过 y=1，不回弹 */
+@keyframes make-way {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.enters {
+  animation: make-way var(--dur-stage) var(--ease-far) both;
+}
+
+/* ─────────────────────── 响应式 ─────────────────────── */
+
+@media (max-width: 1180px) {
+  .binnacle,
+  .logbook {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .binnacle-plate {
+    padding: 12px 0 30px;
+  }
+  .binnacle-side,
+  .log-aside {
+    border-left: 0;
+    border-top: 1px solid var(--rule-strong);
+    padding: 24px 0 30px;
+  }
+  .log-rail {
+    border-right: 0;
+    border-bottom: 1px solid var(--rule-hair);
+    padding: 16px 0;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+  }
+  .log-rail button {
+    flex: none;
+    min-width: 152px;
+    padding: 10px 12px;
+  }
+  .log-rail button::before {
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: 0;
+    width: auto;
+    height: 1px;
+  }
+  .log-rail button[aria-current="true"]::before {
+    width: auto;
+    height: 2px;
+  }
+  .log-sheet {
+    padding: 24px 0 36px;
+  }
+  .profile-review {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  body {
+    font-size: 14px;
+  }
+  input[type="text"],
+  input[type="url"],
+  textarea {
+    font-size: 17px;
+  }
+  textarea.weight-primary {
+    font-size: 18px;
+  }
+  .workspace-main {
+    width: calc(100% - 28px);
+    padding: 26px 0 50px;
+  }
+}
+
+</style>
+<style>
+  /* 预览专用：仅约束画布尺寸，不覆盖任何主题样式 */
+  body { display: grid; place-items: start center; padding: 32px 16px 64px; }
+  .preview-frame { width: min(92vw, 860px); aspect-ratio: 1; }
+  .preview-frame svg { width: 100%; height: 100%; }
+  .preview-note {
+    max-width: 860px; margin: 0 auto 24px;
+    font-size: 13px; line-height: 1.7; opacity: 0.75;
+  }
+</style>
+</head>
+<body>
+  <p class="preview-note">
+    主题归档预览 · 01 星盘 / 航海罗经。由归档的 <code>Compass.tsx</code> +
+    <code>globals.head.css</code> 经 react-dom/server 静态渲染而成，
+    未手工修改任何一行 SVG。数据为参考图取值：0 证据、全部 IDLE、扇区 II 选中。
+  </p>
+  <div class="preview-frame"><svg viewBox="-500 -500 1000 1000" role="img" aria-label="评估罗经"><title>评估罗经：外环为方位刻度，中层为资料扇区，指针为 1+5 Agent 判断</title><circle r="468" class="plate-ring-strong"></circle><circle r="455" class="plate-ring"></circle><g aria-hidden="true"><text x="-391.4434825105663" y="-225.99999999999997" class="rim-inscription" text-anchor="middle" dominant-baseline="middle" transform="rotate(-60 -391.4434825105663 -225.99999999999997)">所有判断保留证据</text><text x="2.767701766073018e-14" y="-452" class="rim-inscription" text-anchor="middle" dominant-baseline="middle" transform="rotate(0 2.767701766073018e-14 -452)">敏感信息不进入报告</text><text x="391.4434825105663" y="-225.99999999999997" class="rim-inscription" text-anchor="middle" dominant-baseline="middle" transform="rotate(60 391.4434825105663 -225.99999999999997)">代码仓库只读</text><text x="391.4434825105663" y="225.99999999999997" class="rim-inscription" text-anchor="middle" dominant-baseline="middle" transform="rotate(300 391.4434825105663 225.99999999999997)">支持同标准复验</text><text x="2.767701766073018e-14" y="452" class="rim-inscription" text-anchor="middle" dominant-baseline="middle" transform="rotate(360 2.767701766073018e-14 452)">高风险操作人工确认</text><text x="-391.4434825105663" y="225.99999999999997" class="rim-inscription" text-anchor="middle" dominant-baseline="middle" transform="rotate(420 -391.4434825105663 225.99999999999997)">不把猜测当事实</text></g><g class="mater-ring" transform="rotate(0)"><text x="2.6329906181668095e-14" y="-430" class="point-label point-label-cardinal" transform="rotate(0 2.6329906181668095e-14 -430)">N</text><text x="83.88883846693518" y="-421.7376705733891" class="point-label" transform="rotate(0 83.88883846693518 -421.7376705733891)">NbE</text><text x="164.55387591698863" y="-397.2681989798533" class="point-label" transform="rotate(0 164.55387591698863 -397.2681989798533)">NNE</text><text x="238.895200198429" y="-357.53193329009446" class="point-label" transform="rotate(0 238.895200198429 -357.53193329009446)">NEbN</text><text x="304.05591591021545" y="-304.0559159102154" class="point-label" transform="rotate(0 304.05591591021545 -304.0559159102154)">NE</text><text x="357.53193329009446" y="-238.89520019842894" class="point-label" transform="rotate(0 357.53193329009446 -238.89520019842894)">NEbE</text><text x="397.2681989798533" y="-164.5538759169886" class="point-label" transform="rotate(0 397.2681989798533 -164.5538759169886)">ENE</text><text x="421.7376705733891" y="-83.88883846693514" class="point-label" transform="rotate(0 421.7376705733891 -83.88883846693514)">EbN</text><text x="430" y="0" class="point-label point-label-cardinal" transform="rotate(0 430 0)">E</text><text x="421.7376705733891" y="83.88883846693514" class="point-label" transform="rotate(0 421.7376705733891 83.88883846693514)">EbS</text><text x="397.2681989798533" y="164.5538759169886" class="point-label" transform="rotate(0 397.2681989798533 164.5538759169886)">ESE</text><text x="357.53193329009446" y="238.89520019842894" class="point-label" transform="rotate(0 357.53193329009446 238.89520019842894)">SEbE</text><text x="304.05591591021545" y="304.0559159102154" class="point-label" transform="rotate(0 304.05591591021545 304.0559159102154)">SE</text><text x="238.895200198429" y="357.53193329009446" class="point-label" transform="rotate(0 238.895200198429 357.53193329009446)">SEbS</text><text x="164.55387591698863" y="397.2681989798533" class="point-label" transform="rotate(0 164.55387591698863 397.2681989798533)">SSE</text><text x="83.88883846693518" y="421.7376705733891" class="point-label" transform="rotate(0 83.88883846693518 421.7376705733891)">SbE</text><text x="2.6329906181668095e-14" y="430" class="point-label point-label-cardinal" transform="rotate(0 2.6329906181668095e-14 430)">S</text><text x="-83.88883846693503" y="421.73767057338915" class="point-label" transform="rotate(0 -83.88883846693503 421.73767057338915)">SbW</text><text x="-164.55387591698857" y="397.2681989798533" class="point-label" transform="rotate(0 -164.55387591698857 397.2681989798533)">SSW</text><text x="-238.895200198429" y="357.5319332900944" class="point-label" transform="rotate(0 -238.895200198429 357.5319332900944)">SWbS</text><text x="-304.0559159102154" y="304.05591591021545" class="point-label" transform="rotate(0 -304.0559159102154 304.05591591021545)">SW</text><text x="-357.5319332900945" y="238.89520019842894" class="point-label" transform="rotate(0 -357.5319332900945 238.89520019842894)">SWbW</text><text x="-397.2681989798533" y="164.55387591698866" class="point-label" transform="rotate(0 -397.2681989798533 164.55387591698866)">WSW</text><text x="-421.7376705733891" y="83.88883846693511" class="point-label" transform="rotate(0 -421.7376705733891 83.88883846693511)">WbS</text><text x="-430" y="5.265981236333619e-14" class="point-label point-label-cardinal" transform="rotate(0 -430 5.265981236333619e-14)">W</text><text x="-421.73767057338915" y="-83.888838466935" class="point-label" transform="rotate(0 -421.73767057338915 -83.888838466935)">WbN</text><text x="-397.26819897985337" y="-164.55387591698837" class="point-label" transform="rotate(0 -397.26819897985337 -164.55387591698837)">WNW</text><text x="-357.53193329009446" y="-238.895200198429" class="point-label" transform="rotate(0 -357.53193329009446 -238.895200198429)">NWbW</text><text x="-304.0559159102155" y="-304.0559159102154" class="point-label" transform="rotate(0 -304.0559159102155 -304.0559159102154)">NW</text><text x="-238.89520019842928" y="-357.5319332900943" class="point-label" transform="rotate(0 -238.89520019842928 -357.5319332900943)">NWbN</text><text x="-164.5538759169885" y="-397.26819897985337" class="point-label" transform="rotate(0 -164.5538759169885 -397.26819897985337)">NNW</text><text x="-83.88883846693533" y="-421.73767057338904" class="point-label" transform="rotate(0 -83.88883846693533 -421.73767057338904)">NbW</text><line x1="2.596251214192389e-14" y1="-424" x2="2.4492935982947064e-14" y2="-400" class="tick-major"></line><line x1="20.804693914825286" y1="-423.4892734309931" x2="20.16681414856885" y2="-410.5049325003259" class="tick-minor"></line><line x1="41.55926749973367" y1="-421.95832410901147" x2="40.285044675449384" y2="-409.02092266227294" class="tick-minor"></line><line x1="62.21372116907338" y1="-419.41084022506715" x2="60.30622500115368" y2="-406.551545595525" class="tick-minor"></line><line x1="82.71829653483842" y1="-415.8529588909697" x2="78.03612880645133" y2="-392.3141121612922" class="tick-major"></line><line x1="103.02359627898393" y1="-411.29325135448664" x2="99.8648539402415" y2="-398.6828450629576" class="tick-minor"></line><line x1="123.08070315589202" y1="-405.74270235045657" x2="119.30700235158402" y2="-393.30247798593786" class="tick-minor"></line><line x1="142.8412978383013" y1="-399.21468363760084" x2="138.46172974420244" y2="-386.97461079022156" class="tick-minor"></line><line x1="162.2577753227981" y1="-391.7249217847856" x2="153.07337294603593" y2="-369.5518130045147" class="tick-major"></line><line x1="181.28335961443966" y1="-383.29146028433996" x2="175.725143399846" y2="-371.5395994737352" class="tick-minor"></line><line x1="199.87221641422298" y1="-373.93461608370256" x2="193.74405883548502" y2="-362.46963964717395" class="tick-minor"></line><line x1="217.97956353792608" y1="-363.67693064011536" x2="211.2962278634142" y2="-352.5264587101118" class="tick-minor"></line><line x1="235.56177880031137" y1="-352.5431156162792" x2="222.2280932078409" y2="-332.5878449210181" class="tick-major"></line><line x1="252.57650510479175" y1="-340.55999334779347" x2="244.8324141463901" y2="-330.1182954385451" class="tick-minor"></line><line x1="268.98275248538573" y1="-327.75643222580044" x2="260.73563979125834" y2="-317.70729633208487" class="tick-minor"></line><line x1="284.7409968551358" y1="-314.1632771505026" x2="276.01073044212455" y2="-304.53091252088814" class="tick-minor"></line><line x1="299.8132752230962" y1="-299.8132752230961" x2="282.842712474619" y2="-282.84271247461896" class="tick-major"></line><line x1="314.16327715050267" y1="-284.7409968551358" x2="304.5309125208882" y2="-276.01073044212455" class="tick-minor"></line><line x1="327.7564322258005" y1="-268.9827524853857" x2="317.7072963320849" y2="-260.7356397912583" class="tick-minor"></line><line x1="340.55999334779347" y1="-252.57650510479175" x2="330.1182954385451" y2="-244.8324141463901" class="tick-minor"></line><line x1="352.5431156162792" y1="-235.56177880031132" x2="332.5878449210181" y2="-222.22809320784086" class="tick-major"></line><line x1="363.67693064011536" y1="-217.97956353792603" x2="352.5264587101118" y2="-211.29622786341415" class="tick-minor"></line><line x1="373.93461608370256" y1="-199.872216414223" x2="362.46963964717395" y2="-193.74405883548502" class="tick-minor"></line><line x1="383.29146028433996" y1="-181.28335961443958" x2="371.5395994737352" y2="-175.7251433998459" class="tick-minor"></line><line x1="391.7249217847856" y1="-162.25777532279807" x2="369.5518130045147" y2="-153.0733729460359" class="tick-major"></line><line x1="399.21468363760084" y1="-142.8412978383013" x2="386.97461079022156" y2="-138.46172974420244" class="tick-minor"></line><line x1="405.74270235045657" y1="-123.08070315589202" x2="393.3024779859378" y2="-119.30700235158402" class="tick-minor"></line><line x1="411.29325135448664" y1="-103.02359627898389" x2="398.6828450629576" y2="-99.86485394024145" class="tick-minor"></line><line x1="415.8529588909697" y1="-82.71829653483837" x2="392.3141121612922" y2="-78.0361288064513" class="tick-major"></line><line x1="419.41084022506715" y1="-62.21372116907338" x2="406.551545595525" y2="-60.30622500115368" class="tick-minor"></line><line x1="421.95832410901147" y1="-41.55926749973369" x2="409.02092266227294" y2="-40.285044675449406" class="tick-minor"></line><line x1="423.4892734309931" y1="-20.80469391482524" x2="410.5049325003259" y2="-20.166814148568804" class="tick-minor"></line><line x1="424" y1="0" x2="400" y2="0" class="tick-major"></line><line x1="423.4892734309931" y1="20.80469391482524" x2="410.5049325003259" y2="20.166814148568804" class="tick-minor"></line><line x1="421.95832410901147" y1="41.55926749973369" x2="409.02092266227294" y2="40.285044675449406" class="tick-minor"></line><line x1="419.41084022506715" y1="62.21372116907338" x2="406.551545595525" y2="60.30622500115368" class="tick-minor"></line><line x1="415.8529588909697" y1="82.71829653483837" x2="392.3141121612922" y2="78.0361288064513" class="tick-major"></line><line x1="411.29325135448664" y1="103.02359627898389" x2="398.6828450629576" y2="99.86485394024145" class="tick-minor"></line><line x1="405.74270235045657" y1="123.08070315589202" x2="393.3024779859378" y2="119.30700235158402" class="tick-minor"></line><line x1="399.21468363760084" y1="142.8412978383013" x2="386.97461079022156" y2="138.46172974420244" class="tick-minor"></line><line x1="391.7249217847856" y1="162.25777532279807" x2="369.5518130045147" y2="153.0733729460359" class="tick-major"></line><line x1="383.29146028433996" y1="181.28335961443958" x2="371.5395994737352" y2="175.7251433998459" class="tick-minor"></line><line x1="373.93461608370256" y1="199.872216414223" x2="362.46963964717395" y2="193.74405883548502" class="tick-minor"></line><line x1="363.67693064011536" y1="217.97956353792603" x2="352.5264587101118" y2="211.29622786341415" class="tick-minor"></line><line x1="352.5431156162792" y1="235.56177880031132" x2="332.5878449210181" y2="222.22809320784086" class="tick-major"></line><line x1="340.55999334779347" y1="252.57650510479175" x2="330.1182954385451" y2="244.8324141463901" class="tick-minor"></line><line x1="327.7564322258005" y1="268.9827524853857" x2="317.7072963320849" y2="260.7356397912583" class="tick-minor"></line><line x1="314.16327715050267" y1="284.7409968551358" x2="304.5309125208882" y2="276.01073044212455" class="tick-minor"></line><line x1="299.8132752230962" y1="299.8132752230961" x2="282.842712474619" y2="282.84271247461896" class="tick-major"></line><line x1="284.7409968551358" y1="314.1632771505026" x2="276.01073044212455" y2="304.53091252088814" class="tick-minor"></line><line x1="268.98275248538573" y1="327.75643222580044" x2="260.73563979125834" y2="317.70729633208487" class="tick-minor"></line><line x1="252.57650510479175" y1="340.55999334779347" x2="244.8324141463901" y2="330.1182954385451" class="tick-minor"></line><line x1="235.56177880031137" y1="352.5431156162792" x2="222.2280932078409" y2="332.5878449210181" class="tick-major"></line><line x1="217.97956353792608" y1="363.67693064011536" x2="211.2962278634142" y2="352.5264587101118" class="tick-minor"></line><line x1="199.87221641422298" y1="373.93461608370256" x2="193.74405883548502" y2="362.46963964717395" class="tick-minor"></line><line x1="181.28335961443966" y1="383.29146028433996" x2="175.725143399846" y2="371.5395994737352" class="tick-minor"></line><line x1="162.2577753227981" y1="391.7249217847856" x2="153.07337294603593" y2="369.5518130045147" class="tick-major"></line><line x1="142.8412978383013" y1="399.21468363760084" x2="138.46172974420244" y2="386.97461079022156" class="tick-minor"></line><line x1="123.08070315589202" y1="405.74270235045657" x2="119.30700235158402" y2="393.30247798593786" class="tick-minor"></line><line x1="103.02359627898393" y1="411.29325135448664" x2="99.8648539402415" y2="398.6828450629576" class="tick-minor"></line><line x1="82.71829653483842" y1="415.8529588909697" x2="78.03612880645133" y2="392.3141121612922" class="tick-major"></line><line x1="62.21372116907338" y1="419.41084022506715" x2="60.30622500115368" y2="406.551545595525" class="tick-minor"></line><line x1="41.55926749973367" y1="421.95832410901147" x2="40.285044675449384" y2="409.02092266227294" class="tick-minor"></line><line x1="20.804693914825286" y1="423.4892734309931" x2="20.16681414856885" y2="410.5049325003259" class="tick-minor"></line><line x1="2.596251214192389e-14" y1="424" x2="2.4492935982947064e-14" y2="400" class="tick-major"></line><line x1="-20.804693914825236" y1="423.4892734309931" x2="-20.1668141485688" y2="410.5049325003259" class="tick-minor"></line><line x1="-41.55926749973362" y1="421.95832410901147" x2="-40.285044675449335" y2="409.02092266227294" class="tick-minor"></line><line x1="-62.21372116907333" y1="419.41084022506715" x2="-60.306225001153635" y2="406.551545595525" class="tick-minor"></line><line x1="-82.71829653483826" y1="415.8529588909698" x2="-78.03612880645119" y2="392.3141121612922" class="tick-major"></line><line x1="-103.02359627898389" y1="411.29325135448664" x2="-99.86485394024145" y2="398.6828450629576" class="tick-minor"></line><line x1="-123.08070315589205" y1="405.74270235045657" x2="-119.30700235158405" y2="393.3024779859378" class="tick-minor"></line><line x1="-142.84129783830124" y1="399.21468363760084" x2="-138.4617297442024" y2="386.97461079022156" class="tick-minor"></line><line x1="-162.25777532279804" y1="391.7249217847856" x2="-153.0733729460359" y2="369.5518130045147" class="tick-major"></line><line x1="-181.28335961443966" y1="383.2914602843399" x2="-175.72514339984602" y2="371.53959947373517" class="tick-minor"></line><line x1="-199.87221641422286" y1="373.9346160837026" x2="-193.7440588354849" y2="362.469639647174" class="tick-minor"></line><line x1="-217.97956353792594" y1="363.67693064011536" x2="-211.29622786341406" y2="352.52645871011185" class="tick-minor"></line><line x1="-235.56177880031137" y1="352.5431156162791" x2="-222.2280932078409" y2="332.5878449210181" class="tick-major"></line><line x1="-252.57650510479175" y1="340.55999334779347" x2="-244.8324141463901" y2="330.1182954385451" class="tick-minor"></line><line x1="-268.9827524853856" y1="327.75643222580055" x2="-260.7356397912582" y2="317.7072963320849" class="tick-minor"></line><line x1="-284.7409968551358" y1="314.1632771505026" x2="-276.01073044212455" y2="304.53091252088814" class="tick-minor"></line><line x1="-299.8132752230961" y1="299.8132752230962" x2="-282.84271247461896" y2="282.842712474619" class="tick-major"></line><line x1="-314.16327715050255" y1="284.74099685513585" x2="-304.5309125208881" y2="276.0107304421246" class="tick-minor"></line><line x1="-327.7564322258005" y1="268.9827524853857" x2="-317.7072963320849" y2="260.7356397912583" class="tick-minor"></line><line x1="-340.5599933477934" y1="252.57650510479178" x2="-330.11829543854503" y2="244.83241414639016" class="tick-minor"></line><line x1="-352.54311561627924" y1="235.56177880031132" x2="-332.58784492101813" y2="222.22809320784086" class="tick-major"></line><line x1="-363.67693064011536" y1="217.97956353792603" x2="-352.5264587101118" y2="211.29622786341415" class="tick-minor"></line><line x1="-373.9346160837025" y1="199.8722164142231" x2="-362.4696396471739" y2="193.74405883548513" class="tick-minor"></line><line x1="-383.29146028433996" y1="181.28335961443958" x2="-371.5395994737352" y2="175.7251433998459" class="tick-minor"></line><line x1="-391.7249217847856" y1="162.25777532279812" x2="-369.5518130045147" y2="153.07337294603596" class="tick-major"></line><line x1="-399.2146836376008" y1="142.84129783830141" x2="-386.9746107902215" y2="138.46172974420256" class="tick-minor"></line><line x1="-405.74270235045657" y1="123.08070315589205" x2="-393.3024779859378" y2="119.30700235158405" class="tick-minor"></line><line x1="-411.29325135448664" y1="103.02359627898396" x2="-398.6828450629576" y2="99.86485394024153" class="tick-minor"></line><line x1="-415.8529588909697" y1="82.71829653483834" x2="-392.3141121612922" y2="78.03612880645126" class="tick-major"></line><line x1="-419.4108402250671" y1="62.213721169073594" x2="-406.55154559552494" y2="60.306225001153884" class="tick-minor"></line><line x1="-421.95832410901147" y1="41.55926749973379" x2="-409.0209226622729" y2="40.2850446754495" class="tick-minor"></line><line x1="-423.4892734309931" y1="20.80469391482522" x2="-410.5049325003259" y2="20.166814148568783" class="tick-minor"></line><line x1="-424" y1="5.192502428384778e-14" x2="-400" y2="4.898587196589413e-14" class="tick-major"></line><line x1="-423.4892734309931" y1="-20.804693914825304" x2="-410.5049325003259" y2="-20.166814148568868" class="tick-minor"></line><line x1="-421.95832410901147" y1="-41.55926749973369" x2="-409.02092266227294" y2="-40.285044675449406" class="tick-minor"></line><line x1="-419.41084022506715" y1="-62.21372116907331" x2="-406.551545595525" y2="-60.30622500115361" class="tick-minor"></line><line x1="-415.8529588909698" y1="-82.71829653483823" x2="-392.3141121612922" y2="-78.03612880645116" class="tick-major"></line><line x1="-411.29325135448664" y1="-103.02359627898386" x2="-398.6828450629576" y2="-99.86485394024143" class="tick-minor"></line><line x1="-405.74270235045657" y1="-123.08070315589194" x2="-393.30247798593786" y2="-119.30700235158393" class="tick-minor"></line><line x1="-399.21468363760084" y1="-142.8412978383013" x2="-386.97461079022156" y2="-138.46172974420244" class="tick-minor"></line><line x1="-391.7249217847857" y1="-162.25777532279784" x2="-369.55181300451477" y2="-153.0733729460357" class="tick-major"></line><line x1="-383.29146028434" y1="-181.2833596144395" x2="-371.5395994737353" y2="-175.72514339984582" class="tick-minor"></line><line x1="-373.93461608370256" y1="-199.872216414223" x2="-362.46963964717395" y2="-193.74405883548502" class="tick-minor"></line><line x1="-363.67693064011536" y1="-217.97956353792594" x2="-352.52645871011185" y2="-211.29622786341406" class="tick-minor"></line><line x1="-352.5431156162792" y1="-235.56177880031137" x2="-332.5878449210181" y2="-222.2280932078409" class="tick-major"></line><line x1="-340.55999334779347" y1="-252.5765051047917" x2="-330.1182954385451" y2="-244.83241414639005" class="tick-minor"></line><line x1="-327.75643222580055" y1="-268.9827524853856" x2="-317.7072963320849" y2="-260.7356397912582" class="tick-minor"></line><line x1="-314.1632771505028" y1="-284.7409968551357" x2="-304.5309125208883" y2="-276.01073044212444" class="tick-minor"></line><line x1="-299.81327522309624" y1="-299.8132752230961" x2="-282.8427124746191" y2="-282.84271247461896" class="tick-major"></line><line x1="-284.7409968551359" y1="-314.16327715050255" x2="-276.01073044212467" y2="-304.5309125208881" class="tick-minor"></line><line x1="-268.98275248538556" y1="-327.75643222580055" x2="-260.73563979125817" y2="-317.707296332085" class="tick-minor"></line><line x1="-252.57650510479164" y1="-340.5599933477935" x2="-244.83241414639002" y2="-330.1182954385451" class="tick-minor"></line><line x1="-235.56177880031166" y1="-352.543115616279" x2="-222.22809320784117" y2="-332.5878449210179" class="tick-major"></line><line x1="-217.97956353792603" y1="-363.67693064011536" x2="-211.29622786341415" y2="-352.5264587101118" class="tick-minor"></line><line x1="-199.87221641422312" y1="-373.9346160837025" x2="-193.74405883548513" y2="-362.4696396471739" class="tick-minor"></line><line x1="-181.28335961443977" y1="-383.2914602843399" x2="-175.7251433998461" y2="-371.5395994737351" class="tick-minor"></line><line x1="-162.25777532279795" y1="-391.72492178478564" x2="-153.0733729460358" y2="-369.5518130045147" class="tick-major"></line><line x1="-142.84129783830124" y1="-399.21468363760084" x2="-138.4617297442024" y2="-386.97461079022156" class="tick-minor"></line><line x1="-123.08070315589208" y1="-405.74270235045657" x2="-119.30700235158406" y2="-393.3024779859378" class="tick-minor"></line><line x1="-103.02359627898399" y1="-411.29325135448664" x2="-99.86485394024156" y2="-398.6828450629576" class="tick-minor"></line><line x1="-82.71829653483856" y1="-415.85295889096966" x2="-78.03612880645147" y2="-392.31411216129214" class="tick-major"></line><line x1="-62.21372116907325" y1="-419.41084022506715" x2="-60.30622500115355" y2="-406.551545595525" class="tick-minor"></line><line x1="-41.55926749973363" y1="-421.95832410901147" x2="-40.28504467544934" y2="-409.02092266227294" class="tick-minor"></line><line x1="-20.80469391482562" y1="-423.4892734309931" x2="-20.166814148569173" y2="-410.5049325003258" class="tick-minor"></line><text x="2.3390753863714445e-14" y="-382" class="degree-label" transform="rotate(0 2.3390753863714445e-14 -382)">000</text><text x="191.00000000000003" y="-330.82170424565555" class="degree-label" transform="rotate(0 191.00000000000003 -330.82170424565555)">030</text><text x="330.8217042456556" y="-190.99999999999997" class="degree-label" transform="rotate(0 330.8217042456556 -190.99999999999997)">060</text><text x="382" y="0" class="degree-label" transform="rotate(0 382 0)">090</text><text x="330.8217042456556" y="190.99999999999997" class="degree-label" transform="rotate(0 330.8217042456556 190.99999999999997)">120</text><text x="191.00000000000003" y="330.82170424565555" class="degree-label" transform="rotate(0 191.00000000000003 330.82170424565555)">150</text><text x="2.3390753863714445e-14" y="382" class="degree-label" transform="rotate(0 2.3390753863714445e-14 382)">180</text><text x="-190.99999999999991" y="330.8217042456556" class="degree-label" transform="rotate(0 -190.99999999999991 330.8217042456556)">210</text><text x="-330.8217042456556" y="190.99999999999997" class="degree-label" transform="rotate(0 -330.8217042456556 190.99999999999997)">240</text><text x="-382" y="4.678150772742889e-14" class="degree-label" transform="rotate(0 -382 4.678150772742889e-14)">270</text><text x="-330.82170424565555" y="-191.00000000000003" class="degree-label" transform="rotate(0 -330.82170424565555 -191.00000000000003)">300</text><text x="-191.00000000000017" y="-330.8217042456555" class="degree-label" transform="rotate(0 -191.00000000000017 -330.8217042456555)">330</text></g><g aria-hidden="true"><circle r="358" class="plate-ring"></circle><line x1="8.450062914116738e-15" y1="-138" x2="2.1921177704737623e-14" y2="-358" class="rhumb"></line><line x1="26.92246443822571" y1="-135.3483686956458" x2="69.84233528177394" y2="-351.1211303843565" class="rhumb"></line><line x1="52.8103136663824" y1="-127.49537548655756" x2="137.00066878670216" y2="-330.74887263904066" class="rhumb"></line><line x1="76.66869215670512" y1="-114.74280649775125" x2="198.89414342101762" y2="-297.6661212043112" class="rhumb"></line><line x1="97.58073580374356" y1="-97.58073580374355" x2="253.14422766478404" y2="-253.14422766478398" class="rhumb"></line><line x1="114.74280649775125" y1="-76.6686921567051" x2="297.6661212043112" y2="-198.8941434210176" class="rhumb"></line><line x1="127.49537548655756" y1="-52.81031366638239" x2="330.74887263904066" y2="-137.00066878670214" class="rhumb"></line><line x1="135.3483686956458" y1="-26.9224644382257" x2="351.1211303843565" y2="-69.84233528177391" class="rhumb"></line><line x1="138" y1="0" x2="358" y2="0" class="rhumb"></line><line x1="135.3483686956458" y1="26.9224644382257" x2="351.1211303843565" y2="69.84233528177391" class="rhumb"></line><line x1="127.49537548655756" y1="52.81031366638239" x2="330.74887263904066" y2="137.00066878670214" class="rhumb"></line><line x1="114.74280649775125" y1="76.6686921567051" x2="297.6661212043112" y2="198.8941434210176" class="rhumb"></line><line x1="97.58073580374356" y1="97.58073580374355" x2="253.14422766478404" y2="253.14422766478398" class="rhumb"></line><line x1="76.66869215670512" y1="114.74280649775125" x2="198.89414342101762" y2="297.6661212043112" class="rhumb"></line><line x1="52.8103136663824" y1="127.49537548655756" x2="137.00066878670216" y2="330.74887263904066" class="rhumb"></line><line x1="26.92246443822571" y1="135.3483686956458" x2="69.84233528177394" y2="351.1211303843565" class="rhumb"></line><line x1="8.450062914116738e-15" y1="138" x2="2.1921177704737623e-14" y2="358" class="rhumb"></line><line x1="-26.92246443822566" y1="135.3483686956458" x2="-69.84233528177381" y2="351.12113038435655" class="rhumb"></line><line x1="-52.810313666382385" y1="127.49537548655756" x2="-137.00066878670214" y2="330.74887263904066" class="rhumb"></line><line x1="-76.66869215670512" y1="114.74280649775123" x2="-198.89414342101762" y2="297.66612120431114" class="rhumb"></line><line x1="-97.58073580374355" y1="97.58073580374356" x2="-253.14422766478398" y2="253.14422766478404" class="rhumb"></line><line x1="-114.74280649775126" y1="76.6686921567051" x2="-297.66612120431125" y2="198.8941434210176" class="rhumb"></line><line x1="-127.49537548655756" y1="52.810313666382406" x2="-330.74887263904066" y2="137.0006687867022" class="rhumb"></line><line x1="-135.3483686956458" y1="26.92246443822569" x2="-351.1211303843565" y2="69.84233528177388" class="rhumb"></line><line x1="-138" y1="1.6900125828233476e-14" x2="-358" y2="4.3842355409475246e-14" class="rhumb"></line><line x1="-135.3483686956458" y1="-26.922464438225653" x2="-351.12113038435655" y2="-69.8423352817738" class="rhumb"></line><line x1="-127.4953754865576" y1="-52.810313666382314" x2="-330.7488726390407" y2="-137.00066878670194" class="rhumb"></line><line x1="-114.74280649775125" y1="-76.66869215670512" x2="-297.6661212043112" y2="-198.89414342101762" class="rhumb"></line><line x1="-97.58073580374358" y1="-97.58073580374355" x2="-253.14422766478407" y2="-253.14422766478398" class="rhumb"></line><line x1="-76.6686921567052" y1="-114.74280649775118" x2="-198.89414342101784" y2="-297.666121204311" class="rhumb"></line><line x1="-52.81031366638235" y1="-127.49537548655759" x2="-137.00066878670205" y2="-330.7488726390407" class="rhumb"></line><line x1="-26.922464438225756" y1="-135.34836869564577" x2="-69.84233528177406" y2="-351.12113038435643" class="rhumb"></line><circle r="236" class="plate-ring"></circle></g><g><g class="sector" data-active="false" role="button" tabindex="0" aria-label="产品材料，已填 0 / 3" aria-pressed="false"><path d="M -160.95161297474962,-172.59947358212426 A 236,236 0 0,1 160.95161297474965,-172.59947358212423 L 103.66375072949977,-111.1657626461139 A 152,152 0 0,0 -103.66375072949975,-111.16576264611393 Z" class="sector-face"></path><text x="1.1879073951729327e-14" y="-214" class="sector-num">I</text><text x="1.1879073951729327e-14" y="-190" class="sector-name">产品材料</text><text x="1.1879073951729327e-14" y="-168" class="sector-fill">0 / 3</text></g><g class="sector" data-active="true" role="button" tabindex="0" aria-label="团队信息，已填 0 / 2" aria-pressed="true"><path d="M 172.59947358212426,-160.95161297474965 A 236,236 0 0,1 172.59947358212426,160.95161297474965 L 111.16576264611393,103.66375072949977 A 152,152 0 0,0 111.16576264611393,-103.66375072949977 Z" class="sector-face"></path><text x="194" y="-20" class="sector-num">II</text><text x="194" y="4" class="sector-name">团队信息</text><text x="194" y="26" class="sector-fill">0 / 2</text></g><g class="sector" data-active="false" role="button" tabindex="0" aria-label="用户与经营，已填 0 / 3" aria-pressed="false"><path d="M 160.95161297474965,172.59947358212423 A 236,236 0 0,1 -160.95161297474962,172.59947358212426 L -103.66375072949975,111.16576264611393 A 152,152 0 0,0 103.66375072949977,111.1657626461139 Z" class="sector-face"></path><text x="1.1879073951729327e-14" y="174" class="sector-num">III</text><text x="1.1879073951729327e-14" y="198" class="sector-name">用户与经营</text><text x="1.1879073951729327e-14" y="220" class="sector-fill">0 / 3</text></g><g class="sector" data-active="false" role="button" tabindex="0" aria-label="时间与地域，已填 0 / 3" aria-pressed="false"><path d="M -172.59947358212423,160.95161297474968 A 236,236 0 0,1 -172.59947358212426,-160.95161297474962 L -111.16576264611393,-103.66375072949975 A 152,152 0 0,0 -111.1657626461139,103.66375072949978 Z" class="sector-face"></path><text x="-194" y="-19.999999999999975" class="sector-num">IV</text><text x="-194" y="4.000000000000024" class="sector-name">时间与地域</text><text x="-194" y="26.000000000000025" class="sector-fill">0 / 3</text></g></g><g class="rete" transform="rotate(0)"><g class="needle" data-state="idle" role="button" tabindex="0" aria-label="势能评审主管：IDLE，0 条证据"><g transform="rotate(0)"><line x1="0" y1="-138" x2="0" y2="-306" class="tick-minor"></line><path d="M0,-25 L4.9,-8.2 L21,-8.2 L8,2 L13,18.6 L0,8.4 L-13,18.6 L-8,2 L-21,-8.2 L-4.9,-8.2 Z" class="needle-body" transform="translate(0 -330)"></path></g><text x="2.2655965784226034e-14" y="-370" class="needle-caption" transform="rotate(0 2.2655965784226034e-14 -370)">势能评审主管</text><text x="2.2655965784226034e-14" y="-355" class="needle-caption" transform="rotate(0 2.2655965784226034e-14 -355)">0 证据</text></g><g class="needle" data-state="idle" role="button" tabindex="0" aria-label="产品与团队专家：IDLE，0 条证据"><g transform="rotate(60)"><line x1="0" y1="-138" x2="0" y2="-262" class="tick-minor"></line><path d="M0,-26 C9.6,-13.4 11.5,-1 0,16 C-11.5,-1 -9.6,-13.4 0,-26 Z" class="needle-body" transform="translate(0 -286)"></path></g><text x="282.324281633727" y="-162.99999999999997" class="needle-caption" transform="rotate(0 282.324281633727 -162.99999999999997)">产品与团队专家</text><text x="282.324281633727" y="-147.99999999999997" class="needle-caption" transform="rotate(0 282.324281633727 -147.99999999999997)">0 证据</text></g><g class="needle" data-state="idle" role="button" tabindex="0" aria-label="用户共创 Agent：IDLE，0 条证据"><g transform="rotate(120)"><line x1="0" y1="-138" x2="0" y2="-262" class="tick-minor"></line><path d="M0,-24 L3.4,-10.5 L6.3,-14.4 L7.4,-5.7 L10.5,-8 L9.7,1 C9.7,9.6 5.1,15.3 0,15.3 C-5.1,15.3 -9.7,9.6 -9.7,1 L-10.5,-8 L-7.4,-5.7 L-6.3,-14.4 L-3.4,-10.5 Z" class="needle-body" transform="translate(0 -286)"></path></g><text x="282.324281633727" y="162.99999999999997" class="needle-caption" transform="rotate(0 282.324281633727 162.99999999999997)">用户共创 Agent</text><text x="282.324281633727" y="177.99999999999997" class="needle-caption" transform="rotate(0 282.324281633727 177.99999999999997)">0 证据</text></g><g class="needle" data-state="idle" role="button" tabindex="0" aria-label="投资与商业 Agent：IDLE，0 条证据"><g transform="rotate(180)"><line x1="0" y1="-138" x2="0" y2="-262" class="tick-minor"></line><path d="M0,-25 L4.2,-12.4 A 12.9,12.9 0 1,1 -4.2,-12.4 Z" class="needle-body" transform="translate(0 -286)"></path></g><text x="1.9961742826101858e-14" y="326" class="needle-caption" transform="rotate(0 1.9961742826101858e-14 326)">投资与商业 Agent</text><text x="1.9961742826101858e-14" y="341" class="needle-caption" transform="rotate(0 1.9961742826101858e-14 341)">0 证据</text></g><g class="needle" data-state="idle" role="button" tabindex="0" aria-label="时间地域 Agent：IDLE，0 条证据"><g transform="rotate(240)"><line x1="0" y1="-138" x2="0" y2="-262" class="tick-minor"></line><path d="M0,-26 C8.6,-18.2 -7.6,-10.5 1.9,-2.9 C10.5,3.8 -4.8,9.6 0,16.2 C-8.6,9.6 6.7,3.8 -1.9,-2.9 C-10.5,-10.5 7.6,-18.2 0,-26 Z" class="needle-body" transform="translate(0 -286)"></path></g><text x="-282.324281633727" y="162.99999999999997" class="needle-caption" transform="rotate(0 -282.324281633727 162.99999999999997)">时间地域 Agent</text><text x="-282.324281633727" y="177.99999999999997" class="needle-caption" transform="rotate(0 -282.324281633727 177.99999999999997)">0 证据</text></g><g class="needle" data-state="idle" role="button" tabindex="0" aria-label="证据校准 Agent：IDLE，0 条证据"><g transform="rotate(300)"><line x1="0" y1="-138" x2="0" y2="-262" class="tick-minor"></line><path d="M0,-26 L7.3,-8.6 L2.3,-8.6 L2.3,16.2 L-2.3,16.2 L-2.3,-8.6 L-7.3,-8.6 Z" class="needle-body" transform="translate(0 -286)"></path></g><text x="-282.32428163372697" y="-163.00000000000003" class="needle-caption" transform="rotate(0 -282.32428163372697 -163.00000000000003)">证据校准 Agent</text><text x="-282.32428163372697" y="-148.00000000000003" class="needle-caption" transform="rotate(0 -282.32428163372697 -148.00000000000003)">0 证据</text></g></g><circle r="138" class="compass-core"></circle><circle r="128" class="plate-ring"></circle></svg></div>
+</body>
+</html>

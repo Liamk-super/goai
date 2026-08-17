@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "version": "1.0.0",
+  "status": "AWAITING_INDEPENDENT_OWNER",
+  "storage": "EXTERNAL_SEALED",
+  "planned_case_count": 25,
+  "distribution": {
+    "model": 6,
+    "agents": 16,
+    "system_e2e": 3
+  },
+  "case_ids_sha256": null,
+  "governance": {
+    "owner_role": "independent_benchmark_owner",
+    "repository_contains_inputs": false,
+    "release_condition": "Release only after a model or system decision is frozen",
+    "rotation_condition": "Rotate cases exposed to implementation authors or included in a production prompt",
+    "minimum_reviewers": 2,
+    "prohibited_coupling": [
+      "production prompt and holdout oracle in the same change",
+      "current system output as holdout gold"
+    ]
+  }
+}

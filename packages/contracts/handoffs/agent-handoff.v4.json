@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/handoffs/agent-handoff.v4.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "tenant_id", "run_id", "task_id", "dispatch_epoch", "agent_code", "status",
+    "findings", "report_ref", "evidence_refs", "limitations", "confidence", "failure_class", "next_action"
+  ],
+  "properties": {
+    "schema_version": { "const": "4.0" },
+    "tenant_id": { "type": "string", "format": "uuid" },
+    "run_id": { "type": "string", "format": "uuid" },
+    "task_id": { "type": "string", "format": "uuid" },
+    "dispatch_epoch": { "type": "integer", "minimum": 0, "maximum": 2147483647 },
+    "agent_code": { "enum": ["user-evidence", "product-engineering", "business-investment"] },
+    "status": { "enum": ["SUCCEEDED", "KNOWN_FAILED", "SUBMISSION_UNKNOWN", "NEEDS_INPUT"] },
+    "findings": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/finding" } },
+    "report_ref": { "anyOf": [{ "$ref": "#/$defs/contentRef" }, { "type": "null" }] },
+    "evidence_refs": {
+      "type": "array", "maxItems": 500, "uniqueItems": true,
+      "items": { "$ref": "#/$defs/contentRef" }
+    },
+    "limitations": { "type": "array", "maxItems": 50, "items": { "type": "string", "minLength": 1 } },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "failure_class": { "type": ["string", "null"], "maxLength": 120 },
+    "next_action": { "type": "string", "minLength": 1, "maxLength": 2000 }
+  },
+  "$defs": {
+    "contentRef": {
+      "type": "object", "additionalProperties": false,
+      "required": ["ref", "sha256"],
+      "properties": {
+        "ref": { "type": "string", "minLength": 1, "maxLength": 1024 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "finding": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "finding_id", "agent_code", "dimension", "subdimension", "claim", "grade", "score_input",
+        "evidence_refs", "confidence", "limitations", "region_scope", "as_of", "valid_until",
+        "hypothesis", "report_section_ref"
+      ],
+      "properties": {
+        "finding_id": { "type": "string", "format": "uuid" },
+        "agent_code": { "enum": ["user-evidence", "product-engineering", "business-investment"] },
+        "dimension": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "subdimension": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "claim": { "type": "string", "minLength": 1, "maxLength": 10000 },
+        "grade": { "enum": ["STRONG", "MODERATE", "WEAK", "INSUFFICIENT_EVIDENCE"] },
+        "score_input": { "type": ["number", "null"], "minimum": 0, "maximum": 5 },
+        "evidence_refs": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "limitations": { "type": "array", "items": { "type": "string" } },
+        "region_scope": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "as_of": { "type": "string", "format": "date" },
+        "valid_until": { "type": "string", "format": "date" },
+        "hypothesis": { "type": "boolean" },
+        "report_section_ref": { "type": "string", "minLength": 1, "maxLength": 500 }
+      }
+    }
+  }
+}

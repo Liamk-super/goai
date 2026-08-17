@@ -1,4 +1,4 @@
-# LaunchScope v0.2 implementation verification
+# LaunchScope generation-aware implementation verification
 
 Verified locally on 2026-08-06. This record separates reproducible local proof
 from external AgentTeams/provider acceptance.
@@ -6,8 +6,9 @@ from external AgentTeams/provider acceptance.
 ## Implemented scope
 
 - Browser-local versioned Demo identity and guarded workspace API.
-- Pinned AgentTeams v1.2.0 `agentteams.io/v1beta1` bundle: one Team, six
-  independent Workers, and one Human coordinator. Windows bootstrap downloads
+- Pinned AgentTeams v1.2.0 `agentteams.io/v1beta1` bundles: the legacy Team retains six
+  independent Workers, while the feature-flagged generation-v4 Team has exactly five Workers, one supervisor
+  Team Leader, no `geo-policy-trend`, disabled peer mentions, and a generation-specific Human coordinator. Windows bootstrap downloads
   the tagged official PowerShell installer and verifies SHA-256 before optional
   execution.
 - RocketMQ 5.x Proxy dispatch using the official Python client, transactional
@@ -33,7 +34,7 @@ from external AgentTeams/provider acceptance.
 | Real local MinIO presigned PUT, HEAD, signed read, anonymous denial | 1 passed |
 | Ruff | passed across `apps`, `packages`, `scripts`, and `tests` |
 | mypy | passed for 69 API/orchestrator source files |
-| AgentTeams deterministic package/resource validation | 1 Team, 6 Workers, 1 Human |
+| AgentTeams deterministic package/resource validation | legacy: 1 Team, 6 Workers, 1 Human; v4: 1 Team, 5 Workers, 1 Human |
 | Web tests | 7 passed |
 | Web and Ops typecheck/production build | passed |
 | Demo PowerShell parser validation | passed |
@@ -42,14 +43,11 @@ The temporary PostgreSQL container created for this verification was matched by
 exact name/image/port, stopped, and removed. Existing workspace services and
 their volumes were not changed.
 
-## External acceptance status
+## External acceptance status in this historical record
 
 `BLOCKED_NO_AUTHORIZED_CASE`
 
-No authorized external URL, paid model/search credentials, or live AgentTeams
-provider case was supplied. Therefore this verification does not claim a live
-AgentTeams/Matrix/RocketMQ/browser/search/paid-model E2E. A recorded snapshot
-remains visibly labelled and read-only. Live completion requires the sanitized
-Run-linked facts listed in `docs/demo/acceptance.md`, including provider usage,
-Matrix receipts, fully published Outbox rows and real allowlisted Evidence.
-
+No authorized external URL, paid model/search credentials, or live AgentTeams provider case was supplied for the
+2026-08-06 verification. Therefore that historical result does not claim a live AgentTeams/Matrix/RocketMQ/
+browser/search/paid-model E2E. The current M7-B acceptance must follow `docs/demo/acceptance.md`; later live results
+must be appended as a new dated section rather than rewriting this historical proof level.

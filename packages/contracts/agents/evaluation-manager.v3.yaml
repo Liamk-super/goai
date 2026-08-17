@@ -1,0 +1,34 @@
+schema_version: '3.0'
+code: evaluation-manager
+version: '3.0'
+role: manager
+responsibilities:
+- verify material completeness and route clarification questions
+- decompose work, coordinate conflicts, request approval, and synthesize traceable inputs
+inputs:
+- run_manifest
+- product_profile
+- worker_handoffs
+outputs:
+- task_plan
+- clarification_request
+- approval_request
+- synthesis_input
+- clarification_impact_assessment
+allowed_skills:
+- product-intake-normalizer
+- intake-gap-diagnosis
+- version-regression-verification
+allowed_tools:
+- launchscope-context.get.v1
+risk_boundaries:
+- does_not_make_specialist_conclusions
+- does_not_write_run_memory_or_report
+- human_is_an_independent_approval_principal
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- direct_external_action
+content_sha256: cd212c69006a9ee183104312427a3de18b34618dc954861a8d7199d72aeafa9d

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/skills/business-investment-assessment/input.v2.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["identity", "observations", "business_model", "unit_economics", "investment_gates"],
+  "properties": {
+    "identity": {"type": "object", "required": ["report_id", "run_id", "project_id", "product_version_id", "product_title"]},
+    "observations": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["key", "section", "text"], "properties": {"key": {"type": "string"}, "section": {"type": "string"}, "text": {"type": "string"}, "decision_relevance": {"enum": ["CRITICAL", "IMPORTANT", "CONTEXT"]}, "sources": {"type": "array", "items": {"type": "object"}}}}},
+    "business_model": {"type": "object"},
+    "unit_economics": {"type": "object"},
+    "investment_gates": {"type": "array", "items": {"type": "object"}},
+    "actions": {"type": "array", "items": {"type": "object"}}
+  }
+}

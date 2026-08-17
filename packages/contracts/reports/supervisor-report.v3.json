@@ -1,0 +1,240 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/reports/supervisor-report.v3.json",
+  "title": "SupervisorReportDocumentV3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "locale", "report_id", "run_id", "project_id", "product_version_id", "product_title",
+    "source_sha256", "top_card", "dimension_scores", "evidence_coverage_profile", "summary_claim_id", "claims",
+    "highlights", "critical_issues", "issue_priorities", "role_summaries", "cross_domain_claims", "actions",
+    "confidence_breakdown", "agent_report_cards", "citations", "source_directory", "audit_detail_ref"
+  ],
+  "properties": {
+    "schema_version": {"const": "3.0"},
+    "locale": {"enum": ["zh-CN", "en"]},
+    "report_id": {"$ref": "#/$defs/uuid"},
+    "run_id": {"$ref": "#/$defs/uuid"},
+    "project_id": {"$ref": "#/$defs/uuid"},
+    "product_version_id": {"$ref": "#/$defs/uuid"},
+    "product_title": {"type": "string", "minLength": 1, "maxLength": 300},
+    "source_sha256": {"$ref": "#/$defs/sha256"},
+    "top_card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["potential_index", "stage", "confidence_band", "evidence_coverage", "recommendation"],
+      "properties": {
+        "potential_index": {"type": "number", "minimum": 0, "maximum": 100},
+        "stage": {"type": "string", "minLength": 1},
+        "confidence_band": {"enum": ["LOW", "MEDIUM", "HIGH"]},
+        "evidence_coverage": {"$ref": "#/$defs/unitInterval"},
+        "recommendation": {"$ref": "#/$defs/recommendation"}
+      }
+    },
+    "comparison": {"type": "object"},
+    "dimension_scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["user_value", "product_capability", "investment_potential", "evidence_quality"],
+      "properties": {
+        "user_value": {"$ref": "#/$defs/dimension"},
+        "product_capability": {"$ref": "#/$defs/dimension"},
+        "investment_potential": {"$ref": "#/$defs/dimension"},
+        "evidence_quality": {"$ref": "#/$defs/dimension"}
+      }
+    },
+    "evidence_coverage_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "definition_version", "label", "required_dimensions", "covered_dimensions", "quality_note",
+        "independent_support_note"
+      ],
+      "properties": {
+        "definition_version": {"type": "string", "minLength": 1},
+        "label": {"enum": ["EVIDENCE_COVERAGE"]},
+        "required_dimensions": {"type": "integer", "minimum": 1},
+        "covered_dimensions": {"type": "integer", "minimum": 0},
+        "quality_note": {"type": "string", "minLength": 1},
+        "independent_support_note": {"type": "string", "minLength": 1}
+      }
+    },
+    "summary_claim_id": {"$ref": "#/$defs/claimId"},
+    "claims": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/claim"}},
+    "highlights": {"$ref": "#/$defs/claimIds"},
+    "critical_issues": {"$ref": "#/$defs/claimIds"},
+    "issue_priorities": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["priority", "claim_id", "decision_impact"],
+        "properties": {
+          "priority": {"enum": ["P0", "P1", "P2"]},
+          "claim_id": {"$ref": "#/$defs/claimId"},
+          "decision_impact": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "role_summaries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["user", "product", "investment"],
+      "properties": {
+        "user": {"$ref": "#/$defs/claimIds"},
+        "product": {"$ref": "#/$defs/claimIds"},
+        "investment": {"$ref": "#/$defs/claimIds"}
+      }
+    },
+    "cross_domain_claims": {"$ref": "#/$defs/claimIds"},
+    "actions": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/action"}},
+    "confidence_breakdown": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile_ref", "audited_evidence_quality", "evidence_coverage", "independent_source_support", "freshness",
+        "cross_domain_agreement", "unresolved_conflict_penalty", "score", "band"
+      ],
+      "properties": {
+        "profile_ref": {"type": "string", "minLength": 1},
+        "audited_evidence_quality": {"$ref": "#/$defs/unitInterval"},
+        "evidence_coverage": {"$ref": "#/$defs/unitInterval"},
+        "independent_source_support": {"$ref": "#/$defs/unitInterval"},
+        "freshness": {"$ref": "#/$defs/unitInterval"},
+        "cross_domain_agreement": {"$ref": "#/$defs/unitInterval"},
+        "unresolved_conflict_penalty": {"$ref": "#/$defs/unitInterval"},
+        "score": {"$ref": "#/$defs/unitInterval"},
+        "band": {"enum": ["LOW", "MEDIUM", "HIGH"]}
+      }
+    },
+    "agent_report_cards": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["agent_code", "report_id", "title", "summary_claim_ids", "source_sha256"],
+        "properties": {
+          "agent_code": {"$ref": "#/$defs/agentCode"},
+          "report_id": {"$ref": "#/$defs/uuid"},
+          "title": {"type": "string", "minLength": 1},
+          "summary_claim_ids": {"$ref": "#/$defs/claimIds"},
+          "source_sha256": {"$ref": "#/$defs/sha256"}
+        }
+      }
+    },
+    "citations": {"type": "array", "items": {"$ref": "#/$defs/citation"}},
+    "source_directory": {"type": "array", "items": {"$ref": "#/$defs/sourceLocator"}},
+    "audit_detail_ref": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "uuid": {"type": "string", "format": "uuid"},
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "unitInterval": {"type": "number", "minimum": 0, "maximum": 1},
+    "recommendation": {"enum": ["PROCEED", "VALIDATE_FURTHER", "ADJUST", "PAUSE"]},
+    "agentCode": {"enum": ["user-evidence", "product-engineering", "business-investment", "evidence-auditor"]},
+    "claimId": {"type": "string", "pattern": "^claim-[A-Za-z0-9._-]+$"},
+    "claimIds": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/claimId"}},
+    "dimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value", "strength", "evidence_level", "positive_driver_claim_ids", "negative_driver_claim_ids",
+        "pending_validation_claim_ids"
+      ],
+      "properties": {
+        "value": {"type": ["number", "null"], "minimum": 0, "maximum": 100},
+        "strength": {"enum": ["STRONG", "MODERATE", "WEAK", "INSUFFICIENT_EVIDENCE"]},
+        "evidence_level": {"enum": ["HIGH", "MEDIUM", "LOW", "PENDING"]},
+        "positive_driver_claim_ids": {"$ref": "#/$defs/claimIds"},
+        "negative_driver_claim_ids": {"$ref": "#/$defs/claimIds"},
+        "pending_validation_claim_ids": {"$ref": "#/$defs/claimIds"}
+      },
+      "anyOf": [
+        {"properties": {"positive_driver_claim_ids": {"minItems": 1}}},
+        {"properties": {"negative_driver_claim_ids": {"minItems": 1}}},
+        {"properties": {"pending_validation_claim_ids": {"minItems": 1}}}
+      ]
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim_id", "section", "text", "status", "decision_relevance", "citation_ids", "score_bearing"],
+      "properties": {
+        "claim_id": {"$ref": "#/$defs/claimId"},
+        "section": {"type": "string", "minLength": 1},
+        "text": {"type": "string", "minLength": 1, "maxLength": 12000},
+        "status": {"enum": ["VERIFIED", "DOWNGRADED", "PENDING_VALIDATION", "CONFLICTED"]},
+        "decision_relevance": {"enum": ["CRITICAL", "IMPORTANT", "CONTEXT"]},
+        "citation_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^citation-[A-Za-z0-9._-]+$"}},
+        "score_bearing": {"type": "boolean"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "VERIFIED"}}, "required": ["status"]},
+          "then": {"properties": {"citation_ids": {"minItems": 1}}}
+        },
+        {
+          "if": {"properties": {"status": {"enum": ["PENDING_VALIDATION", "CONFLICTED"]}}, "required": ["status"]},
+          "then": {"properties": {"score_bearing": {"const": false}}}
+        }
+      ]
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_id", "title", "owner", "deadline_days", "success_criteria", "failure_triggers", "required_evidence",
+        "related_claim_ids"
+      ],
+      "properties": {
+        "action_id": {"type": "string", "pattern": "^action-[A-Za-z0-9._-]+$"},
+        "title": {"type": "string", "minLength": 1},
+        "owner": {"type": "string", "minLength": 1},
+        "deadline_days": {"type": "integer", "minimum": 1, "maximum": 365},
+        "success_criteria": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "failure_triggers": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "required_evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "related_claim_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/claimId"}}
+      }
+    },
+    "citation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["citation_id", "claim_id", "evidence_id", "source_locator_id", "support_role", "audit_status", "label"],
+      "properties": {
+        "citation_id": {"type": "string", "pattern": "^citation-[A-Za-z0-9._-]+$"},
+        "claim_id": {"$ref": "#/$defs/claimId"},
+        "evidence_id": {"$ref": "#/$defs/uuid"},
+        "source_locator_id": {"type": ["string", "null"], "format": "uuid"},
+        "support_role": {"enum": ["SUPPORT", "COUNTER", "BACKGROUND"]},
+        "audit_status": {"enum": ["VERIFIED", "DOWNGRADED", "REJECTED", "NEEDS_MORE"]},
+        "label": {"type": "integer", "minimum": 1}
+      }
+    },
+    "sourceLocator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_locator_id", "evidence_id", "source_kind", "title", "fetched_at", "locator", "independence_group",
+        "content_sha256"
+      ],
+      "properties": {
+        "source_locator_id": {"$ref": "#/$defs/uuid"},
+        "evidence_id": {"$ref": "#/$defs/uuid"},
+        "source_kind": {"enum": ["PUBLIC_URL", "SEARCH_RESULT", "INTERNAL_MATERIAL"]},
+        "canonical_url": {"type": "string", "format": "uri"},
+        "title": {"type": "string", "minLength": 1},
+        "publisher": {"type": ["string", "null"]},
+        "published_at": {"type": ["string", "null"], "format": "date-time"},
+        "fetched_at": {"type": "string", "format": "date-time"},
+        "locator": {"type": "object"},
+        "region": {"type": ["string", "null"]},
+        "independence_group": {"type": "string", "minLength": 1},
+        "content_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

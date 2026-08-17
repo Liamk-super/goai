@@ -1,0 +1,4 @@
+interface:
+  display_name: "Evidence Grounding Audit"
+  short_description: "Calibrate multi-agent claims against evidence"
+  default_prompt: "Use $evidence-grounding-audit to audit Product, User, and Investment Agent outputs and return a deduplicated SupervisorHandoff."

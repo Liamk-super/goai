@@ -1,0 +1,27 @@
+description: LaunchScope Benchmark V1 adapter smoke test
+sharing: false
+writeLatestResults: false
+commandLineOptions:
+  cache: false
+  share: false
+
+prompts:
+  - "{{prompt}}"
+
+providers:
+  - id: file://provider.py
+    label: launchscope-deterministic-smoke
+
+tests:
+  - description: adapter rejects unsupported certainty
+    vars:
+      prompt: NO_EVIDENCE
+    assert:
+      - type: contains
+        value: REJECT
+  - description: adapter preserves unknown
+    vars:
+      prompt: UNKNOWN_VALUE
+    assert:
+      - type: contains
+        value: MARK_UNKNOWN

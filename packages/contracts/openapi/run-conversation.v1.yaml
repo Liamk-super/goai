@@ -1,0 +1,100 @@
+openapi: 3.1.0
+info:
+  title: LaunchScope Run Conversation API
+  version: 1.0.0
+paths:
+  /api/v1/runs/{run_id}/conversations:
+    get:
+      operationId: listRunConversations
+      parameters:
+      - {name: run_id, in: path, required: true, schema: {type: string, format: uuid}}
+      - {name: cursor, in: query, required: false, schema: {type: string, format: uuid}}
+      - {name: limit, in: query, required: false, schema: {type: integer, minimum: 1, maximum: 100, default: 50}}
+      - {name: X-Tenant-Id, in: header, required: true, schema: {type: string, format: uuid}}
+      - {name: X-Actor-Id, in: header, required: true, schema: {type: string, minLength: 1}}
+      - {name: X-Correlation-Id, in: header, required: true, schema: {type: string, format: uuid}}
+      responses:
+        '200':
+          description: User-safe conversation channels and durable messages
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/RunConversations'}
+        '404': {description: Run or cursor not found within the tenant}
+  /api/v1/runs/{run_id}/conversations/{channel}/messages:
+    post:
+      operationId: submitRunConversationMessage
+      parameters:
+      - {name: run_id, in: path, required: true, schema: {type: string, format: uuid}}
+      - {name: channel, in: path, required: true, schema: {$ref: '#/components/schemas/ConversationChannel'}}
+      - {name: X-Tenant-Id, in: header, required: true, schema: {type: string, format: uuid}}
+      - {name: X-Actor-Id, in: header, required: true, schema: {type: string, minLength: 1}}
+      - {name: X-Correlation-Id, in: header, required: true, schema: {type: string, format: uuid}}
+      - {name: Idempotency-Key, in: header, required: true, schema: {type: string, minLength: 1, maxLength: 200}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [message, allow_external_processing]
+              properties:
+                message: {type: string, minLength: 1, maxLength: 30000}
+                allow_external_processing: {type: boolean}
+      responses:
+        '202':
+          description: Message durably recorded and routed through the control plane
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ConversationReceipt'}
+        '409': {description: Idempotency conflict}
+        '422': {description: Invalid channel or unsafe intake proposal}
+components:
+  schemas:
+    ConversationChannel:
+      type: string
+      enum: [supervisor, user-evidence, product-engineering, business-investment]
+    ConversationMessage:
+      type: object
+      additionalProperties: false
+      required: [message_id, channel, role, kind, text, route_state, affected_task_ids, created_at]
+      properties:
+        message_id: {type: string, format: uuid}
+        channel: {$ref: '#/components/schemas/ConversationChannel'}
+        role: {enum: [USER, SUPERVISOR, AGENT, SYSTEM]}
+        kind: {enum: [MESSAGE, ROUTING_RECEIPT, QUESTION, ANSWER]}
+        text: {type: string}
+        route_state: {enum: [RECORDED, ROUTED, WAITING_FOR_USER, NEEDS_ATTENTION]}
+        affected_task_ids: {type: array, items: {type: string, format: uuid}, uniqueItems: true}
+        created_at: {type: string, format: date-time}
+    ConversationChannelState:
+      type: object
+      additionalProperties: false
+      required: [channel, status, evidence_count, pending_count, summary]
+      properties:
+        channel: {$ref: '#/components/schemas/ConversationChannel'}
+        status: {type: string}
+        evidence_count: {type: integer, minimum: 0}
+        pending_count: {type: integer, minimum: 0}
+        summary: {type: string}
+    RunConversations:
+      type: object
+      additionalProperties: false
+      required: [run_id, channels, messages, next_cursor]
+      properties:
+        run_id: {type: string, format: uuid}
+        channels: {type: array, minItems: 4, maxItems: 4, items: {$ref: '#/components/schemas/ConversationChannelState'}}
+        messages: {type: array, items: {$ref: '#/components/schemas/ConversationMessage'}}
+        next_cursor: {type: [string, 'null'], format: uuid}
+    ConversationReceipt:
+      type: object
+      additionalProperties: false
+      required: [message_id, run_id, channel, route_state, affected_task_ids, questions, duplicate]
+      properties:
+        message_id: {type: string, format: uuid}
+        run_id: {type: string, format: uuid}
+        channel: {$ref: '#/components/schemas/ConversationChannel'}
+        route_state: {enum: [RECORDED, ROUTED, WAITING_FOR_USER, NEEDS_ATTENTION]}
+        affected_task_ids: {type: array, items: {type: string, format: uuid}, uniqueItems: true}
+        questions: {type: array, items: {type: string}}
+        duplicate: {type: boolean}

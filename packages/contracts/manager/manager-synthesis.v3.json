@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/manager/manager-synthesis.v3.json",
+  "title": "ManagerSynthesisV3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "locale", "synthesis_id", "run_id", "deterministic_decision_ref", "summary_claim_id",
+    "claims", "actions", "decision_conflict"
+  ],
+  "properties": {
+    "schema_version": {"const": "3.0"},
+    "locale": {"enum": ["zh-CN", "en"]},
+    "synthesis_id": {"type": "string", "format": "uuid"},
+    "run_id": {"type": "string", "format": "uuid"},
+    "deterministic_decision_ref": {"type": "string", "format": "uuid"},
+    "summary_claim_id": {"$ref": "#/$defs/claimId"},
+    "claims": {"type": "array", "minItems": 1, "maxItems": 80, "items": {"$ref": "#/$defs/claim"}},
+    "actions": {"type": "array", "minItems": 1, "maxItems": 12, "items": {"$ref": "#/$defs/action"}},
+    "decision_conflict": {"type": "boolean"}
+  },
+  "$defs": {
+    "claimId": {"type": "string", "pattern": "^claim-[A-Za-z0-9._-]+$"},
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim_id", "section", "text", "status", "decision_relevance", "citation_ids", "score_bearing"],
+      "properties": {
+        "claim_id": {"$ref": "#/$defs/claimId"},
+        "section": {
+          "enum": [
+            "CONCLUSION", "HIGHLIGHT", "CRITICAL_ISSUE", "USER", "PRODUCT", "INVESTMENT", "CROSS_DOMAIN",
+            "COMPARISON", "INFORMATION_GAP"
+          ]
+        },
+        "text": {"type": "string", "minLength": 1, "maxLength": 12000},
+        "status": {"enum": ["VERIFIED", "DOWNGRADED", "PENDING_VALIDATION", "CONFLICTED"]},
+        "decision_relevance": {"enum": ["CRITICAL", "IMPORTANT", "CONTEXT"]},
+        "citation_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^citation-[A-Za-z0-9._-]+$"}
+        },
+        "score_bearing": {"type": "boolean"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "VERIFIED"}}, "required": ["status"]},
+          "then": {"properties": {"citation_ids": {"minItems": 1}}}
+        },
+        {
+          "if": {"properties": {"status": {"enum": ["PENDING_VALIDATION", "CONFLICTED"]}}, "required": ["status"]},
+          "then": {"properties": {"score_bearing": {"const": false}}}
+        }
+      ]
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_id", "title", "owner", "deadline_days", "success_criteria", "failure_triggers", "required_evidence",
+        "related_claim_ids"
+      ],
+      "properties": {
+        "action_id": {"type": "string", "pattern": "^action-[A-Za-z0-9._-]+$"},
+        "title": {"type": "string", "minLength": 1},
+        "owner": {"type": "string", "minLength": 1},
+        "deadline_days": {"type": "integer", "minimum": 1, "maximum": 365},
+        "success_criteria": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "failure_triggers": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "required_evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "related_claim_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/claimId"}}
+      }
+    }
+  }
+}

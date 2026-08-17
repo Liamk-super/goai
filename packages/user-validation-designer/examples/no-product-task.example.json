@@ -1,0 +1,34 @@
+{
+  "task_id": "T-UVD-20260808-003",
+  "project_id": "PRJ-KAOYAN-NOTES",
+  "product_version": "V1.0",
+  "product_profile": {
+    "name": "考研资料速筛助手",
+    "one_line_value_claim": "帮二战考研生在 5 分钟内从海量资料里筛出本周该看的 3 份重点",
+    "description": "上传或粘贴资料链接，按考纲与剩余天数自动排序。",
+    "url": null,
+    "experience_report_ref": null
+  },
+  "target_users": {
+    "raw_description": "距考试 3 个月内的二战考研生，每月可支配预算 50 元以内",
+    "segments": ["距考试 3 个月内的二战考研生"],
+    "claimed_payer": "学生本人",
+    "claimed_first_user": "距考试 3 个月内的二战考研生"
+  },
+  "product_tasks": null,
+  "existing_user_evidence": null,
+  "validation_goal": {
+    "objective": "在没有可访问产品与任务脚本的情况下，先收敛用户假设并给出验证方案",
+    "focus_questions": ["用户是否真的需要这个产品"]
+  },
+  "product_stage": "concept",
+  "constraints": {
+    "time_budget_weeks": 2,
+    "money_budget_cny": 300,
+    "recruitable_channels": ["考研微信群"]
+  },
+  "runtime": {
+    "allowed_tools": ["simulation_engine"],
+    "mode": "first_validation"
+  }
+}

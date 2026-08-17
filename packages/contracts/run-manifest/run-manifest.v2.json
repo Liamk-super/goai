@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/run-manifest/run-manifest.v2.json",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version", "agent_contract_generation", "agents", "skills", "tools", "standard_version",
+    "budget", "limits", "failure_policy", "model_runtime", "user_validation"
+  ],
+  "properties": {
+    "schema_version": { "const": "2.0" },
+    "agent_contract_generation": { "enum": ["v2", "v3"] },
+    "agents": { "type": "object", "minProperties": 6 },
+    "skills": { "type": "object", "minProperties": 6 },
+    "tools": { "type": "object" },
+    "standard_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" },
+    "budget": { "type": "object" },
+    "limits": { "type": "object" },
+    "model_runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["user-evidence"],
+      "properties": {
+        "user-evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["api_style", "model_id", "configuration_sha256"],
+          "properties": {
+            "api_style": { "const": "openai-compatible" },
+            "model_id": { "type": "string", "minLength": 1 },
+            "configuration_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+          }
+        }
+      }
+    },
+    "failure_policy": {
+      "type": "object",
+      "required": ["SUBMISSION_UNKNOWN", "TOOL_SIDE_EFFECT_UNKNOWN"],
+      "properties": {
+        "SUBMISSION_UNKNOWN": { "const": "NEEDS_ATTENTION_NO_RETRY" },
+        "TOOL_SIDE_EFFECT_UNKNOWN": { "const": "NEEDS_ATTENTION_NO_RETRY" }
+      }
+    },
+    "user_validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "mode", "validation_script_sha256", "skill_version", "runner_sha256", "prompt_sha256", "knowledge_package_sha256"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "mode": { "enum": ["first_validation", "version_regression", "evidence_recheck", "disabled"] },
+        "change_reason": {
+          "type": ["string", "null"],
+          "enum": [
+            null,
+            "no_completed_user_validation_history",
+            "validation_script_hash_changed",
+            "standard_version_changed",
+            "explicit_user_evidence_recheck"
+          ]
+        },
+        "validation_script_sha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+        "skill_version": { "const": "1.0.4" },
+        "runner_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "prompt_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "knowledge_package_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}

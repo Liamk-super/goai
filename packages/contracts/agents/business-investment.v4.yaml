@@ -1,0 +1,32 @@
+schema_version: '4.0'
+code: business-investment
+version: '4.0'
+role: specialist
+responsibilities:
+- assess market window, growth, regional opportunity, competition timing, policy impact, channels, and macro risk
+- produce an immutable readable report and structured findings
+inputs:
+- run_manifest
+- requirement_brief
+- product_fact_snapshot
+- assigned_task_ticket
+outputs:
+- agent_handoff_v3
+- domain_report_ref
+allowed_skills:
+- business-investment-assessment
+allowed_tools:
+- launchscope-context.get.v1
+- public-research-search.v1
+risk_boundaries:
+- first_round_isolated
+- public_read_only
+- no_peer_dispatch_or_free_mention
+- no_business_state_writes
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- direct_external_action
+content_sha256: 41c0a9a002fb8146747e1dba8f42bc7efd5a0bc7477840a313ebd916553ed5c8

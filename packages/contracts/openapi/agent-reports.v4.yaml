@@ -1,0 +1,80 @@
+openapi: 3.1.0
+info:
+  title: LaunchScope Private Agent Reports API
+  version: 4.0.0
+paths:
+  /api/v1/experience/runs/{run_id}/agent-reports:
+    get:
+      operationId: listAgentReports
+      parameters:
+      - {name: run_id, in: path, required: true, schema: {type: string, format: uuid}}
+      - {name: X-Tenant-Id, in: header, required: true, schema: {type: string, format: uuid}}
+      - {name: X-Actor-Id, in: header, required: true, schema: {type: string, minLength: 1}}
+      responses:
+        '200':
+          description: Four fixed private Agent report slots without report bodies
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [run_id, reports]
+                properties:
+                  run_id: {type: string, format: uuid}
+                  reports:
+                    type: array
+                    minItems: 4
+                    maxItems: 4
+                    items: {$ref: '#/components/schemas/AgentReportSummary'}
+        '403': {description: Run is outside the actor workspace}
+        '404': {description: Run not found}
+  /api/v1/experience/runs/{run_id}/agent-reports/{agent_code}:
+    get:
+      operationId: getAgentReport
+      parameters:
+      - {name: run_id, in: path, required: true, schema: {type: string, format: uuid}}
+      - {name: agent_code, in: path, required: true, schema: {$ref: '#/components/schemas/AgentCode'}}
+      - {name: X-Tenant-Id, in: header, required: true, schema: {type: string, format: uuid}}
+      - {name: X-Actor-Id, in: header, required: true, schema: {type: string, minLength: 1}}
+      responses:
+        '200':
+          description: Hash-verified private Agent report loaded after explicit user action
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AgentReportDetail'}
+        '403': {description: Run is outside the actor workspace}
+        '404': {description: Report is not available}
+        '409': {description: Immutable object integrity mismatch}
+        '413': {description: Report exceeds the bounded read limit}
+components:
+  schemas:
+    AgentCode:
+      enum: [user-evidence, product-engineering, business-investment, evidence-auditor]
+    AgentReportSummary:
+      type: object
+      additionalProperties: false
+      required: [agent_code, title, kind, status, sha256, created_at, revision, failure_reason]
+      properties:
+        agent_code: {$ref: '#/components/schemas/AgentCode'}
+        title: {type: string}
+        kind: {enum: [DOMAIN, AUDIT]}
+        status: {enum: [PENDING, AVAILABLE, FAILED, UNAVAILABLE]}
+        sha256: {type: [string, 'null'], pattern: '^[0-9a-f]{64}$'}
+        created_at: {type: [string, 'null'], format: date-time}
+        revision: {type: [integer, 'null'], minimum: 0, maximum: 2}
+        failure_reason: {type: [string, 'null']}
+    AgentReportDetail:
+      type: object
+      additionalProperties: false
+      required: [run_id, agent_code, title, kind, sha256, mime_type, created_at, audit_round, format, content]
+      properties:
+        run_id: {type: string, format: uuid}
+        agent_code: {$ref: '#/components/schemas/AgentCode'}
+        title: {type: string}
+        kind: {enum: [DOMAIN, AUDIT]}
+        sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+        mime_type: {type: string}
+        created_at: {type: string, format: date-time}
+        audit_round: {type: [integer, 'null'], minimum: 1, maximum: 2}
+        format: {enum: [json, markdown, text]}
+        content: {type: string, maxLength: 2000000}

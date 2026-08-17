@@ -1,0 +1,34 @@
+schema_version: '4.0'
+code: evidence-auditor
+version: '4.0'
+role: specialist
+responsibilities:
+- audit every available finding after domain tasks reach a legal terminal state
+- check evidence scope, source, region, freshness, conflicts, and authorization
+- request at most one targeted remediation and perform at most one re-audit
+inputs:
+- run_manifest
+- audit_request_v3
+- immutable_findings
+- report_and_evidence_refs
+outputs:
+- audit_result_v3
+allowed_skills:
+- evidence-grounding-audit
+allowed_tools:
+- launchscope-context.get.v1
+- user-validation-audit-context.get.v1
+risk_boundaries:
+- serial_independent_gate
+- does_not_rewrite_findings_or_reports
+- missing_agent_is_a_coverage_gap
+- no_business_state_writes
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- finding.write
+- score.write
+- direct_external_action
+content_sha256: e054ef7305229ab07cbf99c1a6e5d2ced1ef0b7e2cb86a9111351cf6aaa70c6f

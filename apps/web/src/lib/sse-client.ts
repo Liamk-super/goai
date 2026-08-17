@@ -1,5 +1,10 @@
 export type SseEvent = { id: string; event: string; data: Record<string, unknown> };
-export type SseHandlers = { onEvent(event: SseEvent): void; onSnapshot(snapshot: Record<string, unknown>): void; onError(error: Error): void };
+export type SseHandlers = {
+  onEvent(event: SseEvent): void;
+  onSnapshot(snapshot: Record<string, unknown>): void;
+  onError(error: Error): void;
+  onClosed?(): void;
+};
 export type SseFetch = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 
 export class DurableRunStream {
@@ -45,6 +50,7 @@ export class DurableRunStream {
         if (event.event === "run.snapshot") this.handlers.onSnapshot(event.data);
         else this.handlers.onEvent(event);
       }
+      if (!this.stopped) this.handlers.onClosed?.();
     } catch (error) {
       if (!this.stopped) this.handlers.onError(error instanceof Error ? error : new Error("SSE connection failed"));
     }

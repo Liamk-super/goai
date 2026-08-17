@@ -1,0 +1,398 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "launchscope://skills/user-validation-designer/0.1/input",
+  "title": "user-validation-designer input v0.1",
+  "description": "Task envelope for one user-side validation design run. Keyword set is restricted to the shared draft-07 subset supported by src/validate.mjs (no const, no oneOf/anyOf, no format). Boolean constants are expressed as enum:[true].",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "project_id",
+    "product_version",
+    "product_profile",
+    "target_users",
+    "validation_goal"
+  ],
+  "properties": {
+    "task_id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string", "minLength": 1 },
+    "product_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Sole anchor for V1/V2 comparability. Missing -> blocked / invalid_task_envelope."
+    },
+
+    "product_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "one_line_value_claim"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "one_line_value_claim": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Team-stated value proposition (E0). S4a compares persona restatement against it to decide value_communication_failure (KB-USR-S3). Missing -> blocked / insufficient_product_context."
+        },
+        "description": { "type": ["string", "null"] },
+        "category": { "type": ["string", "null"] },
+        "url": {
+          "type": ["string", "null"],
+          "description": "Missing together with experience_report_ref -> S4a not_executable (degrade, not blocked)."
+        },
+        "experience_report_ref": {
+          "type": ["string", "null"],
+          "description": "Reference to an upstream product experience report. Either this or url enables S4a."
+        },
+        "pricing_claim": { "type": ["string", "null"] }
+      }
+    },
+
+    "target_users": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["raw_description"],
+      "properties": {
+        "raw_description": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Team's own words. S1 runs the breadth admission check on this (KB-USR-R04 / P02)."
+        },
+        "segments": {
+          "type": ["array", "null"],
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Pre-narrowed segments. The raw description and every segment are independently checked; segments never bypass a universal or demographic-only definition."
+        },
+        "exclusions": { "type": ["array", "null"], "items": { "type": "string", "minLength": 1 } },
+        "claimed_payer": { "type": ["string", "null"] },
+        "claimed_first_user": { "type": ["string", "null"] }
+      }
+    },
+
+    "product_tasks": {
+      "type": ["array", "null"],
+      "minItems": 1,
+      "maxItems": 5,
+      "description": "Core task script. Same structure and same hash algorithm as product-technical-audit audit.core_tasks (docs/PRODUCT_TASKS_HASH_V0.1.md). Missing -> S4b not_executable and task_test_matrix forced to []; required in version_regression mode.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["task_key", "description", "expected_observable_outcome"],
+        "properties": {
+          "task_key": { "type": "string", "minLength": 1 },
+          "description": { "type": "string", "minLength": 1 },
+          "expected_observable_outcome": { "type": "string", "minLength": 1 },
+          "max_steps": {
+            "type": ["integer", "null"],
+            "minimum": 1,
+            "description": "Execution budget only. Deliberately excluded from product_tasks_hash."
+          }
+        }
+      }
+    },
+
+    "existing_user_evidence": {
+      "type": ["array", "null"],
+      "description": "Pre-existing user-side evidence. E3+ entries trigger persona calibration and win every conflict against simulation (KB-USR-R04 / B04). timestamp is required; expiry judgement belongs to evidence_calibration_agent (DECISIONS D-04).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["evidence_id", "kind", "tier", "source", "timestamp", "observation"],
+        "properties": {
+          "evidence_id": { "type": "string", "minLength": 1 },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "interview",
+              "survey",
+              "usability_test",
+              "review",
+              "public_comment",
+              "usage_data",
+              "retention_data",
+              "payment_record",
+              "contract",
+              "team_statement"
+            ]
+          },
+          "tier": {
+            "type": "string",
+            "enum": ["E0", "E1", "E2", "E3", "E4", "E5"],
+            "description": "LaunchScope evidence level of this real-world evidence. Becomes reliability_level on the ingested record; never re-issued as a card produced by this skill."
+          },
+          "source_tier": {
+            "type": ["string", "null"],
+            "enum": [null, "tier_1", "tier_2", "tier_3", "untraceable"],
+            "description": "Optional source class, judged independently from evidence level. When omitted, the program infers it from kind, source and traceability; it never defaults every record to tier_1."
+          },
+          "source": { "type": "string", "minLength": 1 },
+          "timestamp": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Collection time, ISO8601. Required: this skill never infers recency."
+          },
+          "expiry": {
+            "type": ["string", "null"],
+            "description": "Optional. When null the entry is tagged expiry_unknown and forwarded to evidence_calibration_agent; this skill applies no default lifetime."
+          },
+          "sample_size": { "type": ["integer", "null"], "minimum": 1 },
+          "observation": { "type": "string", "minLength": 1 },
+          "applies_to_segment": { "type": ["string", "null"] },
+          "applies_to_product_version": { "type": ["string", "null"] },
+          "version_stable": {
+            "type": ["boolean", "null"],
+            "description": "Only stable problem evidence kinds may cross versions, and only with stable_reason. Product behavior, usage, retention, pricing and payment remain exact-version bound."
+          },
+          "stable_reason": { "type": ["string", "null"], "description": "Required justification when an allowed stable-problem evidence kind sets version_stable=true." },
+          "applies_to_persona_ids": {
+            "type": ["array", "null"],
+            "items": { "type": "string", "pattern": "^P[0-9]+$" },
+            "description": "Optional explicit Persona scope used for confidence calibration; absence never implies all personas."
+          },
+          "supporting_claims": {
+            "type": ["array", "null"],
+            "items": { "type": "string", "minLength": 1 },
+            "description": "Claims or hypothesis ids directly supported by this caller-supplied record."
+          },
+          "contradicts_claims": {
+            "type": ["array", "null"],
+            "items": { "type": "string", "minLength": 1 },
+            "description": "Existing hypothesis ids directly contradicted by this record. The program resolves ids and gives applicable E3+ real evidence precedence over simulation."
+          },
+          "valid_for_dimensions": {
+            "type": ["array", "null"],
+            "items": {
+              "type": "string",
+              "enum": ["demand_strength", "usage_frequency", "pain_severity", "alternative_gap", "willingness_to_pay", "virality"]
+            },
+            "description": "Explicit dimension applicability. Only listed dimensions may use this record to raise their evidence tier."
+          }
+        }
+      }
+    },
+
+    "validation_goal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objective"],
+      "properties": {
+        "objective": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What this round must answer, issued by review_supervisor_agent. Drives S6 prioritisation."
+        },
+        "focus_questions": {
+          "type": ["array", "null"],
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Subset of KB-USR-R03 Q1-Q4."
+        },
+        "priority_dimension": {
+          "type": ["string", "null"],
+          "enum": [
+            null,
+            "demand_strength",
+            "usage_frequency",
+            "pain_severity",
+            "alternative_gap",
+            "willingness_to_pay",
+            "virality"
+          ]
+        }
+      }
+    },
+
+    "product_stage": {
+      "type": ["string", "null"],
+      "enum": [null, "unknown", "concept", "demo", "mvp", "productized", "scaled"],
+      "description": "Carried from product-technical-audit product_maturity.stage. null is treated as unknown."
+    },
+
+    "constraints": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "time_budget_weeks": { "type": ["integer", "null"], "minimum": 1 },
+        "money_budget_cny": { "type": ["number", "null"], "minimum": 0 },
+        "team_capacity_person_days": { "type": ["number", "null"], "minimum": 0 },
+        "recruitable_channels": { "type": ["array", "null"], "items": { "type": "string", "minLength": 1 } },
+        "compliance_notes": {
+          "type": ["string", "null"],
+          "description": "Review note only. Human review is already mandatory; this field does not imply personal-data collection."
+        }
+      }
+    },
+
+    "previous_validation_results": {
+      "type": ["object", "null"],
+      "description": "Required when runtime.mode = version_regression. Drives hypothesis id inheritance and threshold reuse (spec section 7).",
+      "additionalProperties": false,
+      "required": ["task_id", "project_id", "product_version", "product_tasks_hash", "hypotheses"],
+      "properties": {
+        "task_id": { "type": "string", "minLength": 1 },
+        "project_id": { "type": "string", "minLength": 1 },
+        "product_version": { "type": "string", "minLength": 1 },
+        "product_tasks_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Must equal this round's computed hash, otherwise blocked / script_mismatch."
+        },
+        "scoring_schema_version": { "type": ["string", "null"] },
+        "hypotheses": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["hypothesis_id", "statement", "status", "evidence_level"],
+            "properties": {
+              "hypothesis_id": { "type": "string", "pattern": "^H[0-9]+$" },
+              "statement": { "type": "string", "minLength": 1 },
+              "status": {
+                "type": "string",
+                "enum": ["open", "validated", "falsified", "partially_validated", "abandoned"]
+              },
+              "evidence_level": { "type": "string", "enum": ["E0", "E1", "E2", "E3", "E4", "E5"] },
+              "success_threshold": { "type": ["string", "null"] }
+            }
+          }
+        },
+        "personas_digest": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["persona_id", "label"],
+            "properties": {
+              "persona_id": { "type": "string", "pattern": "^P[0-9]+$" },
+              "label": { "type": "string", "minLength": 1 },
+              "behavior_keys": { "$ref": "#/definitions/behavior_keys" }
+            }
+          }
+        },
+        "experience_issue_ids": { "type": ["array", "null"], "items": { "type": "string", "minLength": 1 } }
+        ,"task_results": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["persona_id", "task_key", "result"],
+            "properties": {
+              "persona_id": { "type": "string", "pattern": "^P[0-9]+$" },
+              "task_key": { "type": "string", "minLength": 1 },
+              "result": { "type": "string", "enum": ["completed", "completed_with_difficulty", "failed", "not_executed"] }
+            }
+          }
+        }
+      }
+    },
+
+    "previous_validation_results_hash": {
+      "type": ["string", "null"],
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Trusted Harness/storage digest of the canonical previous_validation_results baseline. Required for version_regression; a caller self-hash does not establish trust."
+    },
+
+    "previous_structured_output": {
+      "type": ["object", "null"],
+      "description": "Required in evidence_recheck mode. Prior contract-valid structured output used as immutable state; S2-S5 simulations are not rerun."
+    },
+
+    "previous_state_hash": {
+      "type": ["string", "null"],
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Trusted Harness/storage hash for previous_structured_output. Required by evidence_recheck; a caller cannot establish trust merely by hashing its own altered object."
+    },
+
+    "evidence_refs": {
+      "type": ["array", "null"],
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Upstream Evidence Card ids this run builds on."
+    },
+
+    "upstream_product_handoff": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "description": "product-technical-audit handoff.to_user_cocreation_agent, forwarded verbatim. Supplies the technical attribution baseline for S4 experience issues.",
+      "properties": {
+        "product_completeness": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "score": { "type": ["integer", "null"], "minimum": 1, "maximum": 5 },
+            "capped": { "type": ["boolean", "null"] },
+            "cap_reason": { "type": ["string", "null"] },
+            "basis": { "type": ["string", "null"] }
+          }
+        },
+        "product_maturity": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "stage": {
+              "type": ["string", "null"],
+              "enum": [null, "concept", "demo", "mvp", "productized", "scaled"]
+            },
+            "gap_list": { "type": ["array", "null"], "items": { "type": "string" } }
+          }
+        },
+        "blocking_observations": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["observation"],
+            "properties": {
+              "observation_id": { "type": ["string", "null"], "minLength": 1 },
+              "observation": { "type": "string", "minLength": 1 },
+              "task_key": { "type": ["string", "null"] },
+              "technical_attribution": { "type": ["string", "null"] },
+              "evidence_refs": { "type": ["array", "null"], "items": { "type": "string" } }
+            }
+          }
+        },
+        "broken_claim": { "type": ["boolean", "null"] },
+        "product_evidence_cards": { "type": ["array", "null"], "items": { "type": "object" } }
+      }
+    },
+
+    "runtime": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "allowed_tools": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["product_reader", "evidence_writer", "simulation_engine", "kb_retriever"]
+          }
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["first_validation", "version_regression", "evidence_recheck"]
+        },
+        "product_tasks_hash": {
+          "type": ["string", "null"],
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Optional caller-supplied hash. When present it must match the recomputed value, otherwise blocked / script_mismatch."
+        },
+        "scoring_schema_version": { "type": ["string", "null"] },
+        "max_simulation_retries": { "type": ["integer", "null"], "minimum": 0, "maximum": 2 }
+      }
+    }
+  },
+
+  "definitions": {
+    "behavior_keys": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["alternative_in_use", "budget_constraint", "skill_level", "urgency", "risk_attitude"],
+      "description": "The five behavioural keys used by the differentiation check (KB-USR-G02 / NEW-DECISION-U01).",
+      "properties": {
+        "alternative_in_use": { "type": "string", "minLength": 1 },
+        "budget_constraint": { "type": "string", "minLength": 1 },
+        "skill_level": { "type": "string", "enum": ["novice", "intermediate", "expert"] },
+        "urgency": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "risk_attitude": { "type": "string", "enum": ["averse", "neutral", "tolerant"] }
+      }
+    }
+  }
+}

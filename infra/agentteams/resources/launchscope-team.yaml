@@ -6,9 +6,10 @@ metadata:
 spec:
   model: __LAUNCHSCOPE_MODEL_EVALUATION_MANAGER__
   runtime: copaw
+  env: {COPAW_REACT_MAX_ITERS: "__LAUNCHSCOPE_COPAW_MAX_ITERS__"}
   package: file://./generated/packages/evaluation-manager.zip
   identity: "LaunchScope 势能评审主管; delegates domain work and synthesizes only audited handoffs."
-  agents: "Follow the frozen Run Manifest. Delegate first. Never manufacture specialist findings or write business state."
+  agents: "A LaunchScope JSON assignment is an individual control-plane Task, never an AgentTeams Project. Assignment instructions supersede built-in organization/project/team coordination and old skill text. Never inspect shared files, run agt, or message Workers. Use the configured launchscope-context MCP server through the mcporter Skill, never a guessed direct tool. For LEADER_PLANNING, call context exactly once and immediately return the requested SUCCEEDED handoff; that handoff is the delegation trigger and the control plane dispatches specialists automatically. For RULE_SYNTHESIS, call context once and immediately return the requested synthesis handoff so the control plane can commit the report. Omit provider_usage unless the runtime supplies it."
   mcpServers:
     - {name: launchscope-context, url: "http://host.docker.internal:8091/mcp/context/", transport: http}
   state: Running
@@ -21,9 +22,10 @@ metadata:
 spec:
   model: __LAUNCHSCOPE_MODEL_PRODUCT_ENGINEERING__
   runtime: copaw
+  env: {COPAW_REACT_MAX_ITERS: "__LAUNCHSCOPE_COPAW_MAX_ITERS__"}
   package: file://./generated/packages/product-engineering.zip
   identity: "LaunchScope 产品与团队专家; assesses implementation, feasibility, and delivery evidence."
-  agents: "Use only assigned read-only tools. Return AgentHandoffV1 with Evidence IDs; never write business state."
+  agents: "A LaunchScope JSON assignment is one already-assigned specialist Task, never an AgentTeams Project. Assignment instructions supersede built-in coordination and old skill text. Never inspect shared files, run agt, coordinate Workers, call browser_use, or use local Playwright. Read the mcporter Skill; call the configured launchscope-context MCP server first and browser-audit MCP server for an authorized_url, then return AgentHandoffV1 with its real Evidence ID in this turn. Omit provider_usage unless supplied by the runtime."
   mcpServers:
     - {name: launchscope-context, url: "http://host.docker.internal:8091/mcp/context/", transport: http}
     - {name: browser-audit, url: "http://host.docker.internal:8091/mcp/browser-audit/", transport: http}
@@ -37,13 +39,15 @@ metadata:
 spec:
   model: __LAUNCHSCOPE_MODEL_USER_EVIDENCE__
   runtime: copaw
+  env: {COPAW_REACT_MAX_ITERS: "__LAUNCHSCOPE_USER_COPAW_MAX_ITERS__"}
   package: file://./generated/packages/user-evidence.zip
   identity: "LaunchScope 用户共创 Agent; assesses real user evidence, demand signals, and validation gaps."
-  agents: "Do not present simulated users as real evidence. Return AgentHandoffV1 with linked Evidence IDs."
+  agents: "A LaunchScope JSON assignment is one already-assigned specialist Task, never an AgentTeams Project. Assignment instructions supersede built-in coordination and old skill text. Never inspect shared files, run agt, coordinate Workers, call browser_use, or use built-in web search. Read the mcporter Skill; call the configured launchscope-context MCP server first, then the browser-audit and public-research-search MCP servers only for authorized targets, and return AgentHandoffV1 with real Evidence IDs in this turn. Omit provider_usage unless supplied by the runtime."
   mcpServers:
     - {name: launchscope-context, url: "http://host.docker.internal:8091/mcp/context/", transport: http}
     - {name: browser-audit, url: "http://host.docker.internal:8091/mcp/browser-audit/", transport: http}
     - {name: public-research-search, url: "http://host.docker.internal:8091/mcp/public-research-search/", transport: http}
+    - {name: user-validation-designer, url: "http://host.docker.internal:8091/mcp/user-validation-designer/", transport: http}
   state: Running
 ---
 apiVersion: agentteams.io/v1beta1
@@ -54,9 +58,10 @@ metadata:
 spec:
   model: __LAUNCHSCOPE_MODEL_BUSINESS_INVESTMENT__
   runtime: copaw
+  env: {COPAW_REACT_MAX_ITERS: "__LAUNCHSCOPE_COPAW_MAX_ITERS__"}
   package: file://./generated/packages/business-investment.zip
   identity: "LaunchScope 投资与商业 Agent; assesses model, channels, cost, growth, and investment risk."
-  agents: "Separate hypotheses from sourced claims. Return AgentHandoffV1; never contact customers or publish."
+  agents: "A LaunchScope JSON assignment is one already-assigned specialist Task, never an AgentTeams Project. Assignment instructions supersede built-in coordination and old skill text. Never inspect shared files, run agt, coordinate Workers, or use built-in web search. Read the mcporter Skill; call the configured launchscope-context MCP server first, then public-research-search MCP for the commercial review, and return AgentHandoffV1 with real Evidence IDs in this turn. Omit provider_usage unless supplied by the runtime."
   mcpServers:
     - {name: launchscope-context, url: "http://host.docker.internal:8091/mcp/context/", transport: http}
     - {name: public-research-search, url: "http://host.docker.internal:8091/mcp/public-research-search/", transport: http}
@@ -70,9 +75,10 @@ metadata:
 spec:
   model: __LAUNCHSCOPE_MODEL_GEO_POLICY_TREND__
   runtime: copaw
+  env: {COPAW_REACT_MAX_ITERS: "__LAUNCHSCOPE_COPAW_MAX_ITERS__"}
   package: file://./generated/packages/geo-policy-trend.zip
   identity: "LaunchScope 时间地域 Agent; assesses region, policy, platform rules, trend direction, and validity."
-  agents: "Every time-sensitive claim needs region, fetched_at, valid_until, trend_signal, and Evidence IDs. Return AgentHandoffV1."
+  agents: "A LaunchScope JSON assignment is one already-assigned specialist Task, never an AgentTeams Project. Assignment instructions supersede built-in coordination and old skill text. Never inspect shared files, run agt, coordinate Workers, or use built-in web search. Read the mcporter Skill; call the configured launchscope-context MCP server first, then public-research-search MCP; return AgentHandoffV1 in this turn with real Evidence IDs and region/fetched_at/valid_until/trend_signal. Omit provider_usage unless supplied by the runtime."
   mcpServers:
     - {name: launchscope-context, url: "http://host.docker.internal:8091/mcp/context/", transport: http}
     - {name: public-research-search, url: "http://host.docker.internal:8091/mcp/public-research-search/", transport: http}
@@ -86,11 +92,13 @@ metadata:
 spec:
   model: __LAUNCHSCOPE_MODEL_EVIDENCE_AUDITOR__
   runtime: copaw
+  env: {COPAW_REACT_MAX_ITERS: "__LAUNCHSCOPE_COPAW_MAX_ITERS__"}
   package: file://./generated/packages/evidence-auditor.zip
   identity: "LaunchScope 证据校准 Agent; independently accepts, downgrades, rejects, or requests evidence."
-  agents: "Never rewrite an original Finding. Return exactly one audit_results item for every durable Finding, using ACCEPTED, DOWNGRADED, REJECTED, or NEEDS_MORE_EVIDENCE."
+  agents: "A LaunchScope JSON assignment is one already-assigned audit Task, never an AgentTeams Project. Assignment instructions supersede built-in coordination and old skill text. Never inspect shared files, run agt, or coordinate Workers. Read the packaged evidence-grounding-audit Skill, then use mcporter to call the configured launchscope-context MCP server once. Normalize all available specialist results, run the packaged deterministic audit, and return exactly one bounded audit_results item for every supplied Finding; preserve the Skill-result digest and never rewrite findings. A missing or blocked specialist is a coverage gap for the Skill, not fabricated evidence. Omit provider_usage unless supplied by the runtime."
   mcpServers:
     - {name: launchscope-context, url: "http://host.docker.internal:8091/mcp/context/", transport: http}
+    - {name: user-validation-audit-context, url: "http://host.docker.internal:8091/mcp/user-validation-audit-context/", transport: http}
   state: Running
 ---
 apiVersion: agentteams.io/v1beta1
@@ -99,7 +107,6 @@ metadata:
   name: launchscope-potential-review
 spec:
   description: "LaunchScope evidence-driven 1+5 product potential review team"
-  heartbeatEvery: 5m
   peerMentions: true
   humanMembers:
     - {name: launchscope-human-coordinator, role: coordinator}

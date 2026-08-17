@@ -24,6 +24,9 @@ AGENT_CODES = frozenset(
     }
 )
 MANAGER_CODE = "evaluation-manager"
+SUPERVISOR_1P4_AGENT_CODES = frozenset(
+    {"evaluation-manager", "product-engineering", "user-evidence", "business-investment", "evidence-auditor"}
+)
 _REQUIRED_FIELDS = frozenset(
     {
         "schema_version",
@@ -41,6 +44,11 @@ _REQUIRED_FIELDS = frozenset(
     }
 )
 _FORBIDDEN_WRITES = frozenset({"run.write", "task.write", "memory.write", "report.write"})
+# ADR 0004 adds a second published generation through Expand-Migrate-Contract.
+# v1 stays the default so already frozen RunManifest hashes keep verifying.
+_GENERATIONS: Mapping[str, str] = MappingProxyType(
+    {"v1": "1.0", "v2": "2.0", "v3": "3.0", "v4": "4.0", "v5": "5.0", "v6": "6.0"}
+)
 
 
 class AgentContractError(ValueError):
@@ -80,11 +88,19 @@ class AgentManifestLoader:
         self.manifest_root = manifest_root or Path(__file__).resolve().parents[4] / "packages" / "contracts" / "agents"
         self._by_ref: dict[tuple[str, str], AgentIdentityContract] = {}
 
-    def load_all(self) -> tuple[AgentIdentityContract, ...]:
-        contracts = tuple(self.load_file(path) for path in sorted(self.manifest_root.glob("*.v1.yaml")))
+    def load_all(self, generation: str = "v1") -> tuple[AgentIdentityContract, ...]:
+        if generation not in _GENERATIONS:
+            raise AgentContractError(f"unknown Agent contract generation: {generation}")
+        root = (
+            self.manifest_root.parent / "manager" / "agents"
+            if generation in {"v5", "v6"} and self.manifest_root.name == "agents"
+            else self.manifest_root
+        )
+        contracts = tuple(self.load_file(path) for path in sorted(root.glob(f"*.{generation}.yaml")))
+        expected_codes = SUPERVISOR_1P4_AGENT_CODES if generation in {"v4", "v5", "v6"} else AGENT_CODES
         actual = {contract.code for contract in contracts}
-        if actual != AGENT_CODES or len(contracts) != len(AGENT_CODES):
-            raise AgentContractError("the Agent catalog must contain exactly the fixed Manager and five specialists")
+        if actual != expected_codes or len(contracts) != len(expected_codes):
+            raise AgentContractError("the Agent catalog does not match its frozen physical topology")
         manager = next(contract for contract in contracts if contract.code == MANAGER_CODE)
         if manager.role != "manager":
             raise AgentContractError("evaluation-manager must be the sole Manager")
@@ -134,13 +150,16 @@ class AgentManifestLoader:
 
     @staticmethod
     def _validate_document(document: Mapping[str, object], path: Path) -> None:
-        if document["schema_version"] != "1.0" or document["role"] not in {"manager", "specialist"}:
+        if document["schema_version"] not in set(_GENERATIONS.values()) or document["role"] not in {
+            "manager",
+            "specialist",
+        }:
             raise AgentContractError(f"Agent contract {path.name} has an unsupported schema or role")
         for name in ("code", "version", "content_sha256"):
             if not isinstance(document[name], str) or not document[name]:
                 raise AgentContractError(f"Agent contract {path.name} requires a non-empty {name}")
-        if document["code"] not in AGENT_CODES or document["version"] != "1.0":
-            raise AgentContractError(f"Agent contract {path.name} is not a fixed V0.1 identity")
+        if document["code"] not in AGENT_CODES or document["version"] != document["schema_version"]:
+            raise AgentContractError(f"Agent contract {path.name} is not a fixed LaunchScope identity")
         if not isinstance(document["content_sha256"], str) or len(document["content_sha256"]) != 64:
             raise AgentContractError(f"Agent contract {path.name} has an invalid content_sha256")
         for name in (
@@ -169,4 +188,11 @@ def _hash_contract(document: Mapping[str, object]) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
-__all__ = ["AGENT_CODES", "MANAGER_CODE", "AgentContractError", "AgentIdentityContract", "AgentManifestLoader"]
+__all__ = [
+    "AGENT_CODES",
+    "MANAGER_CODE",
+    "SUPERVISOR_1P4_AGENT_CODES",
+    "AgentContractError",
+    "AgentIdentityContract",
+    "AgentManifestLoader",
+]

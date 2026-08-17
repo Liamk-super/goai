@@ -1,0 +1,885 @@
+{
+  "schema_version": "1.0",
+  "id": "system-e2e-v1",
+  "version": "1.0.0",
+  "benchmark_type": "SYSTEM_E2E",
+  "expected_case_count": 12,
+  "cases": [
+    {
+      "schema_version": "1.0",
+      "id": "SYS-E2E-01",
+      "suite": "system-e2e-v1",
+      "benchmark_type": "SYSTEM_E2E",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "核心用户、付费者和验证目标均缺失。",
+          "facts": {
+            "core_fields_complete": false
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "CONTRACT_DERIVED",
+        "expected": {
+          "action": "BLOCK",
+          "status": "NEEDS_INPUT",
+          "called_agents": [
+            "evaluation-manager"
+          ]
+        },
+        "rule_refs": [
+          "SUP-CORE-MISSING-BLOCK"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "BLOCK",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_status_2",
+            "type": "EQUALS",
+            "path": "$.status",
+            "expected": "NEEDS_INPUT",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_called_agents_3",
+            "type": "CONTAINS_ALL",
+            "path": "$.called_agents",
+            "values": [
+              "evaluation-manager"
+            ],
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-CORE-MISSING-BLOCK"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Incomplete intake stops at manager",
+        "agent": null,
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "system_e2e",
+          "deterministic"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "SYS-E2E-02",
+      "suite": "system-e2e-v1",
+      "benchmark_type": "SYSTEM_E2E",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "输入完整，四个专业维度均可执行。",
+          "facts": {
+            "core_fields_complete": true,
+            "authorized_external": false
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "CONTRACT_DERIVED",
+        "expected": {
+          "action": "AUDIT_THEN_SYNTHESIZE",
+          "called_agents": [
+            "evaluation-manager",
+            "product-engineering",
+            "user-evidence",
+            "business-investment",
+            "geo-policy-trend",
+            "evidence-auditor"
+          ]
+        },
+        "rule_refs": [
+          "ARCH-AUDIT-BEFORE-REPORT",
+          "SUP-AUDIT-BEFORE-SYNTHESIS"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "AUDIT_THEN_SYNTHESIZE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_called_agents_2",
+            "type": "CONTAINS_ALL",
+            "path": "$.called_agents",
+            "values": [
+              "evaluation-manager",
+              "product-engineering",
+              "user-evidence",
+              "business-investment",
+              "geo-policy-trend",
+              "evidence-auditor"
+            ],
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "ARCH-AUDIT-BEFORE-REPORT",
+              "SUP-AUDIT-BEFORE-SYNTHESIS"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Full 1+5 audited path",
+        "agent": null,
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "system_e2e",
+          "deterministic"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "SYS-E2E-03",
+      "suite": "system-e2e-v1",
+      "benchmark_type": "SYSTEM_E2E",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "专业任务未全部完成时尝试启动审计。",
+          "facts": {
+            "specialists_complete": false
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "CONTRACT_DERIVED",
+        "expected": {
+          "action": "ROUTE_EVIDENCE_AUDITOR",
+          "audit_ready": false
+        },
+        "rule_refs": [
+          "SUP-AUDIT-BEFORE-SYNTHESIS"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "ROUTE_EVIDENCE_AUDITOR",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_audit_ready_2",
+            "type": "EQUALS",
+            "path": "$.audit_ready",
+            "expected": false,
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-AUDIT-BEFORE-SYNTHESIS"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Audit dependency gate",
+        "agent": null,
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "system_e2e",
+          "deterministic"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "SYS-E2E-04",
+      "suite": "system-e2e-v1",
+      "benchmark_type": "SYSTEM_E2E",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "审计 REJECT 一个无引用 claim 后进入综合。",
+          "facts": {
+            "rejected_claim_count": 1
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "CONTRACT_DERIVED",
+        "expected": {
+          "action": "FILTER_REPORT",
+          "status": "COMPLETE_WITH_REJECTIONS"
+        },
+        "rule_refs": [
+          "EVD-REPORT-ADMISSION"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "FILTER_REPORT",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_status_2",
+            "type": "EQUALS",
+            "path": "$.status",
+            "expected": "COMPLETE_WITH_REJECTIONS",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-REPORT-ADMISSION"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Rejected claim excluded",
+        "agent": null,
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "system_e2e",
+          "deterministic"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "SYS-E2E-05",
+      "suite": "system-e2e-v1",
+      "benchmark_type": "SYSTEM_E2E",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "商业看好但合规不利，冲突未解决。",
+          "facts": {
+            "conflict": true,
+            "resolved": false
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "CONTRACT_DERIVED",
+        "expected": {
+          "action": "VALIDATE_FURTHER"
+        },
+        "rule_refs": [
+          "SUP-CONFLICT-NO-AVERAGE",
+          "SUP-COVERAGE50-CAP"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "VALIDATE_FURTHER",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-CONFLICT-NO-AVERAGE",
+              "SUP-COVERAGE50-CAP"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Conflict caps recommendation",
+        "agent": null,
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "system_e2e",
+          "deterministic"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "SYS-E2E-06",
+      "suite": "system-e2e-v1",
+      "benchmark_type": "SYSTEM_E2E",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "总预算使用达到 80%。",
+          "facts": {
+            "budget_used_percent": 80
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "CONTRACT_DERIVED",
+        "expected": {
+          "action": "FREEZE_LOW_PRIORITY"
+        },
+        "rule_refs": [
+          "SUP-BUDGET80-FREEZE"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "FREEZE_LOW_PRIORITY",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-BUDGET80-FREEZE"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Budget freeze across DAG",
+        "agent": null,
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "system_e2e",
+          "deterministic"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "SYS-E2E-07",
+      "suite": "system-e2e-v1",
+      "benchmark_type": "SYSTEM_E2E",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "外部模型提交结果未知。",
+          "facts": {
+            "submission_state": "UNKNOWN"
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "CONTRACT_DERIVED",
+        "expected": {
+          "action": "NEEDS_ATTENTION_NO_RETRY",
+          "status": "NEEDS_ATTENTION",
+          "retry_count": 0
+        },
+        "rule_refs": [
+          "ARCH-SUBMISSION-UNKNOWN"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "NEEDS_ATTENTION_NO_RETRY",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_status_2",
+            "type": "EQUALS",
+            "path": "$.status",
+            "expected": "NEEDS_ATTENTION",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_retry_count_3",
+            "type": "EQUALS",
+            "path": "$.retry_count",
+            "expected": 0,
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "ARCH-SUBMISSION-UNKNOWN"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Unknown provider submission",
+        "agent": null,
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "system_e2e",
+          "deterministic"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "SYS-E2E-08",
+      "suite": "system-e2e-v1",
+      "benchmark_type": "SYSTEM_E2E",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "准备向 RocketMQ 发布任务。",
+          "facts": {
+            "business_state_committed": false
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "CONTRACT_DERIVED",
+        "expected": {
+          "action": "COMMIT_CONTROL_PLANE_FIRST"
+        },
+        "rule_refs": [
+          "ARCH-POSTGRES-TRUTH"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "COMMIT_CONTROL_PLANE_FIRST",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "ARCH-POSTGRES-TRUTH"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Control plane commits before dispatch",
+        "agent": null,
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "system_e2e",
+          "deterministic"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "SYS-E2E-09",
+      "suite": "system-e2e-v1",
+      "benchmark_type": "SYSTEM_E2E",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "运行中配置中心出现新 Prompt 和 Skill 版本。",
+          "facts": {
+            "run_started": true,
+            "new_versions_available": true
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "CONTRACT_DERIVED",
+        "expected": {
+          "action": "USE_FROZEN_MANIFEST"
+        },
+        "rule_refs": [
+          "ARCH-VERSION-FROZEN-RUN"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "USE_FROZEN_MANIFEST",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "ARCH-VERSION-FROZEN-RUN"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Run uses frozen versions",
+        "agent": null,
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "system_e2e",
+          "deterministic"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "SYS-E2E-10",
+      "suite": "system-e2e-v1",
+      "benchmark_type": "SYSTEM_E2E",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "Worker 输出非假设 claim 且无 evidence IDs。",
+          "facts": {
+            "hypothesis": false,
+            "evidence_ids": []
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "CONTRACT_DERIVED",
+        "expected": {
+          "action": "REQUIRE_EVIDENCE",
+          "status": "REJECTED_HANDOFF"
+        },
+        "rule_refs": [
+          "ARCH-EVIDENCE-CLAIMS"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REQUIRE_EVIDENCE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_status_2",
+            "type": "EQUALS",
+            "path": "$.status",
+            "expected": "REJECTED_HANDOFF",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "ARCH-EVIDENCE-CLAIMS"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Unsupported claim stays hypothesis",
+        "agent": null,
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "system_e2e",
+          "deterministic"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "SYS-E2E-11",
+      "suite": "system-e2e-v1",
+      "benchmark_type": "SYSTEM_E2E",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "只有录像、Mock 和健康检查，没有授权外部 Case。",
+          "facts": {
+            "evidence_types": [
+              "recording",
+              "mock",
+              "health_check"
+            ],
+            "authorized_external": false
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "CONTRACT_DERIVED",
+        "expected": {
+          "action": "BLOCKED_NO_AUTHORIZED_CASE"
+        },
+        "rule_refs": [
+          "ARCH-REAL-E2E-NO-MOCK"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "BLOCKED_NO_AUTHORIZED_CASE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "ARCH-REAL-E2E-NO-MOCK"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Recorded run is not live acceptance",
+        "agent": null,
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "system_e2e",
+          "deterministic"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "SYS-E2E-12",
+      "suite": "system-e2e-v1",
+      "benchmark_type": "SYSTEM_E2E",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "V2 复验试图切换标准后与 V1 比分。",
+          "facts": {
+            "same_case": true,
+            "standard_changed": true
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "CONTRACT_DERIVED",
+        "expected": {
+          "action": "USE_FROZEN_MANIFEST",
+          "comparison_valid": false
+        },
+        "rule_refs": [
+          "ARCH-VERSION-FROZEN-RUN"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "USE_FROZEN_MANIFEST",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_comparison_valid_2",
+            "type": "EQUALS",
+            "path": "$.comparison_valid",
+            "expected": false,
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "ARCH-VERSION-FROZEN-RUN"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": [
+          {
+            "id": "overall_effectiveness",
+            "dimension": "OVERALL_EFFECTIVENESS",
+            "required": true,
+            "instructions": "After an authorized live run, judge end-to-end usefulness; deterministic harness output is insufficient."
+          }
+        ]
+      },
+      "metadata": {
+        "title": "V1 V2 comparable standard",
+        "agent": null,
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "system_e2e",
+          "deterministic"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    }
+  ]
+}

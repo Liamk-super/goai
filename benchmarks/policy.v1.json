@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "version": "1.0.0",
+  "expected_counts": {
+    "model": 30,
+    "agents": {
+      "evaluation-manager": 16,
+      "product-engineering": 12,
+      "user-evidence": 12,
+      "business-investment": 12,
+      "geo-policy-trend": 12,
+      "evidence-auditor": 16
+    },
+    "system_e2e": 12,
+    "total": 122
+  },
+  "gates": {
+    "source_hashes_match": true,
+    "schema_valid_rate": 1,
+    "critical_violations_max": 0,
+    "ordinary_automated_pass_rate_min": 0.95,
+    "per_agent_automated_pass_rate_min": 0.9,
+    "manager_auditor_critical_pass_rate_min": 1,
+    "human_required_must_be_resolved_for_release": true,
+    "live_external_gate_without_authorization": "BLOCKED_NO_AUTHORIZED_CASE"
+  },
+  "formal_model_selection": {
+    "minimum_independent_repeats": 3,
+    "cache_allowed": false,
+    "sharing_allowed": false
+  },
+  "score_policy": "Report gates, deterministic dimensions, human dimensions, latency, tokens and cost separately; no single blended score."
+}

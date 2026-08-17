@@ -27,6 +27,7 @@ def test_mcp_requires_consumer_credential_and_exposes_only_named_capability(monk
     monkeypatch.setenv("LAUNCHSCOPE_DEMO_MODE", "false")
     monkeypatch.setenv("LAUNCHSCOPE_MCP_CONSUMER_TOKEN", "consumer-token")
     monkeypatch.setattr(mcp_module, "application", lambda: FakeMcpApplication())
+    monkeypatch.setattr(mcp_module, "_assert_route_active", lambda *_args, **_kwargs: None)
     body = {"jsonrpc": "2.0", "id": 1, "method": "tools/list", "params": {}}
     with TestClient(app) as client:
         assert client.post("/mcp/context/", headers=_headers("wrong"), json=body).status_code == 401

@@ -1,75 +1,95 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { AgentTeamsRun, Project, Run } from "../../lib/api-client";
-import { Compass, type CompassNeedle, type CompassSector } from "./Compass";
+import type { AgentTeamsRun, Project, ProjectPortrait, Run } from "../../lib/api-client";
+import { EvaluationWheel } from "./EvaluationWheel";
+import { useI18n } from "../i18n/LocaleProvider";
+import { isSupervisorExperience } from "../../lib/supervisor-experience";
+import { productNameLength } from "../../lib/product-name";
+import { filterProjectRuns, runVersionLabel } from "../../lib/project-history";
+import { buildSectorStates } from "../../lib/wheel-state";
+import { evaluationRouteForStage, stageCodeFromProfile } from "../../lib/hit-predictor-intake";
 
 const INTAKE_SECTIONS = [
-  ["I", "产品材料", "产品解决的问题、核心功能与可检查材料", 3],
-  ["II", "团队信息", "角色、能力边界与交付约束", 2],
-  ["III", "用户与经营", "使用者、付费者、数据与商业假设", 3],
-  ["IV", "时间与地域", "目标市场、政策、平台规则与时效", 2],
+  ["I", "Product material", "The problem, core functionality, and tangible artifacts", 3],
+  ["II", "Team capability", "Who is building it, relevant experience, and current delivery capacity", 2],
+  ["III", "Users and traction", "Who uses it, who pays, and whether real usage data exists", 3],
+  ["IV", "Timing and region", "Target market and any policy or platform constraints", 2],
 ] as const;
 
 const DEFAULT_AGENTS = [
-  "势能评审主管",
-  "产品与团队专家",
-  "用户共创 Agent",
-  "投资与商业 Agent",
-  "时间地域 Agent",
-  "证据校准 Agent",
+  "Prediction project lead",
+  "Product and team",
+  "User evidence",
+  "Business and investment",
+  "Timing and policy",
+  "Evidence calibration",
 ];
 
-const TRUST_BOUNDARY = [
-  "不把猜测当事实",
-  "所有判断保留证据",
-  "敏感信息不进入报告",
-  "代码仓库只读",
-  "支持同标准复验",
-  "高风险操作人工确认",
-];
+const SUPERVISOR_AGENTS = ["Prediction project lead", "Product and team", "User evidence", "Business and investment", "Evidence check"];
+
+const AGENT_NAMES: Record<string, string> = {
+  "evaluation-manager": "Prediction project lead",
+  "product-engineering": "Product and team",
+  "user-evidence": "User evidence",
+  "business-investment": "Business and investment",
+  "geo-policy-trend": "Timing and policy",
+  "evidence-auditor": "Evidence check",
+};
+
+type NeedleReadout = {
+  key: string;
+  name: string;
+  status: string;
+  evidence: number;
+};
 
 /** 一整周 = 一次完整评审。走完一周，V1 归档。 */
 const NOTCHES_PER_REVOLUTION = 32;
-
-function readable(value: string | null | undefined) {
-  return (value ?? "DRAFT").replaceAll("_", " ");
-}
 
 export function MomentumWorkbench({
   project,
   runs,
   team,
+  portrait,
 }: {
   project: Project;
   runs: Run[];
   team?: AgentTeamsRun;
+  portrait?: ProjectPortrait;
 }) {
+  const { status, t } = useI18n();
   const latest = runs[0];
+  const supervisorMode = latest ? isSupervisorExperience(latest) : true;
   const [activeSector, setActiveSector] = useState(0);
+  const [versionSearch, setVersionSearch] = useState("");
+  const visibleRuns = useMemo(
+    () => filterProjectRuns(runs, versionSearch),
+    [runs, versionSearch],
+  );
 
-  const needles = useMemo<CompassNeedle[]>(() => {
+  const needles = useMemo(() => {
     if (!team?.tasks.length) {
-      return DEFAULT_AGENTS.map((name, index) => ({
+      return (supervisorMode ? SUPERVISOR_AGENTS : DEFAULT_AGENTS).map((name, index) => ({
         key: `${name}-${index}`,
-        name,
+        name: t(name),
         status: index === 0 && latest ? latest.status : "IDLE",
         evidence: 0,
       }));
     }
-    const byAgent = new Map<string, CompassNeedle>();
+    const byAgent = new Map<string, NeedleReadout>();
     for (const item of team.tasks) {
       const code = item.agent_identity_ref.split("@")[0];
       const current = byAgent.get(code);
       byAgent.set(code, {
         key: code,
-        name: code === "evaluation-manager" ? "势能评审主管" : code.replaceAll("-", " "),
+        name: t(AGENT_NAMES[code] ?? code.replaceAll("-", " ")),
         status: code === "evaluation-manager" ? (latest?.status ?? item.status) : item.status,
         evidence: (current?.evidence ?? 0) + (item.evidence_count ?? 0),
       });
     }
     return [...byAgent.values()];
-  }, [latest, team]);
+  }, [latest, supervisorMode, team]);
 
   /** 已落库的证据总数 —— 唯一让盘面前进的东西。没有证据，盘面不动。 */
   const evidenceCount = useMemo(
@@ -77,9 +97,16 @@ export function MomentumWorkbench({
     [needles],
   );
   const notch = Math.min(evidenceCount, NOTCHES_PER_REVOLUTION);
+  const hasPortrait = Boolean(portrait?.product_version_id);
+  const portraitStage = stageCodeFromProfile(portrait?.confirmed_fields.stage ?? "");
+  const preliminaryPrediction = Boolean(
+    portraitStage && evaluationRouteForStage(portraitStage) !== "FORMAL_EVALUATION",
+  );
 
-  const sectors = useMemo<CompassSector[]>(
-    () =>
+  const sectors = useMemo(
+    () => hasPortrait
+      ? buildSectorStates(portrait?.confirmed_fields ?? {})
+      :
       INTAKE_SECTIONS.map(([code, name, , total]) => ({
         key: name,
         code,
@@ -87,42 +114,53 @@ export function MomentumWorkbench({
         filled: runs.length ? total : 0,
         total,
       })),
-    [runs.length],
+    [hasPortrait, portrait?.confirmed_fields, runs.length],
   );
 
-  const version = runs.length ? `V${runs.length}` : "V1 草稿";
-  const stage = latest?.current_stage ?? (runs.length ? latest.status : "资料收集");
-  const completion = runs.length ? 100 : 0;
   const active = INTAKE_SECTIONS[activeSector];
 
+  const savedPortraitHref = portrait?.product_version_id
+    ? `/projects/${project.project_id}/new-evaluation?versionId=${encodeURIComponent(portrait.product_version_id)}`
+    : `/projects/${project.project_id}/new-evaluation`;
   const primaryHref = latest
     ? `/runs/${latest.run_id}`
-    : `/projects/${project.project_id}/new-evaluation`;
+    : hasPortrait ? savedPortraitHref : `/projects/${project.project_id}/new-evaluation`;
   const primaryLabel =
-    latest?.status === "COMPLETED" ? "查看报告与证据" : latest ? "查看 Agent 运行" : "开始补充资料";
+    latest?.status === "COMPLETED"
+      ? t("View results")
+      : latest
+        ? t("View progress")
+        : hasPortrait
+          ? preliminaryPrediction
+            ? t("Start preliminary prediction")
+            : t("Start prediction")
+          : t("Add details");
+
+  /** 一句话说清「现在该干什么」。用户不需要读四个读数才知道下一步。 */
+  const nextStep = latest
+    ? latest.status === "COMPLETED"
+      ? t("The prediction is complete. Review the result and supporting evidence.")
+      : t("The predictor is checking the project. The dial advances as new evidence arrives.")
+    : hasPortrait
+      ? preliminaryPrediction
+        ? t("Your confirmed project portrait is saved. Review it and start a preliminary prediction to test the most important assumptions.")
+        : t("Your confirmed project portrait is saved. Review it and start the full prediction when you are ready.")
+      : t("No details yet. Complete the four basic sections to start a prediction.");
 
   return (
     <section className="binnacle">
       <div className="binnacle-plate">
-        <div className="compass">
-          <Compass
+        <div className="wheel-frame instrument-shell project-wheel-frame">
+          <EvaluationWheel
             sectors={sectors}
-            needles={needles}
+            team={team}
+            architectureGeneration={supervisorMode ? "supervisor-1p4-v1" : "legacy-1p5"}
             notch={notch}
-            notches={NOTCHES_PER_REVOLUTION}
             activeSector={activeSector}
             onSelectSector={setActiveSector}
-            inscription={TRUST_BOUNDARY}
           />
-          <div className="core-read">
-            <span className="core-rev">{version}</span>
-            <strong className="core-name">{project.name}</strong>
-            <span className="core-stage">{readable(stage)}</span>
-            <span className="core-figure">
-              <b>{completion}</b>
-              <i>%</i>
-            </span>
-            <span className="core-figure-label">证据完整度</span>
+          <div className="core-read project-core-read">
+            <strong className="core-name" data-name-length={productNameLength(project.name)} title={project.name}>{project.name}</strong>
             <a className="button core-cta" href={primaryHref}>
               {primaryLabel}
             </a>
@@ -130,69 +168,87 @@ export function MomentumWorkbench({
         </div>
       </div>
 
-      <aside className="binnacle-side" aria-label="项目读数">
-        <div className="plate">
-          <p className="plate-kicker">当前扇区 · {active[0]}</p>
-          <h2>{active[1]}</h2>
-          <p>{active[2]}</p>
+      <aside className="binnacle-side" aria-label={t("Project readings")}>
+        <div className="side-lead">
+          <p className="prediction-target"><strong>{t("Prediction target")}</strong>{project.name}</p>
+          <p className="plate-kicker">{t("Next step")}</p>
+          <p className="side-lead-text">{nextStep}</p>
+          <a className="button secondary" href={primaryHref}>
+            {primaryLabel}
+          </a>
         </div>
 
-        <div className="plate plate-quiet">
-          <p className="plate-kicker">证据推进</p>
+        <div className="side-block">
+          <p className="plate-kicker">
+            {active[0]} · {t(active[1])}
+          </p>
+          <p className="side-note">{t(active[2])}</p>
+        </div>
+
+        <div className="side-block">
+          <p className="plate-kicker">
+            {t("{count} evidence items · progress {notch} / {total}", { count: evidenceCount, notch, total: NOTCHES_PER_REVOLUTION })}
+          </p>
           {/* 棘轮刻度条：每一格对应一条真实证据落库。
               没有事件就不亮 —— 这不是进度条动画。 */}
-          <div className="detent-bar" aria-label={`已推进 ${notch} / ${NOTCHES_PER_REVOLUTION} 格`}>
+          <div className="detent-bar" aria-label={t("Advanced {notch} / {total} notches", { notch, total: NOTCHES_PER_REVOLUTION })}>
             {Array.from({ length: NOTCHES_PER_REVOLUTION }, (_, i) => (
               <i key={i} data-lit={i < notch} />
             ))}
           </div>
-          <dl className="readout" style={{ marginTop: 16 }}>
-            <dt>NOTCH</dt>
-            <dd>
-              {String(notch).padStart(2, "0")} / {NOTCHES_PER_REVOLUTION}
-            </dd>
-          </dl>
-          <dl className="readout">
-            <dt>EVIDENCE</dt>
-            <dd>{evidenceCount}</dd>
-          </dl>
-          <dl className="readout">
-            <dt>SOURCE</dt>
-            <dd>PostgreSQL</dd>
-          </dl>
         </div>
 
-        <div className="plate plate-quiet">
-          <p className="plate-kicker">网盘指针 · 1+5</p>
-          <ul className="record-list">
+        <div className="side-block">
+          <p className="plate-kicker">{t("Prediction team {topology}", { topology: supervisorMode ? t("Project lead 1+4") : "1+5" })}</p>
+          <ul className="agent-chips">
             {needles.map((n) => (
-              <li key={n.key}>
-                <span>{n.name}</span>
-                <span className="status" data-state={n.status.toLowerCase()}>
-                  {n.evidence ? `${n.evidence} 证据` : readable(n.status)}
+              <li key={n.key} data-state={n.status.toLowerCase()}>
+                <span className="chip-name">{n.name}</span>
+                <span className="chip-read">
+                  {n.evidence ? t("{count} items", { count: n.evidence }) : status(n.status)}
                 </span>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="plate plate-quiet">
-          <p className="plate-kicker">版本历史</p>
-          {runs.length ? (
+        {runs.length > 0 && (
+          <div className="side-block version-history-block">
+            <div className="version-history-heading">
+              <p className="plate-kicker">{t("Version history")}</p>
+              <span>{t("{count} prediction versions", { count: runs.length })}</span>
+            </div>
+            <label className="version-search">
+              <span className="field-name">{t("Find a version")}</span>
+              <input
+                type="search"
+                value={versionSearch}
+                onChange={event => setVersionSearch(event.target.value)}
+                placeholder={t("Search by version, for example V2")}
+              />
+            </label>
             <ul className="record-list">
-              {runs.map((run, index) => (
+              {visibleRuns.map((run) => (
                 <li key={run.run_id}>
-                  <a href={`/runs/${run.run_id}`}>V{runs.length - index}</a>
+                  <a href={`/runs/${run.run_id}`}>
+                    {runVersionLabel(run, runs.length - runs.indexOf(run))}
+                  </a>
                   <span className="status" data-state={run.status.toLowerCase()}>
-                    {readable(run.status)}
+                    {status(run.status)}
                   </span>
                 </li>
               ))}
             </ul>
-          ) : (
-            <p>第一轮正式评审完成后，会在这里形成不可覆盖的 V1 档案。</p>
-          )}
-        </div>
+            {visibleRuns.length === 0 && (
+              <div className="version-search-empty" role="status">
+                <span>{t("No matching versions.")}</span>
+                <button type="button" className="quiet" onClick={() => setVersionSearch("")}>
+                  {t("Clear search")}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </aside>
     </section>
   );

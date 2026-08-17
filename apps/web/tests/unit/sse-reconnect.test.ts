@@ -32,3 +32,21 @@ data: {"status":"PLANNED"}
   await stream.connect();
   assert.deepEqual(snapshots, [{ current_cursor: "event.fresh", status: "PLANNED" }, { status: "PLANNED" }]);
 });
+
+test("a normal finite stream closure activates the durable snapshot fallback", async () => {
+  let closed = 0;
+  const stream = new DurableRunStream("/runs/r/events", {}, {
+    onSnapshot() {},
+    onEvent() {},
+    onError: error => { throw error; },
+    onClosed: () => { closed += 1; },
+  }, async () => sse(`event: run.snapshot
+id: event.initial
+data: {"status":"RUNNING"}
+
+`));
+
+  await stream.connect();
+
+  assert.equal(closed, 1);
+});

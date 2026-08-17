@@ -1,0 +1,23 @@
+{
+  "task_id": "T-UVD-20260808-002",
+  "project_id": "PRJ-AI-NOTE-ALL",
+  "product_version": "V0.1",
+  "product_profile": {
+    "name": "AI 笔记助手",
+    "one_line_value_claim": "让每个人都能更高效地记笔记",
+    "description": "AI 自动整理笔记，支持语音转写与摘要。",
+    "category": "效率工具",
+    "url": "https://example-note.app"
+  },
+  "target_users": {
+    "raw_description": "所有需要记笔记的人，学生、白领、自由职业者都可以用，基本上所有人都有这个需求"
+  },
+  "validation_goal": {
+    "objective": "验证目标用户是否真的需要 AI 笔记整理"
+  },
+  "product_stage": "demo",
+  "runtime": {
+    "allowed_tools": ["product_reader", "simulation_engine"],
+    "mode": "first_validation"
+  }
+}

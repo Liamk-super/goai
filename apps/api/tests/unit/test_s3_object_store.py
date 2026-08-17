@@ -1,9 +1,17 @@
 from __future__ import annotations
 
 from hashlib import sha256
+from io import BytesIO
 from urllib.parse import parse_qs, urlsplit
 
-from launchscope_api.infrastructure.object_store import S3ObjectStoreSettings, S3QuarantineObjectStore
+import pytest
+
+from launchscope_api.infrastructure.object_store import (
+    ObjectStoreIntegrityError,
+    S3ObjectStoreSettings,
+    S3QuarantineObjectStore,
+)
+from launchscope_api.modules.project_dossier.material_ingestion import ObjectMetadata
 
 
 def test_private_presigned_upload_binds_content_metadata_and_has_short_ttl(monkeypatch) -> None:
@@ -51,3 +59,48 @@ def test_private_presigned_read_has_short_ttl_and_no_write_headers(monkeypatch) 
     assert query["X-Amz-Expires"] == ["180"]
     assert query["X-Amz-SignedHeaders"] == ["host"]
     assert "X-Amz-Signature" in query
+
+
+def test_private_read_is_bounded_and_verifies_the_content_digest(monkeypatch) -> None:
+    settings = S3ObjectStoreSettings(
+        endpoint="http://minio:9000",
+        bucket="launchscope-evidence",
+        access_key_id="test-access",
+        secret_access_key="test-secret",
+    )
+    store = S3QuarantineObjectStore(settings)
+    payload = b"aggregate evidence"
+    monkeypatch.setattr(
+        store,
+        "head",
+        lambda _key: ObjectMetadata(sha256(payload).hexdigest(), len(payload), "text/plain"),
+    )
+    monkeypatch.setattr(
+        "launchscope_api.infrastructure.object_store.urlopen",
+        lambda *_args, **_kwargs: BytesIO(payload),
+    )
+
+    assert store.get_private("tenant/a/evidence/1.txt", max_bytes=100) == payload
+
+
+def test_private_read_rejects_a_payload_that_differs_from_immutable_metadata(monkeypatch) -> None:
+    settings = S3ObjectStoreSettings(
+        endpoint="http://minio:9000",
+        bucket="launchscope-evidence",
+        access_key_id="test-access",
+        secret_access_key="test-secret",
+    )
+    store = S3QuarantineObjectStore(settings)
+    payload = b"tampered evidence"
+    monkeypatch.setattr(
+        store,
+        "head",
+        lambda _key: ObjectMetadata("a" * 64, len(payload), "text/plain"),
+    )
+    monkeypatch.setattr(
+        "launchscope_api.infrastructure.object_store.urlopen",
+        lambda *_args, **_kwargs: BytesIO(payload),
+    )
+
+    with pytest.raises(ObjectStoreIntegrityError, match="sha256"):
+        store.get_private("tenant/a/evidence/1.txt", max_bytes=100)

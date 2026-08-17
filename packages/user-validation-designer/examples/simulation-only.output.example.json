@@ -1,0 +1,2961 @@
+{
+  "task_id": "T-UVD-20260809-004",
+  "status": "completed",
+  "result_summary": "用户需求未验证：目前没有足够真实用户证据支撑强弱判断，先补最关键的真实行为数据。",
+  "structured_output": {
+    "simulation_disclaimer": "本报告中所有 Persona、模拟访谈、模拟体验与任务测试结果均为 AI 模拟产出，证据等级封顶 E2，不得作为真实用户结论使用；真实用户证据（E3+）永远优先。",
+    "overall_judgment": "insufficient_evidence",
+    "user_value_judgment": "unverified",
+    "evidence_confidence": "low",
+    "user_value_score": {
+      "raw_total": 32,
+      "counted_weight": 40,
+      "normalized_total": 80,
+      "uncounted_dimension_count": 4,
+      "dimensions": {
+        "demand_strength": {
+          "score": 4,
+          "weight": 20,
+          "counted": true,
+          "cap_reason": null,
+          "evidence_refs": [
+            "EV-uvd-1"
+          ],
+          "basis": "模拟 Persona 表现出高绕行成本（E2）",
+          "max_tier": "E2",
+          "needs_rescore": false,
+          "real_evidence_overrides_simulation": false
+        },
+        "usage_frequency": {
+          "score": null,
+          "weight": 20,
+          "counted": false,
+          "cap_reason": "no_user_evidence",
+          "evidence_refs": [],
+          "basis": "备考期近似日频（E2 模拟）",
+          "max_tier": "E0",
+          "needs_rescore": false,
+          "real_evidence_overrides_simulation": false
+        },
+        "pain_severity": {
+          "score": 4,
+          "weight": 20,
+          "counted": true,
+          "cap_reason": null,
+          "evidence_refs": [
+            "EV-uvd-1"
+          ],
+          "basis": "频率 5 × 强度 4 × 绕行成本 4（E2 模拟）",
+          "max_tier": "E2",
+          "needs_rescore": false,
+          "real_evidence_overrides_simulation": false
+        },
+        "alternative_gap": {
+          "score": null,
+          "weight": 15,
+          "counted": false,
+          "cap_reason": "no_user_evidence",
+          "evidence_refs": [],
+          "basis": "替代方案有明确缺点但已被接受（E2 模拟）",
+          "max_tier": "E0",
+          "needs_rescore": false,
+          "real_evidence_overrides_simulation": false
+        },
+        "willingness_to_pay": {
+          "score": null,
+          "weight": 15,
+          "counted": false,
+          "cap_reason": "no_user_evidence",
+          "evidence_refs": [],
+          "basis": "仅口头意愿，按 KB-USR-F07 记为弱信号（E2）",
+          "max_tier": "E0",
+          "needs_rescore": false,
+          "real_evidence_overrides_simulation": false
+        },
+        "virality": {
+          "score": null,
+          "weight": 10,
+          "counted": false,
+          "cap_reason": "no_user_evidence",
+          "evidence_refs": [],
+          "basis": "私用场景，缺乏天然传播动机（E2 模拟）",
+          "max_tier": "E0",
+          "needs_rescore": false,
+          "real_evidence_overrides_simulation": false
+        }
+      },
+      "preliminary": true,
+      "evidence_ceiling": "E2",
+      "user_value_ceiling": {
+        "applied": false,
+        "ceiling": null,
+        "reason": ">=3 dimensions uncounted for lack of evidence"
+      },
+      "scoring_note": "本分数是需求侧证据强度的序数，不是用户喜欢程度，也不是成功率。未计分维度表示证据不足，不等于低分。"
+    },
+    "target_user_definition": {
+      "admitted": true,
+      "breadth_check": {
+        "verdict": "borderline",
+        "matched_broad_patterns": [
+          "raw_description:missing_behavioral_qualifier",
+          "segments[1]:missing_behavioral_qualifier",
+          "segments[2]:missing_behavioral_qualifier"
+        ],
+        "reason": "The audience is demographic-only or missing behavioural, situational, pain, payer, or adoption constraints; modelling may proceed only with reduced confidence."
+      },
+      "converged_segments": [
+        {
+          "segment_id": "SEG1",
+          "label": "距初试 6 个月内的二战考研生",
+          "who_hurts_most": "二战考研生：每天筛资料超 1 小时",
+          "who_pays": "学生本人",
+          "who_adopts_first": "自习室高频使用者",
+          "payer_differs_from_user": false,
+          "fact_type": "assumption",
+          "evidence_refs": [
+            "EV-uvd-1"
+          ]
+        }
+      ],
+      "excluded_segments": [
+        {
+          "label": "已上岸的学生",
+          "reason": "Explicitly excluded by target_users.exclusions; do not recruit or extrapolate to this segment."
+        }
+      ],
+      "clarification_questions": [
+        "谁最痛？请给出具体人群、触发场景，以及当前为问题付出的时间、金钱或绕行成本。",
+        "谁付钱？使用者与付费者是否相同；若不同，谁做购买决策？",
+        "谁最先用？什么具体行为或场景会触发第一批真实使用？"
+      ]
+    },
+    "personas": [
+      {
+        "persona_id": "P1",
+        "label": "二战考研生 · 每天刷资料超 1 小时，时间极紧",
+        "archetype": "high_need",
+        "background": {
+          "identity": "二战考研生",
+          "occupation": "全职备考",
+          "environment": "自习室 + 手机"
+        },
+        "goal_statement": "当我在自习室复习时，我想快速筛掉重复资料，以便把时间花在真正没掌握的考点上",
+        "motivation": "距离初试只剩 4 个月，重复资料让我焦虑",
+        "pains": [
+          {
+            "description": "同一考点资料重复下载，筛选耗时",
+            "frequency": 5,
+            "severity": 4,
+            "workaround_cost": 4,
+            "pain_class": "functional",
+            "fact_type": "assumption",
+            "priority_score": 80
+          }
+        ],
+        "barriers": [
+          "担心筛选把重点漏掉",
+          "不愿再学一个新工具"
+        ],
+        "behavior_keys": {
+          "alternative_in_use": "手动整理文件夹 + Excel 清单",
+          "budget_constraint": "月预算 50 元以内",
+          "skill_level": "intermediate",
+          "urgency": 5,
+          "risk_attitude": "averse"
+        },
+        "value_threshold": {
+          "statement": "每周至少省 2 小时才值得换",
+          "quantified": true,
+          "fact_type": "assumption"
+        },
+        "rejection_threshold": {
+          "statement": "学习成本超过 30 分钟或要付费超过 50 元就放弃",
+          "quantified": true,
+          "fact_type": "assumption"
+        },
+        "rejection_reasons": [
+          "怕筛掉自己还没掌握的考点",
+          "考完就用不上，不想为一次性需求付费"
+        ],
+        "confidence": "medium",
+        "field_provenance": {
+          "goal": "inference",
+          "pains": "inference",
+          "alternative": "inference",
+          "value_threshold": "assumption"
+        },
+        "eligible_for_scoring": true,
+        "calibrated_by_real_evidence": []
+      },
+      {
+        "persona_id": "P2",
+        "label": "考研机构助教 · 已有内部资料库，最挑剔",
+        "archetype": "skeptic",
+        "background": {
+          "identity": "机构助教",
+          "occupation": "教辅",
+          "environment": "办公室电脑"
+        },
+        "goal_statement": "当我给学生发资料时，我想确认资料没有重复和过期，以便不被学生质疑专业度",
+        "motivation": "机构已有资料库，换工具要说服负责人",
+        "pains": [
+          {
+            "description": "现有资料库维护靠人工，版本混乱",
+            "frequency": 3,
+            "severity": 3,
+            "workaround_cost": 3,
+            "pain_class": "functional",
+            "fact_type": "assumption",
+            "priority_score": 27
+          }
+        ],
+        "barriers": [
+          "数据放在哪、谁能看",
+          "采购流程要走审批",
+          "和现有资料库打不通"
+        ],
+        "behavior_keys": {
+          "alternative_in_use": "机构自建资料库 + 人工校对",
+          "budget_constraint": "走机构采购，个人不付费",
+          "skill_level": "expert",
+          "urgency": 2,
+          "risk_attitude": "neutral"
+        },
+        "value_threshold": {
+          "statement": "能和现有资料库打通并支持批量导出才考虑",
+          "quantified": false,
+          "fact_type": "assumption"
+        },
+        "rejection_threshold": {
+          "statement": "学生资料要上传到第三方服务器就直接否决",
+          "quantified": false,
+          "fact_type": "assumption"
+        },
+        "rejection_reasons": [
+          "学生资料上传第三方有合规顾虑",
+          "采购流程比工具本身麻烦"
+        ],
+        "confidence": "medium",
+        "field_provenance": {
+          "goal": "inference",
+          "pains": "inference",
+          "alternative": "inference",
+          "value_threshold": "assumption"
+        },
+        "eligible_for_scoring": true,
+        "calibrated_by_real_evidence": []
+      },
+      {
+        "persona_id": "P3",
+        "label": "在职跨考生 · 通勤碎片时间，弱网络低预算",
+        "archetype": "edge_case",
+        "background": {
+          "identity": "在职跨考生",
+          "occupation": "全职工作",
+          "environment": "地铁通勤 + 手机弱网"
+        },
+        "goal_statement": "当我通勤时，我想用碎片时间看最该看的资料，以便不浪费仅有的学习时间",
+        "motivation": "每天只有 1 小时通勤可用",
+        "pains": [
+          {
+            "description": "弱网下加载慢，干脆放弃",
+            "frequency": 4,
+            "severity": 4,
+            "workaround_cost": 2,
+            "pain_class": "functional",
+            "fact_type": "assumption",
+            "priority_score": 32
+          }
+        ],
+        "barriers": [
+          "不能离线用就没意义",
+          "注册流程太长直接退出"
+        ],
+        "behavior_keys": {
+          "alternative_in_use": "什么都不做，随便看看公众号",
+          "budget_constraint": "只用免费产品",
+          "skill_level": "novice",
+          "urgency": 3,
+          "risk_attitude": "tolerant"
+        },
+        "value_threshold": {
+          "statement": "地铁上能离线打开才有用",
+          "quantified": false,
+          "fact_type": "assumption"
+        },
+        "rejection_threshold": {
+          "statement": "要注册填超过 3 项信息就放弃",
+          "quantified": true,
+          "fact_type": "assumption"
+        },
+        "rejection_reasons": [
+          "弱网加载不出来",
+          "要填太多信息才能试用"
+        ],
+        "confidence": "medium",
+        "field_provenance": {
+          "goal": "inference",
+          "pains": "inference",
+          "alternative": "inference",
+          "value_threshold": "assumption"
+        },
+        "eligible_for_scoring": true,
+        "calibrated_by_real_evidence": []
+      }
+    ],
+    "persona_outcomes": [
+      {
+        "persona_id": "P1",
+        "verdict": "accept",
+        "core_task_failed": false,
+        "failed_task_keys": [],
+        "reason": "No tested core task failed."
+      },
+      {
+        "persona_id": "P2",
+        "verdict": "at_risk",
+        "core_task_failed": false,
+        "failed_task_keys": [
+          "export_weekly_plan"
+        ],
+        "reason": "At least one core task failed for this Persona."
+      },
+      {
+        "persona_id": "P3",
+        "verdict": "at_risk",
+        "core_task_failed": false,
+        "failed_task_keys": [
+          "upload_and_rank"
+        ],
+        "reason": "At least one core task failed for this Persona."
+      }
+    ],
+    "persona_set_check": {
+      "count": 3,
+      "archetype_coverage": {
+        "high_need": true,
+        "skeptic": true,
+        "edge_case": true
+      },
+      "differentiation": {
+        "pairwise_min_distinct_keys": 5,
+        "homogeneous_pairs": [],
+        "verdict": "pass"
+      },
+      "retries_used": 0
+    },
+    "jobs_to_be_done": [
+      {
+        "job_id": "J1",
+        "persona_ids": [
+          "P1",
+          "P2",
+          "P3"
+        ],
+        "statement": "当我复习时间紧张时，我想快速筛掉重复资料，以便把时间花在没掌握的考点上",
+        "job_type": "functional",
+        "outcome_metric": "每周减少筛资料时间 2 小时以上",
+        "fact_type": "assumption",
+        "evidence_refs": [
+          "EV-uvd-1"
+        ]
+      }
+    ],
+    "scenarios_and_alternatives": [
+      {
+        "scenario_id": "SC1",
+        "persona_id": "P1",
+        "trigger_event": "下载完一批资料，发现和上周的重复",
+        "environment": "自习室，笔记本电脑",
+        "limits": {
+          "time": "每天可支配 30 分钟整理",
+          "budget": "50 元/月",
+          "skill": null,
+          "device": "笔记本",
+          "network": "正常",
+          "permission": null
+        },
+        "alternatives": [
+          {
+            "name": "手动整理文件夹 + Excel 清单",
+            "alternative_type": "workaround",
+            "cost": {
+              "money": "0",
+              "time": "每周 5 小时",
+              "effort": "高"
+            },
+            "gap": "无法判断内容是否重复，只能靠文件名",
+            "fact_type": "assumption",
+            "evidence_refs": [
+              "EV-uvd-1"
+            ]
+          },
+          {
+            "name": "什么都不做",
+            "alternative_type": "do_nothing",
+            "cost": {
+              "money": "0",
+              "time": "0",
+              "effort": "低"
+            },
+            "gap": "资料越堆越多，焦虑加剧",
+            "fact_type": "assumption",
+            "evidence_refs": []
+          }
+        ],
+        "switching_forces": {
+          "push": 4,
+          "pull": 4,
+          "anxiety": 3,
+          "habit": 3,
+          "verdict": "will_switch",
+          "basis": "绕行成本 4，push 按 KB-USR-F02 提至 4",
+          "push_forced_by_workaround_cost": false
+        },
+        "journey": [
+          {
+            "stage": "awareness",
+            "behavior": "看到同学推荐",
+            "thought": "又一个工具？",
+            "emotion": 3,
+            "touchpoint": "微信群",
+            "pain": null,
+            "drop_off_risk": "medium"
+          },
+          {
+            "stage": "trial",
+            "behavior": "打开首页",
+            "thought": "这到底帮我做什么",
+            "emotion": 2,
+            "touchpoint": "落地页",
+            "pain": "价值主张不清晰",
+            "drop_off_risk": "high"
+          },
+          {
+            "stage": "first_use",
+            "behavior": "上传资料",
+            "thought": "还要等多久",
+            "emotion": 3,
+            "touchpoint": "上传页",
+            "pain": "无进度提示",
+            "drop_off_risk": "medium"
+          },
+          {
+            "stage": "continued_use",
+            "behavior": "第二周未再打开",
+            "thought": "考完就用不上",
+            "emotion": 2,
+            "touchpoint": null,
+            "pain": "缺乏持续使用理由",
+            "drop_off_risk": "high"
+          },
+          {
+            "stage": "referral",
+            "behavior": "未推荐",
+            "thought": "没什么好说的",
+            "emotion": 3,
+            "touchpoint": null,
+            "pain": null,
+            "drop_off_risk": "high"
+          }
+        ],
+        "flags": {
+          "pseudo_demand_risk": false,
+          "high_switching_friction": false
+        }
+      },
+      {
+        "scenario_id": "SC2",
+        "persona_id": "P2",
+        "trigger_event": "负责人要求核对本期资料版本",
+        "environment": "办公室",
+        "limits": {
+          "time": null,
+          "budget": "走采购",
+          "skill": null,
+          "device": "台式机",
+          "network": "正常",
+          "permission": "需负责人审批"
+        },
+        "alternatives": [
+          {
+            "name": "继续维持现状",
+            "alternative_type": "do_nothing",
+            "cost": {
+              "money": "0",
+              "time": "0",
+              "effort": "低"
+            },
+            "gap": "版本混乱继续存在",
+            "fact_type": "assumption",
+            "evidence_refs": []
+          },
+          {
+            "name": "机构自建资料库 + 人工校对",
+            "alternative_type": "direct_product",
+            "cost": {
+              "money": "已投入",
+              "time": "每周 2 小时",
+              "effort": "中"
+            },
+            "gap": "版本混乱但已被接受",
+            "fact_type": "assumption",
+            "evidence_refs": []
+          }
+        ],
+        "switching_forces": {
+          "push": 2,
+          "pull": 3,
+          "anxiety": 4,
+          "habit": 4,
+          "verdict": "will_not_switch",
+          "basis": "anxiety+habit(8) >= push+pull(5)",
+          "push_forced_by_workaround_cost": false
+        },
+        "journey": [
+          {
+            "stage": "awareness",
+            "behavior": "同事转发",
+            "thought": "数据放哪",
+            "emotion": 2,
+            "touchpoint": "微信",
+            "pain": "合规疑虑",
+            "drop_off_risk": "high"
+          },
+          {
+            "stage": "trial",
+            "behavior": "未试用",
+            "thought": "先问负责人",
+            "emotion": 2,
+            "touchpoint": null,
+            "pain": "采购流程",
+            "drop_off_risk": "high"
+          },
+          {
+            "stage": "first_use",
+            "behavior": "未进行",
+            "thought": null,
+            "emotion": 2,
+            "touchpoint": null,
+            "pain": null,
+            "drop_off_risk": "high"
+          },
+          {
+            "stage": "continued_use",
+            "behavior": "未进行",
+            "thought": null,
+            "emotion": 2,
+            "touchpoint": null,
+            "pain": null,
+            "drop_off_risk": "high"
+          },
+          {
+            "stage": "referral",
+            "behavior": "未进行",
+            "thought": null,
+            "emotion": 2,
+            "touchpoint": null,
+            "pain": null,
+            "drop_off_risk": "high"
+          }
+        ],
+        "flags": {
+          "pseudo_demand_risk": false,
+          "high_switching_friction": true
+        }
+      },
+      {
+        "scenario_id": "SC3",
+        "persona_id": "P3",
+        "trigger_event": "地铁上想利用碎片时间",
+        "environment": "地铁，手机弱网",
+        "limits": {
+          "time": "每天 1 小时通勤",
+          "budget": "只用免费",
+          "skill": "新手",
+          "device": "手机",
+          "network": "弱网",
+          "permission": null
+        },
+        "alternatives": [
+          {
+            "name": "暂不处理",
+            "alternative_type": "do_nothing",
+            "cost": {
+              "money": "0",
+              "time": "0",
+              "effort": "低"
+            },
+            "gap": "碎片信息继续累积",
+            "fact_type": "assumption",
+            "evidence_refs": []
+          },
+          {
+            "name": "刷公众号文章",
+            "alternative_type": "manual",
+            "cost": {
+              "money": "0",
+              "time": "1 小时",
+              "effort": "低"
+            },
+            "gap": "内容零散，不成体系",
+            "fact_type": "assumption",
+            "evidence_refs": []
+          }
+        ],
+        "switching_forces": {
+          "push": 3,
+          "pull": 3,
+          "anxiety": 3,
+          "habit": 4,
+          "verdict": "will_not_switch",
+          "basis": "习惯强，弱网体验差",
+          "push_forced_by_workaround_cost": false
+        },
+        "journey": [
+          {
+            "stage": "awareness",
+            "behavior": "应用商店看到",
+            "thought": "免费吗",
+            "emotion": 3,
+            "touchpoint": "商店",
+            "pain": null,
+            "drop_off_risk": "medium"
+          },
+          {
+            "stage": "trial",
+            "behavior": "注册时退出",
+            "thought": "填这么多干嘛",
+            "emotion": 1,
+            "touchpoint": "注册页",
+            "pain": "注册项过多",
+            "drop_off_risk": "high"
+          },
+          {
+            "stage": "first_use",
+            "behavior": "弱网加载失败",
+            "thought": "算了",
+            "emotion": 1,
+            "touchpoint": "首页",
+            "pain": "无离线能力",
+            "drop_off_risk": "high"
+          },
+          {
+            "stage": "continued_use",
+            "behavior": "卸载",
+            "thought": null,
+            "emotion": 1,
+            "touchpoint": null,
+            "pain": null,
+            "drop_off_risk": "high"
+          },
+          {
+            "stage": "referral",
+            "behavior": "未推荐",
+            "thought": null,
+            "emotion": 1,
+            "touchpoint": null,
+            "pain": null,
+            "drop_off_risk": "high"
+          }
+        ],
+        "flags": {
+          "pseudo_demand_risk": false,
+          "high_switching_friction": true
+        }
+      }
+    ],
+    "simulated_findings": {
+      "executed": {
+        "first_experience": true,
+        "task_test": true
+      },
+      "skip_reasons": [],
+      "evidence_tier": "E2",
+      "first_experience": [
+        {
+          "persona_id": "P1",
+          "five_second_impression": "像是一个资料整理工具",
+          "can_restate_value": true,
+          "restated_value": "帮我筛掉重复资料",
+          "deviation_from_claim": null,
+          "continue_intent": "hesitant",
+          "reason": "不确定会不会漏掉考点",
+          "patience_exceeded": false,
+          "evidence_refs": [
+            "EV-uvd-2"
+          ]
+        },
+        {
+          "persona_id": "P2",
+          "five_second_impression": "没看出和我们自建库的区别",
+          "can_restate_value": false,
+          "restated_value": null,
+          "deviation_from_claim": "团队主张“5 分钟筛完”，但首屏未说明依据",
+          "continue_intent": "refuse",
+          "reason": "数据放哪没说清",
+          "patience_exceeded": false,
+          "evidence_refs": [
+            "EV-uvd-2"
+          ]
+        },
+        {
+          "persona_id": "P3",
+          "five_second_impression": "不知道是干嘛的",
+          "can_restate_value": false,
+          "restated_value": null,
+          "deviation_from_claim": "首屏未提到离线或弱网",
+          "continue_intent": "refuse",
+          "reason": "注册要填太多",
+          "patience_exceeded": true,
+          "evidence_refs": [
+            "EV-uvd-2"
+          ]
+        }
+      ],
+      "value_communication_failure": true,
+      "task_test_matrix": [
+        {
+          "persona_id": "P1",
+          "task_key": "upload_and_rank",
+          "result": "completed_with_difficulty",
+          "reason": null,
+          "path": [
+            "start",
+            "upload_and_rank",
+            "result"
+          ],
+          "hesitation_steps": [
+            "选择去重强度"
+          ],
+          "errors": [],
+          "abandon_reason": null,
+          "cognitive_walkthrough": null,
+          "cause_type": "cognitive",
+          "evidence_refs": [
+            "EV-uvd-3"
+          ]
+        },
+        {
+          "persona_id": "P1",
+          "task_key": "adjust_by_deadline",
+          "result": "completed",
+          "reason": null,
+          "path": [
+            "start",
+            "adjust_by_deadline",
+            "result"
+          ],
+          "hesitation_steps": [],
+          "errors": [],
+          "abandon_reason": null,
+          "cognitive_walkthrough": null,
+          "cause_type": "unknown",
+          "evidence_refs": [
+            "EV-uvd-3"
+          ]
+        },
+        {
+          "persona_id": "P1",
+          "task_key": "export_weekly_plan",
+          "result": "completed",
+          "reason": null,
+          "path": [
+            "start",
+            "export_weekly_plan",
+            "result"
+          ],
+          "hesitation_steps": [],
+          "errors": [],
+          "abandon_reason": null,
+          "cognitive_walkthrough": null,
+          "cause_type": "unknown",
+          "evidence_refs": [
+            "EV-uvd-3"
+          ]
+        },
+        {
+          "persona_id": "P2",
+          "task_key": "upload_and_rank",
+          "result": "completed",
+          "reason": null,
+          "path": [
+            "start",
+            "upload_and_rank",
+            "result"
+          ],
+          "hesitation_steps": [],
+          "errors": [],
+          "abandon_reason": null,
+          "cognitive_walkthrough": null,
+          "cause_type": "unknown",
+          "evidence_refs": [
+            "EV-uvd-3"
+          ]
+        },
+        {
+          "persona_id": "P2",
+          "task_key": "adjust_by_deadline",
+          "result": "completed",
+          "reason": null,
+          "path": [
+            "start",
+            "adjust_by_deadline",
+            "result"
+          ],
+          "hesitation_steps": [],
+          "errors": [],
+          "abandon_reason": null,
+          "cognitive_walkthrough": null,
+          "cause_type": "unknown",
+          "evidence_refs": [
+            "EV-uvd-3"
+          ]
+        },
+        {
+          "persona_id": "P2",
+          "task_key": "export_weekly_plan",
+          "result": "failed",
+          "reason": null,
+          "path": [
+            "start",
+            "export_weekly_plan",
+            "result"
+          ],
+          "hesitation_steps": [],
+          "errors": [
+            "导出按钮无响应"
+          ],
+          "abandon_reason": "导出失败，无法交付给学生",
+          "cognitive_walkthrough": {
+            "will_try_correct_goal": true,
+            "will_notice_correct_action": true,
+            "can_link_action_to_goal": true,
+            "can_understand_feedback": false
+          },
+          "cause_type": "unknown",
+          "evidence_refs": [
+            "EV-uvd-3"
+          ]
+        },
+        {
+          "persona_id": "P3",
+          "task_key": "upload_and_rank",
+          "result": "failed",
+          "reason": null,
+          "path": [
+            "start",
+            "upload_and_rank",
+            "result"
+          ],
+          "hesitation_steps": [],
+          "errors": [
+            "弱网下上传超时"
+          ],
+          "abandon_reason": "加载不出来",
+          "cognitive_walkthrough": {
+            "will_try_correct_goal": true,
+            "will_notice_correct_action": false,
+            "can_link_action_to_goal": true,
+            "can_understand_feedback": false
+          },
+          "cause_type": "unknown",
+          "evidence_refs": [
+            "EV-uvd-3"
+          ]
+        },
+        {
+          "persona_id": "P3",
+          "task_key": "adjust_by_deadline",
+          "result": "completed",
+          "reason": null,
+          "path": [
+            "start",
+            "adjust_by_deadline",
+            "result"
+          ],
+          "hesitation_steps": [],
+          "errors": [],
+          "abandon_reason": null,
+          "cognitive_walkthrough": null,
+          "cause_type": "unknown",
+          "evidence_refs": [
+            "EV-uvd-3"
+          ]
+        },
+        {
+          "persona_id": "P3",
+          "task_key": "export_weekly_plan",
+          "result": "completed",
+          "reason": null,
+          "path": [
+            "start",
+            "export_weekly_plan",
+            "result"
+          ],
+          "hesitation_steps": [],
+          "errors": [],
+          "abandon_reason": null,
+          "cognitive_walkthrough": null,
+          "cause_type": "unknown",
+          "evidence_refs": [
+            "EV-uvd-3"
+          ]
+        }
+      ],
+      "experience_issues": [
+        {
+          "issue_id": "UX1",
+          "description": "导出功能失效，机构型用户核心任务中断",
+          "severity": "blocker",
+          "frequency_persona_count": 1,
+          "cause_type": "unknown",
+          "affected_personas": [
+            "P2"
+          ],
+          "step_ref": "导出",
+          "cognitive_break_point": false,
+          "evidence_refs": [
+            "EV-uvd-3"
+          ]
+        },
+        {
+          "issue_id": "UX2",
+          "description": "弱网环境下上传超时且无提示",
+          "severity": "major",
+          "frequency_persona_count": 1,
+          "cause_type": "unknown",
+          "affected_personas": [
+            "P3"
+          ],
+          "step_ref": "上传",
+          "cognitive_break_point": false,
+          "evidence_refs": [
+            "EV-uvd-3"
+          ]
+        },
+        {
+          "issue_id": "UX3",
+          "description": "首屏价值主张无法被复述",
+          "severity": "major",
+          "frequency_persona_count": 2,
+          "cause_type": "cognitive",
+          "affected_personas": [
+            "P2",
+            "P3"
+          ],
+          "step_ref": "首页",
+          "cognitive_break_point": true,
+          "evidence_refs": [
+            "EV-uvd-2"
+          ]
+        }
+      ],
+      "simulated_interview": [
+        {
+          "persona_id": "P1",
+          "turns": [
+            {
+              "speaker": "researcher",
+              "text": "你上一次整理重复资料是什么时候？花了多久？"
+            },
+            {
+              "speaker": "user",
+              "text": "上周日，大概三个多小时，最后还是靠文件名猜。"
+            }
+          ],
+          "signals": [
+            {
+              "text": "上周日花了三个多小时",
+              "strength": "strong",
+              "reason": "近期真实行为 + 时间成本"
+            }
+          ],
+          "questions_raised": [
+            "筛掉的资料还能找回来吗？"
+          ],
+          "complaints": [
+            "不敢全信自动筛选"
+          ]
+        },
+        {
+          "persona_id": "P2",
+          "turns": [
+            {
+              "speaker": "researcher",
+              "text": "你们现在怎么核对资料版本？"
+            },
+            {
+              "speaker": "user",
+              "text": "助教人工过一遍，每周两小时，出过一次发错版本的事故。"
+            }
+          ],
+          "signals": [
+            {
+              "text": "每周两小时人工核对，出过事故",
+              "strength": "strong",
+              "reason": "行为 + 成本 + 后果"
+            }
+          ],
+          "questions_raised": [
+            "学生资料存在你们服务器吗？"
+          ],
+          "complaints": [
+            "导出直接失败，没法交付"
+          ]
+        },
+        {
+          "persona_id": "P3",
+          "turns": [
+            {
+              "speaker": "researcher",
+              "text": "通勤场景中哪里失败了？"
+            },
+            {
+              "speaker": "user",
+              "text": "弱网时上传超时，而且没有恢复入口。"
+            }
+          ],
+          "signals": [
+            {
+              "text": "弱网上传超时",
+              "strength": "strong",
+              "reason": "具体任务失败及后果"
+            }
+          ],
+          "questions_raised": [
+            "排序结果能离线使用吗？"
+          ],
+          "complaints": [
+            "上传超时后进度全部丢失。"
+          ]
+        }
+      ],
+      "hidden_needs": [
+        {
+          "description": "需要“可撤销/可追溯”的筛选结果，否则不敢用",
+          "derived_from": "P1 反复确认能否找回被筛掉的资料",
+          "persona_ids": [
+            "P1"
+          ],
+          "fact_type": "inference"
+        }
+      ],
+      "insights": [
+        {
+          "observation": "2/3 Persona 无法复述价值主张",
+          "root_cause": "首屏用功能语言描述，未落到用户任务",
+          "kano_type": "basic",
+          "theme": "价值传达",
+          "recommendation": "首屏改为任务语言：省下多少时间",
+          "evidence_refs": [
+            "EV-uvd-2"
+          ]
+        },
+        {
+          "observation": "机构型用户先问数据存放位置",
+          "root_cause": "涉及学生资料的合规顾虑未被前置回应",
+          "kano_type": "basic",
+          "theme": "信任与合规",
+          "recommendation": "在定价页前明确数据存储与权限说明",
+          "evidence_refs": [
+            "EV-uvd-4"
+          ]
+        }
+      ],
+      "politeness_feedback_removed": [
+        {
+          "text": "整体挺好的",
+          "persona_id": "P1",
+          "reason": "无行为或成本支撑，按 KB-USR-B02 记为礼貌性反馈，权重 0"
+        }
+      ],
+      "realism_check": {
+        "negative_findings_count": 7,
+        "hidden_needs_count": 1,
+        "verdict": "pass",
+        "retries_used": 0
+      }
+    },
+    "user_hypotheses": [
+      {
+        "hypothesis_id": "H1",
+        "statement": "目标用户每周为筛选重复资料花费 2 小时以上",
+        "claim_type": "demand",
+        "fact_type": "inference",
+        "current_evidence_level": "E2",
+        "supporting_refs": [
+          "EV-uvd-1"
+        ],
+        "contradicting_refs": [],
+        "affected_dimensions": [
+          "demand_strength",
+          "pain_severity"
+        ],
+        "decision_impact": "blocking",
+        "status": "open",
+        "carried_from_previous": false,
+        "deferred_reason": null,
+        "priority_score": 48,
+        "priority_rank": 1,
+        "transition_driver": "simulation evidence only; authoritative status remains open",
+        "linked_plan_ids": [
+          "VP1"
+        ]
+      },
+      {
+        "hypothesis_id": "H2",
+        "statement": "学生用户愿意为该产品付费 50 元以内",
+        "claim_type": "willingness_to_pay",
+        "fact_type": "assumption",
+        "current_evidence_level": "E0",
+        "supporting_refs": [],
+        "contradicting_refs": [],
+        "affected_dimensions": [
+          "willingness_to_pay"
+        ],
+        "decision_impact": "high",
+        "status": "open",
+        "carried_from_previous": false,
+        "deferred_reason": null,
+        "priority_score": 22.5,
+        "priority_rank": 2,
+        "transition_driver": "simulation evidence only; authoritative status remains open",
+        "linked_plan_ids": [
+          "VP2"
+        ]
+      },
+      {
+        "hypothesis_id": "H3",
+        "statement": "机构型用户的合规顾虑会阻断采购",
+        "claim_type": "segment",
+        "fact_type": "inference",
+        "current_evidence_level": "E2",
+        "supporting_refs": [
+          "EV-uvd-4"
+        ],
+        "contradicting_refs": [],
+        "affected_dimensions": [
+          "alternative_gap"
+        ],
+        "decision_impact": "medium",
+        "status": "open",
+        "carried_from_previous": false,
+        "deferred_reason": null,
+        "priority_score": 9,
+        "priority_rank": 3,
+        "transition_driver": "simulation evidence only; authoritative status remains open",
+        "linked_plan_ids": [
+          "VP3"
+        ]
+      }
+    ],
+    "top_user_problems": [
+      {
+        "problem_id": "UP-I1",
+        "question": "导出功能失效，机构型用户核心任务中断",
+        "why_it_matters": "A blocker experience issue blocks or materially degrades the user task.",
+        "blocks_which_judgment": "user value judgment",
+        "related_hypothesis_ids": [],
+        "related_issue_ids": [
+          "UX1"
+        ],
+        "rank": 1
+      },
+      {
+        "problem_id": "UP-I2",
+        "question": "弱网环境下上传超时且无提示",
+        "why_it_matters": "A major experience issue blocks or materially degrades the user task.",
+        "blocks_which_judgment": "user value judgment",
+        "related_hypothesis_ids": [],
+        "related_issue_ids": [
+          "UX2"
+        ],
+        "rank": 2
+      },
+      {
+        "problem_id": "UP-I3",
+        "question": "首屏价值主张无法被复述",
+        "why_it_matters": "A major experience issue blocks or materially degrades the user task.",
+        "blocks_which_judgment": "user value judgment",
+        "related_hypothesis_ids": [],
+        "related_issue_ids": [
+          "UX3"
+        ],
+        "rank": 3
+      },
+      {
+        "problem_id": "UP1",
+        "question": "目标用户每周为筛选重复资料花费 2 小时以上",
+        "why_it_matters": "Unresolved at E2; affects demand_strength, pain_severity.",
+        "blocks_which_judgment": "user value judgment",
+        "related_hypothesis_ids": [
+          "H1"
+        ],
+        "related_issue_ids": [],
+        "rank": 4
+      },
+      {
+        "problem_id": "UP2",
+        "question": "学生用户愿意为该产品付费 50 元以内",
+        "why_it_matters": "Unresolved at E0; affects willingness_to_pay.",
+        "blocks_which_judgment": "dimension scoring",
+        "related_hypothesis_ids": [
+          "H2"
+        ],
+        "related_issue_ids": [],
+        "rank": 5
+      }
+    ],
+    "validation_plans": [
+      {
+        "plan_id": "VP1",
+        "hypothesis_id": "H1",
+        "hypothesis": "目标用户每周为筛选重复资料花费 2 小时以上",
+        "validation_target": {
+          "falsifiable_statement": "若 <60% 受访者描述出每周 2 小时以上的真实耗时，则该假设被证伪",
+          "proves_or_disproves": "both"
+        },
+        "target_participants": {
+          "persona_ids": [
+            "P1",
+            "P3"
+          ],
+          "segment_label": "距初试 6 个月内的二战考研生",
+          "must_be_real_user": true
+        },
+        "recruitment_criteria": {
+          "inclusion": [
+            "近 1 个月内自行整理过考研资料",
+            "距初试 6 个月内"
+          ],
+          "exclusion": [
+            "从未自行搜集资料者",
+            "已上岸的学生"
+          ],
+          "screening_questions": [
+            "你上一次整理资料是什么时候？",
+            "那次大概花了多少时间？"
+          ],
+          "channels": [
+            "学校自习室",
+            "考研微信群"
+          ],
+          "pii_handling_note": "仅登记联系方式用于约访，由人工在审批后收集；本 Skill 不采集任何个人信息"
+        },
+        "method": "problem_interview",
+        "method_rationale": "需求真实性与痛点强度属行为类问题，按 KB-USR-V02 用问题访谈而非问卷",
+        "sample_size": {
+          "value": 6,
+          "unit": "persons_per_persona",
+          "basis": "KB-USR-V03：每 Persona 5–8 人",
+          "saturation_rule": "连续 2–3 场无新主题即停",
+          "underpowered": false
+        },
+        "tasks_or_questions": [
+          {
+            "item_id": "Q1",
+            "content": "你上一次整理重复资料是什么时候？",
+            "kind": "past_behavior_question",
+            "question_type": "last_occurrence",
+            "reused_from_previous_round": false
+          },
+          {
+            "item_id": "Q2",
+            "content": "那次花了多少时间／花了多少钱？",
+            "kind": "cost_question",
+            "question_type": "past_time_cost",
+            "reused_from_previous_round": false
+          }
+        ],
+        "success_metrics": [
+          {
+            "metric_id": "M1",
+            "metric": "主动描述出每周 ≥2 小时真实耗时的受访者比例",
+            "metric_type": "behavioral",
+            "measurement_type": "rate",
+            "observable_event": "participant_reports_past_weekly_sorting_time",
+            "commitment_type": null,
+            "measurable": true
+          }
+        ],
+        "success_threshold": {
+          "metric_id": "M1",
+          "operator": ">=",
+          "value": 60,
+          "unit": "percent",
+          "expression": "≥60% 受访者主动提及每周 2 小时以上耗时",
+          "basis": "KB-USR-V03 建议阈值",
+          "reused_from_previous_round": false,
+          "change_reason": null
+        },
+        "duration": {
+          "weeks": 2,
+          "fits_constraints": true,
+          "note": "within stated constraints"
+        },
+        "estimated_cost": {
+          "money_cny": 600,
+          "person_days": 3,
+          "confidence": "medium"
+        },
+        "current_evidence_level": "E2",
+        "target_evidence_level": "E3",
+        "evidence_upgrade": [
+          {
+            "claim_id": "H1",
+            "claim": "目标用户每周为筛选重复资料花费 2 小时以上",
+            "from_tier": "E2",
+            "to_tier": "E3",
+            "upgrade_condition": "≥60% 受访者主动描述真实耗时且达到饱和"
+          }
+        ],
+        "priority_rank": 1,
+        "execution_owner": "human",
+        "needs_human_review": true,
+        "external_actions_required": [
+          "recruit_participants",
+          "contact_users"
+        ],
+        "risks_and_limits": [
+          "访谈样本偏向自习室高频用户，可能高估耗时",
+          "needs_human_review: method \"problem_interview\" involves real users",
+          "needs_human_review: plan recruits real participants"
+        ],
+        "carried_from_previous": false
+      },
+      {
+        "plan_id": "VP2",
+        "hypothesis_id": "H2",
+        "hypothesis": "学生用户愿意为该产品付费 50 元以内",
+        "validation_target": {
+          "falsifiable_statement": "若真实留资/预付转化 <10%，则付费意愿假设被证伪",
+          "proves_or_disproves": "both"
+        },
+        "target_participants": {
+          "persona_ids": [
+            "P1"
+          ],
+          "segment_label": "距初试 6 个月内的二战考研生",
+          "must_be_real_user": true
+        },
+        "recruitment_criteria": {
+          "inclusion": [
+            "访问定价页的真实用户"
+          ],
+          "exclusion": [
+            "团队成员及其熟人",
+            "已上岸的学生"
+          ],
+          "screening_questions": [
+            "你目前处于备考第几轮？"
+          ],
+          "channels": [
+            "考研微信群"
+          ],
+          "pii_handling_note": "留资仅收集单一联系方式，人工审批后执行；本 Skill 只设计不执行"
+        },
+        "method": "pricing_experiment",
+        "method_rationale": "付费意愿必须由真实承诺行为验证，口头询问无效（KB-USR-V02）",
+        "sample_size": {
+          "value": 100,
+          "unit": "persons_total",
+          "basis": "KB-USR-V03：定价实验需足量曝光",
+          "saturation_rule": null,
+          "underpowered": false
+        },
+        "tasks_or_questions": [
+          {
+            "item_id": "T1",
+            "content": "在定价页选择套餐并提交预约",
+            "kind": "task",
+            "question_type": null,
+            "reused_from_previous_round": false
+          }
+        ],
+        "success_metrics": [
+          {
+            "metric_id": "M2",
+            "metric": "真实预约转化率",
+            "metric_type": "commitment",
+            "measurement_type": "commitment",
+            "observable_event": "reservation_created",
+            "commitment_type": "reservation_created",
+            "measurable": true
+          }
+        ],
+        "success_threshold": {
+          "metric_id": "M2",
+          "operator": ">=",
+          "value": 10,
+          "unit": "percent",
+          "expression": "真实预约转化 ≥10%",
+          "basis": "KB-USR-V03 建议阈值（视客单价调整）",
+          "reused_from_previous_round": false,
+          "change_reason": null
+        },
+        "duration": {
+          "weeks": 3,
+          "fits_constraints": true,
+          "note": "within stated constraints"
+        },
+        "estimated_cost": {
+          "money_cny": 1500,
+          "person_days": 4,
+          "confidence": "low"
+        },
+        "current_evidence_level": "E0",
+        "target_evidence_level": "E4",
+        "evidence_upgrade": [
+          {
+            "claim_id": "H2",
+            "claim": "学生用户愿意为该产品付费 50 元以内",
+            "from_tier": "E0",
+            "to_tier": "E4",
+            "upgrade_condition": "留资转化 ≥10% 且为真实用户行为"
+          }
+        ],
+        "priority_rank": 2,
+        "execution_owner": "human",
+        "needs_human_review": true,
+        "external_actions_required": [
+          "publish_landing_page",
+          "collect_personal_data",
+          "recruit_participants",
+          "charge_or_collect_deposit"
+        ],
+        "risks_and_limits": [
+          "落地页转化受文案影响大，不能单独证明长期付费",
+          "needs_human_review: method \"pricing_experiment\" involves real users",
+          "needs_human_review: plan recruits real participants"
+        ],
+        "carried_from_previous": false
+      },
+      {
+        "plan_id": "VP3",
+        "hypothesis_id": "H3",
+        "hypothesis": "机构型用户的合规顾虑会阻断采购",
+        "validation_target": {
+          "falsifiable_statement": "若少于 60% 的真实机构用户能描述最近一次因合规要求放弃采购，则该阻断假设不成立",
+          "proves_or_disproves": "both"
+        },
+        "target_participants": {
+          "persona_ids": [
+            "P2"
+          ],
+          "segment_label": "机构型用户",
+          "must_be_real_user": true
+        },
+        "recruitment_criteria": {
+          "inclusion": [
+            "近 1 个月内自行整理过考研资料",
+            "距初试 6 个月内"
+          ],
+          "exclusion": [
+            "从未自行搜集资料者",
+            "已上岸的学生"
+          ],
+          "screening_questions": [
+            "你上一次整理资料是什么时候？",
+            "那次大概花了多少时间？"
+          ],
+          "channels": [
+            "学校自习室",
+            "考研微信群"
+          ],
+          "pii_handling_note": "仅登记联系方式用于约访，由人工在审批后收集；本 Skill 不采集任何个人信息"
+        },
+        "method": "problem_interview",
+        "method_rationale": "需求真实性与痛点强度属行为类问题，按 KB-USR-V02 用问题访谈而非问卷",
+        "sample_size": {
+          "value": 6,
+          "unit": "persons_per_persona",
+          "basis": "KB-USR-V03：每 Persona 5–8 人",
+          "saturation_rule": "连续 2–3 场无新主题即停",
+          "underpowered": false
+        },
+        "tasks_or_questions": [
+          {
+            "item_id": "Q1",
+            "content": "你上一次因为合规要求放弃或延迟采购是什么时候？",
+            "kind": "past_behavior_question",
+            "question_type": "last_occurrence",
+            "reused_from_previous_round": false
+          },
+          {
+            "item_id": "Q2",
+            "content": "当时具体哪项要求阻断了流程，最后如何处理？",
+            "kind": "past_behavior_question",
+            "question_type": "past_failure",
+            "reused_from_previous_round": false
+          }
+        ],
+        "success_metrics": [
+          {
+            "metric_id": "M3",
+            "metric": "能描述最近一次真实合规阻断行为的机构用户比例",
+            "metric_type": "behavioral",
+            "measurement_type": "rate",
+            "observable_event": "participant_reports_recent_compliance_block",
+            "commitment_type": null,
+            "measurable": true
+          }
+        ],
+        "success_threshold": {
+          "metric_id": "M3",
+          "operator": ">=",
+          "value": 60,
+          "unit": "percent",
+          "expression": "≥60% 受访机构用户描述最近一次真实合规阻断行为",
+          "basis": "预注册的行为证据阈值",
+          "reused_from_previous_round": false,
+          "change_reason": null
+        },
+        "duration": {
+          "weeks": 2,
+          "fits_constraints": true,
+          "note": "within stated constraints"
+        },
+        "estimated_cost": {
+          "money_cny": 600,
+          "person_days": 3,
+          "confidence": "medium"
+        },
+        "current_evidence_level": "E2",
+        "target_evidence_level": "E3",
+        "evidence_upgrade": [
+          {
+            "claim_id": "H3",
+            "claim": "机构型用户的合规顾虑会阻断采购",
+            "from_tier": "E2",
+            "to_tier": "E3",
+            "upgrade_condition": "至少 60% 的真实机构用户描述最近一次合规阻断行为"
+          }
+        ],
+        "priority_rank": 3,
+        "execution_owner": "human",
+        "needs_human_review": true,
+        "external_actions_required": [
+          "recruit_participants",
+          "contact_users"
+        ],
+        "risks_and_limits": [
+          "访谈样本偏向自习室高频用户，可能高估耗时",
+          "needs_human_review: method \"problem_interview\" involves real users",
+          "needs_human_review: plan recruits real participants"
+        ],
+        "carried_from_previous": false
+      }
+    ],
+    "deferred_validations": [],
+    "evidence_level_summary": {
+      "max_tier_achieved": "E2",
+      "max_ingested_tier": "E0",
+      "max_applicable_tier": "E2",
+      "has_real_user_evidence": false,
+      "tier_distribution": {
+        "E0": 1,
+        "E1": 0,
+        "E2": 4,
+        "E3": 0,
+        "E4": 0,
+        "E5": 0
+      },
+      "ingested_tier_distribution": {
+        "E0": 1,
+        "E1": 0,
+        "E2": 0,
+        "E3": 0,
+        "E4": 0,
+        "E5": 0
+      },
+      "applicable_tier_distribution": {
+        "E0": 0,
+        "E1": 0,
+        "E2": 2,
+        "E3": 0,
+        "E4": 0,
+        "E5": 0
+      },
+      "simulation_capped": true,
+      "downgraded_entries": [],
+      "expiry_unknown_refs": [
+        "EV-USR-SIMONLY-0001"
+      ],
+      "per_claim": [
+        {
+          "claim_id": "H1",
+          "claim": "目标用户每周为筛选重复资料花费 2 小时以上",
+          "current_tier": "E2",
+          "target_tier": "E3",
+          "upgrade_plan_id": "VP1",
+          "upgradable": true
+        },
+        {
+          "claim_id": "H2",
+          "claim": "学生用户愿意为该产品付费 50 元以内",
+          "current_tier": "E0",
+          "target_tier": "E4",
+          "upgrade_plan_id": "VP2",
+          "upgradable": true
+        },
+        {
+          "claim_id": "H3",
+          "claim": "机构型用户的合规顾虑会阻断采购",
+          "current_tier": "E2",
+          "target_tier": "E3",
+          "upgrade_plan_id": "VP3",
+          "upgradable": true
+        }
+      ],
+      "judgment_ceiling": {
+        "applied": false,
+        "ceiling": "unverified",
+        "reason": ">=3 dimensions uncounted for lack of evidence"
+      }
+    },
+    "evidence_effect_ledger": [
+      {
+        "evidence_id": "EV-uvd-1",
+        "claim_id": "H1",
+        "relation": "support",
+        "effective_tier": "E2",
+        "scope_valid": true,
+        "product_version_valid": true,
+        "semantic_valid": true
+      },
+      {
+        "evidence_id": "EV-uvd-1",
+        "claim_id": "H2",
+        "relation": "not_applicable",
+        "effective_tier": "E2",
+        "scope_valid": true,
+        "product_version_valid": true,
+        "semantic_valid": true
+      },
+      {
+        "evidence_id": "EV-uvd-1",
+        "claim_id": "H3",
+        "relation": "not_applicable",
+        "effective_tier": "E2",
+        "scope_valid": true,
+        "product_version_valid": true,
+        "semantic_valid": true
+      },
+      {
+        "evidence_id": "EV-uvd-2",
+        "claim_id": "H1",
+        "relation": "neutral",
+        "effective_tier": "E2",
+        "scope_valid": true,
+        "product_version_valid": true,
+        "semantic_valid": true
+      },
+      {
+        "evidence_id": "EV-uvd-2",
+        "claim_id": "H2",
+        "relation": "not_applicable",
+        "effective_tier": "E2",
+        "scope_valid": true,
+        "product_version_valid": true,
+        "semantic_valid": true
+      },
+      {
+        "evidence_id": "EV-uvd-2",
+        "claim_id": "H3",
+        "relation": "not_applicable",
+        "effective_tier": "E2",
+        "scope_valid": true,
+        "product_version_valid": true,
+        "semantic_valid": true
+      },
+      {
+        "evidence_id": "EV-uvd-3",
+        "claim_id": "H1",
+        "relation": "neutral",
+        "effective_tier": "E2",
+        "scope_valid": true,
+        "product_version_valid": true,
+        "semantic_valid": true
+      },
+      {
+        "evidence_id": "EV-uvd-3",
+        "claim_id": "H2",
+        "relation": "not_applicable",
+        "effective_tier": "E2",
+        "scope_valid": true,
+        "product_version_valid": true,
+        "semantic_valid": true
+      },
+      {
+        "evidence_id": "EV-uvd-3",
+        "claim_id": "H3",
+        "relation": "not_applicable",
+        "effective_tier": "E2",
+        "scope_valid": true,
+        "product_version_valid": true,
+        "semantic_valid": true
+      },
+      {
+        "evidence_id": "EV-uvd-4",
+        "claim_id": "H1",
+        "relation": "not_applicable",
+        "effective_tier": "E2",
+        "scope_valid": true,
+        "product_version_valid": true,
+        "semantic_valid": true
+      },
+      {
+        "evidence_id": "EV-uvd-4",
+        "claim_id": "H2",
+        "relation": "not_applicable",
+        "effective_tier": "E2",
+        "scope_valid": true,
+        "product_version_valid": true,
+        "semantic_valid": true
+      },
+      {
+        "evidence_id": "EV-uvd-4",
+        "claim_id": "H3",
+        "relation": "support",
+        "effective_tier": "E2",
+        "scope_valid": true,
+        "product_version_valid": true,
+        "semantic_valid": true
+      },
+      {
+        "evidence_id": "EV-USR-SIMONLY-0001",
+        "claim_id": "H1",
+        "relation": "not_applicable",
+        "effective_tier": "E0",
+        "scope_valid": false,
+        "product_version_valid": false,
+        "semantic_valid": true
+      },
+      {
+        "evidence_id": "EV-USR-SIMONLY-0001",
+        "claim_id": "H2",
+        "relation": "not_applicable",
+        "effective_tier": "E0",
+        "scope_valid": false,
+        "product_version_valid": false,
+        "semantic_valid": true
+      },
+      {
+        "evidence_id": "EV-USR-SIMONLY-0001",
+        "claim_id": "H3",
+        "relation": "not_applicable",
+        "effective_tier": "E0",
+        "scope_valid": false,
+        "product_version_valid": false,
+        "semantic_valid": true
+      }
+    ],
+    "missing_information": [
+      {
+        "field": "target_users.raw_description",
+        "state": "unknown",
+        "why_it_matters": "The target user description lacks quantified qualifiers, so persona confidence is reduced.",
+        "affected_units": [
+          "s1",
+          "s2"
+        ],
+        "affected_dimensions": [],
+        "how_to_obtain": "Add behavioural qualifiers: frequency, budget, deadline, current alternative."
+      }
+    ],
+    "conflicts": [],
+    "critical_issue": {
+      "issue": "导出功能失效，机构型用户核心任务中断",
+      "impact": "A blocker user-task issue prevents a core workflow from completing for 1 Persona(s).",
+      "recommendation": "Resolve and re-test 导出 before treating the user review as complete.",
+      "evidence_refs": [
+        "EV-uvd-3"
+      ]
+    },
+    "flags": {
+      "target_user_too_broad": false,
+      "persona_homogeneous": false,
+      "simulation_unrealistic": false,
+      "pseudo_demand_risk": false,
+      "value_communication_failure": true,
+      "high_switching_friction": true,
+      "retention_risk": true,
+      "politeness_only_feedback": true,
+      "compliance_concern": false,
+      "external_action_pending_approval": true,
+      "prompt_injection_observed": false,
+      "conflict": false
+    },
+    "out_of_scope_redirects": [],
+    "evidence_cards": [
+      {
+        "evidence_id": "EV-uvd-1",
+        "evidence_type": "persona_evidence",
+        "source": "simulation://s2/P1",
+        "source_tier": "tier_3",
+        "timestamp": "2026-08-09T02:00:00.000Z",
+        "reliability_level": "E2",
+        "supporting_claims": [
+          "P1"
+        ],
+        "applicability": {
+          "product_version": "V1.0",
+          "scope": "s2",
+          "environment": null,
+          "persona_ids": [
+            "P1"
+          ],
+          "segment": null,
+          "valid_for_dimensions": [
+            "demand_strength",
+            "pain_severity"
+          ]
+        },
+        "expiry": "unknown",
+        "content_hash": "6f9060908e9b4b45a9dba33af09ec7d4509bf394a327641176d6eced2ea8c635",
+        "observation": "模拟建模：P1 每周为筛资料花费约 5 小时，已用 Excel 清单绕行",
+        "fact_type": "inference",
+        "simulation_note": "AI simulation output. Capped at E2; not a real user statement."
+      },
+      {
+        "evidence_id": "EV-uvd-2",
+        "evidence_type": "simulated_experience_evidence",
+        "source": "simulation://s4a/P2",
+        "source_tier": "tier_3",
+        "timestamp": "2026-08-09T02:00:00.000Z",
+        "reliability_level": "E2",
+        "supporting_claims": [
+          "P2"
+        ],
+        "applicability": {
+          "product_version": "V1.0",
+          "scope": "s4a",
+          "environment": null,
+          "persona_ids": [
+            "P2"
+          ],
+          "segment": null,
+          "valid_for_dimensions": [
+            "demand_strength"
+          ]
+        },
+        "expiry": "unknown",
+        "content_hash": "91cef7d9b7c2cc0c8871a5ff4aa4c5e43789d268ee2e7aa93338989b0fab68f3",
+        "observation": "模拟首体验：2/3 Persona 无法复述价值主张",
+        "fact_type": "inference",
+        "simulation_note": "AI simulation output. Capped at E2; not a real user statement."
+      },
+      {
+        "evidence_id": "EV-uvd-3",
+        "evidence_type": "simulated_task_evidence",
+        "source": "simulation://s4b/P2",
+        "source_tier": "tier_3",
+        "timestamp": "2026-08-09T02:00:00.000Z",
+        "reliability_level": "E2",
+        "supporting_claims": [
+          "P2"
+        ],
+        "applicability": {
+          "product_version": "V1.0",
+          "scope": "s4b",
+          "environment": null,
+          "persona_ids": [
+            "P2"
+          ],
+          "segment": null,
+          "valid_for_dimensions": [
+            "pain_severity"
+          ]
+        },
+        "expiry": "unknown",
+        "content_hash": "2a4f78308199874951b91dc9ee26d16afd6cbe049730aeee03ccaefd2cd91798",
+        "observation": "模拟任务测试：导出任务失败（功能性），弱网上传超时",
+        "fact_type": "inference",
+        "simulation_note": "AI simulation output. Capped at E2; not a real user statement."
+      },
+      {
+        "evidence_id": "EV-uvd-4",
+        "evidence_type": "simulated_interview_evidence",
+        "source": "simulation://s5/P2",
+        "source_tier": "tier_3",
+        "timestamp": "2026-08-09T02:00:00.000Z",
+        "reliability_level": "E2",
+        "supporting_claims": [
+          "P2"
+        ],
+        "applicability": {
+          "product_version": "V1.0",
+          "scope": "s5",
+          "environment": null,
+          "persona_ids": [
+            "P2"
+          ],
+          "segment": null,
+          "valid_for_dimensions": [
+            "alternative_gap"
+          ]
+        },
+        "expiry": "unknown",
+        "content_hash": "2d10702bae452417c3091db96f329607236117938116130b914c3b35c9b00fbe",
+        "observation": "模拟访谈：机构型用户首先追问数据存放与权限",
+        "fact_type": "inference",
+        "simulation_note": "AI simulation output. Capped at E2; not a real user statement."
+      }
+    ],
+    "handoff": {
+      "to_product_team_expert_agent": {
+        "experience_issues": [
+          {
+            "issue_id": "UX1",
+            "description": "导出功能失效，机构型用户核心任务中断",
+            "severity": "blocker",
+            "frequency_persona_count": 1,
+            "cause_type": "unknown",
+            "affected_personas": [
+              "P2"
+            ],
+            "step_ref": "导出",
+            "cognitive_break_point": false,
+            "evidence_refs": [
+              "EV-uvd-3"
+            ]
+          },
+          {
+            "issue_id": "UX2",
+            "description": "弱网环境下上传超时且无提示",
+            "severity": "major",
+            "frequency_persona_count": 1,
+            "cause_type": "unknown",
+            "affected_personas": [
+              "P3"
+            ],
+            "step_ref": "上传",
+            "cognitive_break_point": false,
+            "evidence_refs": [
+              "EV-uvd-3"
+            ]
+          },
+          {
+            "issue_id": "UX3",
+            "description": "首屏价值主张无法被复述",
+            "severity": "major",
+            "frequency_persona_count": 2,
+            "cause_type": "cognitive",
+            "affected_personas": [
+              "P2",
+              "P3"
+            ],
+            "step_ref": "首页",
+            "cognitive_break_point": true,
+            "evidence_refs": [
+              "EV-uvd-2"
+            ]
+          }
+        ],
+        "journey_drop_offs": [
+          {
+            "scenario_id": "SC1",
+            "persona_id": "P1",
+            "stage": "trial",
+            "pain": "价值主张不清晰",
+            "emotion": 2
+          },
+          {
+            "scenario_id": "SC1",
+            "persona_id": "P1",
+            "stage": "continued_use",
+            "pain": "缺乏持续使用理由",
+            "emotion": 2
+          },
+          {
+            "scenario_id": "SC1",
+            "persona_id": "P1",
+            "stage": "referral",
+            "pain": null,
+            "emotion": 3
+          },
+          {
+            "scenario_id": "SC2",
+            "persona_id": "P2",
+            "stage": "awareness",
+            "pain": "合规疑虑",
+            "emotion": 2
+          },
+          {
+            "scenario_id": "SC2",
+            "persona_id": "P2",
+            "stage": "trial",
+            "pain": "采购流程",
+            "emotion": 2
+          },
+          {
+            "scenario_id": "SC2",
+            "persona_id": "P2",
+            "stage": "first_use",
+            "pain": null,
+            "emotion": 2
+          },
+          {
+            "scenario_id": "SC2",
+            "persona_id": "P2",
+            "stage": "continued_use",
+            "pain": null,
+            "emotion": 2
+          },
+          {
+            "scenario_id": "SC2",
+            "persona_id": "P2",
+            "stage": "referral",
+            "pain": null,
+            "emotion": 2
+          },
+          {
+            "scenario_id": "SC3",
+            "persona_id": "P3",
+            "stage": "trial",
+            "pain": "注册项过多",
+            "emotion": 1
+          },
+          {
+            "scenario_id": "SC3",
+            "persona_id": "P3",
+            "stage": "first_use",
+            "pain": "无离线能力",
+            "emotion": 1
+          },
+          {
+            "scenario_id": "SC3",
+            "persona_id": "P3",
+            "stage": "continued_use",
+            "pain": null,
+            "emotion": 1
+          },
+          {
+            "scenario_id": "SC3",
+            "persona_id": "P3",
+            "stage": "referral",
+            "pain": null,
+            "emotion": 1
+          }
+        ],
+        "value_communication_failure": true,
+        "task_test_matrix": [
+          {
+            "persona_id": "P1",
+            "task_key": "upload_and_rank",
+            "result": "completed_with_difficulty",
+            "reason": null,
+            "path": [
+              "start",
+              "upload_and_rank",
+              "result"
+            ],
+            "hesitation_steps": [
+              "选择去重强度"
+            ],
+            "errors": [],
+            "abandon_reason": null,
+            "cognitive_walkthrough": null,
+            "cause_type": "cognitive",
+            "evidence_refs": [
+              "EV-uvd-3"
+            ]
+          },
+          {
+            "persona_id": "P1",
+            "task_key": "adjust_by_deadline",
+            "result": "completed",
+            "reason": null,
+            "path": [
+              "start",
+              "adjust_by_deadline",
+              "result"
+            ],
+            "hesitation_steps": [],
+            "errors": [],
+            "abandon_reason": null,
+            "cognitive_walkthrough": null,
+            "cause_type": "unknown",
+            "evidence_refs": [
+              "EV-uvd-3"
+            ]
+          },
+          {
+            "persona_id": "P1",
+            "task_key": "export_weekly_plan",
+            "result": "completed",
+            "reason": null,
+            "path": [
+              "start",
+              "export_weekly_plan",
+              "result"
+            ],
+            "hesitation_steps": [],
+            "errors": [],
+            "abandon_reason": null,
+            "cognitive_walkthrough": null,
+            "cause_type": "unknown",
+            "evidence_refs": [
+              "EV-uvd-3"
+            ]
+          },
+          {
+            "persona_id": "P2",
+            "task_key": "upload_and_rank",
+            "result": "completed",
+            "reason": null,
+            "path": [
+              "start",
+              "upload_and_rank",
+              "result"
+            ],
+            "hesitation_steps": [],
+            "errors": [],
+            "abandon_reason": null,
+            "cognitive_walkthrough": null,
+            "cause_type": "unknown",
+            "evidence_refs": [
+              "EV-uvd-3"
+            ]
+          },
+          {
+            "persona_id": "P2",
+            "task_key": "adjust_by_deadline",
+            "result": "completed",
+            "reason": null,
+            "path": [
+              "start",
+              "adjust_by_deadline",
+              "result"
+            ],
+            "hesitation_steps": [],
+            "errors": [],
+            "abandon_reason": null,
+            "cognitive_walkthrough": null,
+            "cause_type": "unknown",
+            "evidence_refs": [
+              "EV-uvd-3"
+            ]
+          },
+          {
+            "persona_id": "P2",
+            "task_key": "export_weekly_plan",
+            "result": "failed",
+            "reason": null,
+            "path": [
+              "start",
+              "export_weekly_plan",
+              "result"
+            ],
+            "hesitation_steps": [],
+            "errors": [
+              "导出按钮无响应"
+            ],
+            "abandon_reason": "导出失败，无法交付给学生",
+            "cognitive_walkthrough": {
+              "will_try_correct_goal": true,
+              "will_notice_correct_action": true,
+              "can_link_action_to_goal": true,
+              "can_understand_feedback": false
+            },
+            "cause_type": "unknown",
+            "evidence_refs": [
+              "EV-uvd-3"
+            ]
+          },
+          {
+            "persona_id": "P3",
+            "task_key": "upload_and_rank",
+            "result": "failed",
+            "reason": null,
+            "path": [
+              "start",
+              "upload_and_rank",
+              "result"
+            ],
+            "hesitation_steps": [],
+            "errors": [
+              "弱网下上传超时"
+            ],
+            "abandon_reason": "加载不出来",
+            "cognitive_walkthrough": {
+              "will_try_correct_goal": true,
+              "will_notice_correct_action": false,
+              "can_link_action_to_goal": true,
+              "can_understand_feedback": false
+            },
+            "cause_type": "unknown",
+            "evidence_refs": [
+              "EV-uvd-3"
+            ]
+          },
+          {
+            "persona_id": "P3",
+            "task_key": "adjust_by_deadline",
+            "result": "completed",
+            "reason": null,
+            "path": [
+              "start",
+              "adjust_by_deadline",
+              "result"
+            ],
+            "hesitation_steps": [],
+            "errors": [],
+            "abandon_reason": null,
+            "cognitive_walkthrough": null,
+            "cause_type": "unknown",
+            "evidence_refs": [
+              "EV-uvd-3"
+            ]
+          },
+          {
+            "persona_id": "P3",
+            "task_key": "export_weekly_plan",
+            "result": "completed",
+            "reason": null,
+            "path": [
+              "start",
+              "export_weekly_plan",
+              "result"
+            ],
+            "hesitation_steps": [],
+            "errors": [],
+            "abandon_reason": null,
+            "cognitive_walkthrough": null,
+            "cause_type": "unknown",
+            "evidence_refs": [
+              "EV-uvd-3"
+            ]
+          }
+        ],
+        "contract_note": "User-side phenomena and cognitive attribution only; all of it is E2 simulation. Functional and technical attribution is your call. Where our cause_type disagrees with yours, both are retained as a conflict rather than reconciled here."
+      },
+      "to_investment_business_agent": {
+        "demand_strength": {
+          "score": 4,
+          "counted": true,
+          "cap_reason": null,
+          "max_tier": "E2",
+          "evidence_refs": [
+            "EV-uvd-1"
+          ]
+        },
+        "usage_frequency": {
+          "score": null,
+          "counted": false,
+          "cap_reason": "no_user_evidence",
+          "max_tier": "E0",
+          "evidence_refs": []
+        },
+        "willingness_to_pay": {
+          "score": null,
+          "counted": false,
+          "cap_reason": "no_user_evidence",
+          "max_tier": "E0",
+          "evidence_refs": []
+        },
+        "virality_potential": {
+          "score": null,
+          "counted": false,
+          "cap_reason": "no_user_evidence",
+          "max_tier": "E0",
+          "evidence_refs": []
+        },
+        "payer_vs_user": {
+          "segments": [
+            {
+              "segment_id": "SEG1",
+              "who_pays": "学生本人",
+              "who_adopts_first": "自习室高频使用者",
+              "payer_differs_from_user": false,
+              "fact_type": "assumption"
+            }
+          ]
+        },
+        "alternatives": [
+          {
+            "scenario_id": "SC1",
+            "name": "手动整理文件夹 + Excel 清单",
+            "alternative_type": "workaround",
+            "cost": {
+              "money": "0",
+              "time": "每周 5 小时",
+              "effort": "高"
+            },
+            "gap": "无法判断内容是否重复，只能靠文件名",
+            "fact_type": "assumption"
+          },
+          {
+            "scenario_id": "SC1",
+            "name": "什么都不做",
+            "alternative_type": "do_nothing",
+            "cost": {
+              "money": "0",
+              "time": "0",
+              "effort": "低"
+            },
+            "gap": "资料越堆越多，焦虑加剧",
+            "fact_type": "assumption"
+          },
+          {
+            "scenario_id": "SC2",
+            "name": "继续维持现状",
+            "alternative_type": "do_nothing",
+            "cost": {
+              "money": "0",
+              "time": "0",
+              "effort": "低"
+            },
+            "gap": "版本混乱继续存在",
+            "fact_type": "assumption"
+          },
+          {
+            "scenario_id": "SC2",
+            "name": "机构自建资料库 + 人工校对",
+            "alternative_type": "direct_product",
+            "cost": {
+              "money": "已投入",
+              "time": "每周 2 小时",
+              "effort": "中"
+            },
+            "gap": "版本混乱但已被接受",
+            "fact_type": "assumption"
+          },
+          {
+            "scenario_id": "SC3",
+            "name": "暂不处理",
+            "alternative_type": "do_nothing",
+            "cost": {
+              "money": "0",
+              "time": "0",
+              "effort": "低"
+            },
+            "gap": "碎片信息继续累积",
+            "fact_type": "assumption"
+          },
+          {
+            "scenario_id": "SC3",
+            "name": "刷公众号文章",
+            "alternative_type": "manual",
+            "cost": {
+              "money": "0",
+              "time": "1 小时",
+              "effort": "低"
+            },
+            "gap": "内容零散，不成体系",
+            "fact_type": "assumption"
+          }
+        ],
+        "switching_forces_summary": [
+          {
+            "scenario_id": "SC1",
+            "persona_id": "P1",
+            "push": 4,
+            "pull": 4,
+            "anxiety": 3,
+            "habit": 3,
+            "verdict": "will_switch",
+            "basis": "绕行成本 4，push 按 KB-USR-F02 提至 4",
+            "push_forced_by_workaround_cost": false
+          },
+          {
+            "scenario_id": "SC2",
+            "persona_id": "P2",
+            "push": 2,
+            "pull": 3,
+            "anxiety": 4,
+            "habit": 4,
+            "verdict": "will_not_switch",
+            "basis": "anxiety+habit(8) >= push+pull(5)",
+            "push_forced_by_workaround_cost": false
+          },
+          {
+            "scenario_id": "SC3",
+            "persona_id": "P3",
+            "push": 3,
+            "pull": 3,
+            "anxiety": 3,
+            "habit": 4,
+            "verdict": "will_not_switch",
+            "basis": "习惯强，弱网体验差",
+            "push_forced_by_workaround_cost": false
+          }
+        ],
+        "contract_note": "Demand-side evidence strength only. Market sizing, pricing and investment value are yours. willingness_to_pay is an ordinal signal, not a price point; stated intent is recorded as a weak signal. Real-user evidence present: false."
+      },
+      "to_evidence_calibration_agent": {
+        "evidence_cards": [
+          {
+            "evidence_id": "EV-uvd-1",
+            "evidence_type": "persona_evidence",
+            "source": "simulation://s2/P1",
+            "source_tier": "tier_3",
+            "timestamp": "2026-08-09T02:00:00.000Z",
+            "reliability_level": "E2",
+            "supporting_claims": [
+              "P1"
+            ],
+            "applicability": {
+              "product_version": "V1.0",
+              "scope": "s2",
+              "environment": null,
+              "persona_ids": [
+                "P1"
+              ],
+              "segment": null,
+              "valid_for_dimensions": [
+                "demand_strength",
+                "pain_severity"
+              ]
+            },
+            "expiry": "unknown",
+            "content_hash": "6f9060908e9b4b45a9dba33af09ec7d4509bf394a327641176d6eced2ea8c635",
+            "observation": "模拟建模：P1 每周为筛资料花费约 5 小时，已用 Excel 清单绕行",
+            "fact_type": "inference",
+            "simulation_note": "AI simulation output. Capped at E2; not a real user statement."
+          },
+          {
+            "evidence_id": "EV-uvd-2",
+            "evidence_type": "simulated_experience_evidence",
+            "source": "simulation://s4a/P2",
+            "source_tier": "tier_3",
+            "timestamp": "2026-08-09T02:00:00.000Z",
+            "reliability_level": "E2",
+            "supporting_claims": [
+              "P2"
+            ],
+            "applicability": {
+              "product_version": "V1.0",
+              "scope": "s4a",
+              "environment": null,
+              "persona_ids": [
+                "P2"
+              ],
+              "segment": null,
+              "valid_for_dimensions": [
+                "demand_strength"
+              ]
+            },
+            "expiry": "unknown",
+            "content_hash": "91cef7d9b7c2cc0c8871a5ff4aa4c5e43789d268ee2e7aa93338989b0fab68f3",
+            "observation": "模拟首体验：2/3 Persona 无法复述价值主张",
+            "fact_type": "inference",
+            "simulation_note": "AI simulation output. Capped at E2; not a real user statement."
+          },
+          {
+            "evidence_id": "EV-uvd-3",
+            "evidence_type": "simulated_task_evidence",
+            "source": "simulation://s4b/P2",
+            "source_tier": "tier_3",
+            "timestamp": "2026-08-09T02:00:00.000Z",
+            "reliability_level": "E2",
+            "supporting_claims": [
+              "P2"
+            ],
+            "applicability": {
+              "product_version": "V1.0",
+              "scope": "s4b",
+              "environment": null,
+              "persona_ids": [
+                "P2"
+              ],
+              "segment": null,
+              "valid_for_dimensions": [
+                "pain_severity"
+              ]
+            },
+            "expiry": "unknown",
+            "content_hash": "2a4f78308199874951b91dc9ee26d16afd6cbe049730aeee03ccaefd2cd91798",
+            "observation": "模拟任务测试：导出任务失败（功能性），弱网上传超时",
+            "fact_type": "inference",
+            "simulation_note": "AI simulation output. Capped at E2; not a real user statement."
+          },
+          {
+            "evidence_id": "EV-uvd-4",
+            "evidence_type": "simulated_interview_evidence",
+            "source": "simulation://s5/P2",
+            "source_tier": "tier_3",
+            "timestamp": "2026-08-09T02:00:00.000Z",
+            "reliability_level": "E2",
+            "supporting_claims": [
+              "P2"
+            ],
+            "applicability": {
+              "product_version": "V1.0",
+              "scope": "s5",
+              "environment": null,
+              "persona_ids": [
+                "P2"
+              ],
+              "segment": null,
+              "valid_for_dimensions": [
+                "alternative_gap"
+              ]
+            },
+            "expiry": "unknown",
+            "content_hash": "2d10702bae452417c3091db96f329607236117938116130b914c3b35c9b00fbe",
+            "observation": "模拟访谈：机构型用户首先追问数据存放与权限",
+            "fact_type": "inference",
+            "simulation_note": "AI simulation output. Capped at E2; not a real user statement."
+          }
+        ],
+        "issued_evidence_cards": [
+          {
+            "evidence_id": "EV-uvd-1",
+            "evidence_type": "persona_evidence",
+            "source": "simulation://s2/P1",
+            "source_tier": "tier_3",
+            "timestamp": "2026-08-09T02:00:00.000Z",
+            "reliability_level": "E2",
+            "supporting_claims": [
+              "P1"
+            ],
+            "applicability": {
+              "product_version": "V1.0",
+              "scope": "s2",
+              "environment": null,
+              "persona_ids": [
+                "P1"
+              ],
+              "segment": null,
+              "valid_for_dimensions": [
+                "demand_strength",
+                "pain_severity"
+              ]
+            },
+            "expiry": "unknown",
+            "content_hash": "6f9060908e9b4b45a9dba33af09ec7d4509bf394a327641176d6eced2ea8c635",
+            "observation": "模拟建模：P1 每周为筛资料花费约 5 小时，已用 Excel 清单绕行",
+            "fact_type": "inference",
+            "simulation_note": "AI simulation output. Capped at E2; not a real user statement."
+          },
+          {
+            "evidence_id": "EV-uvd-2",
+            "evidence_type": "simulated_experience_evidence",
+            "source": "simulation://s4a/P2",
+            "source_tier": "tier_3",
+            "timestamp": "2026-08-09T02:00:00.000Z",
+            "reliability_level": "E2",
+            "supporting_claims": [
+              "P2"
+            ],
+            "applicability": {
+              "product_version": "V1.0",
+              "scope": "s4a",
+              "environment": null,
+              "persona_ids": [
+                "P2"
+              ],
+              "segment": null,
+              "valid_for_dimensions": [
+                "demand_strength"
+              ]
+            },
+            "expiry": "unknown",
+            "content_hash": "91cef7d9b7c2cc0c8871a5ff4aa4c5e43789d268ee2e7aa93338989b0fab68f3",
+            "observation": "模拟首体验：2/3 Persona 无法复述价值主张",
+            "fact_type": "inference",
+            "simulation_note": "AI simulation output. Capped at E2; not a real user statement."
+          },
+          {
+            "evidence_id": "EV-uvd-3",
+            "evidence_type": "simulated_task_evidence",
+            "source": "simulation://s4b/P2",
+            "source_tier": "tier_3",
+            "timestamp": "2026-08-09T02:00:00.000Z",
+            "reliability_level": "E2",
+            "supporting_claims": [
+              "P2"
+            ],
+            "applicability": {
+              "product_version": "V1.0",
+              "scope": "s4b",
+              "environment": null,
+              "persona_ids": [
+                "P2"
+              ],
+              "segment": null,
+              "valid_for_dimensions": [
+                "pain_severity"
+              ]
+            },
+            "expiry": "unknown",
+            "content_hash": "2a4f78308199874951b91dc9ee26d16afd6cbe049730aeee03ccaefd2cd91798",
+            "observation": "模拟任务测试：导出任务失败（功能性），弱网上传超时",
+            "fact_type": "inference",
+            "simulation_note": "AI simulation output. Capped at E2; not a real user statement."
+          },
+          {
+            "evidence_id": "EV-uvd-4",
+            "evidence_type": "simulated_interview_evidence",
+            "source": "simulation://s5/P2",
+            "source_tier": "tier_3",
+            "timestamp": "2026-08-09T02:00:00.000Z",
+            "reliability_level": "E2",
+            "supporting_claims": [
+              "P2"
+            ],
+            "applicability": {
+              "product_version": "V1.0",
+              "scope": "s5",
+              "environment": null,
+              "persona_ids": [
+                "P2"
+              ],
+              "segment": null,
+              "valid_for_dimensions": [
+                "alternative_gap"
+              ]
+            },
+            "expiry": "unknown",
+            "content_hash": "2d10702bae452417c3091db96f329607236117938116130b914c3b35c9b00fbe",
+            "observation": "模拟访谈：机构型用户首先追问数据存放与权限",
+            "fact_type": "inference",
+            "simulation_note": "AI simulation output. Capped at E2; not a real user statement."
+          }
+        ],
+        "ingested_evidence_refs": [
+          "EV-USR-SIMONLY-0001"
+        ],
+        "ingested_evidence": [
+          {
+            "evidence_id": "EV-USR-SIMONLY-0001",
+            "kind": "team_statement",
+            "source": "团队提交的项目说明",
+            "reliability_level": "E0",
+            "source_tier": "tier_3",
+            "timestamp": "2026-08-01",
+            "sample_size": null,
+            "requested_valid_for_dimensions": null,
+            "sample_adequacy": "not_applicable",
+            "recommended_min": null,
+            "expiry": "unknown",
+            "observation": "团队称考研生普遍有资料筛选痛点，但未提供任何用户侧记录",
+            "applies_to_segment": "距考试 3 个月内的二战考研生",
+            "supporting_claims": [],
+            "contradicting_claims": [],
+            "applicability": {
+              "product_version": "unknown",
+              "scope": "existing_user_evidence",
+              "environment": null,
+              "persona_ids": [],
+              "segment": "距考试 3 个月内的二战考研生",
+              "valid_for_dimensions": []
+            },
+            "fact_type": "inference",
+            "origin": "caller_supplied",
+            "version_stable": false,
+            "stable_reason": null,
+            "integrity_valid": false,
+            "product_version_valid": false,
+            "semantic_valid": true,
+            "content_hash": "c15fb1f06bd992ede281c9c4df66e0fee5a3b762d8405517decf06a580a65d12",
+            "scope_valid": false
+          }
+        ],
+        "fact_inference_assumption_split": {
+          "fact": 0,
+          "inference": 7,
+          "assumption": 18
+        },
+        "conflict_pairs": [],
+        "downgraded_entries": [],
+        "expiry_unknown_refs": [
+          "EV-uvd-1",
+          "EV-uvd-2",
+          "EV-uvd-3",
+          "EV-uvd-4",
+          "EV-USR-SIMONLY-0001"
+        ],
+        "simulation_capped": true,
+        "contract_note": "All simulated cards are capped at E2 by program, never by prompt. This skill issues no E3+ card. Expiry is not defaulted here (DECISIONS D-04); entries in expiry_unknown_refs need your validity ruling. On rejection we re-evidence or downgrade; we do not argue."
+      },
+      "to_review_supervisor_agent": {
+        "overall_judgment": "insufficient_evidence",
+        "user_value_judgment": "unverified",
+        "evidence_confidence": "low",
+        "critical_issue": {
+          "issue": "导出功能失效，机构型用户核心任务中断",
+          "impact": "A blocker user-task issue prevents a core workflow from completing for 1 Persona(s).",
+          "recommendation": "Resolve and re-test 导出 before treating the user review as complete.",
+          "evidence_refs": [
+            "EV-uvd-3"
+          ]
+        },
+        "key_real_evidence_refs": [],
+        "next_actions": [
+          {
+            "action": "VP1: run problem_interview for H1 (2w, approval required before any real-user contact)",
+            "owner_hint": "human",
+            "verifiable_outcome": "H1 moves E2 -> E3 when ≥60% 受访者主动提及每周 2 小时以上耗时 is met"
+          },
+          {
+            "action": "VP2: run pricing_experiment for H2 (3w, approval required before any real-user contact)",
+            "owner_hint": "human",
+            "verifiable_outcome": "H2 moves E0 -> E4 when 真实预约转化 ≥10% is met"
+          },
+          {
+            "action": "VP3: run problem_interview for H3 (2w, approval required before any real-user contact)",
+            "owner_hint": "human",
+            "verifiable_outcome": "H3 moves E2 -> E3 when ≥60% 受访机构用户描述最近一次真实合规阻断行为 is met"
+          }
+        ],
+        "top_risks": [
+          {
+            "problem_id": "UP-I1",
+            "question": "导出功能失效，机构型用户核心任务中断",
+            "blocks_which_judgment": "user value judgment"
+          },
+          {
+            "problem_id": "UP-I2",
+            "question": "弱网环境下上传超时且无提示",
+            "blocks_which_judgment": "user value judgment"
+          },
+          {
+            "problem_id": "UP-I3",
+            "question": "首屏价值主张无法被复述",
+            "blocks_which_judgment": "user value judgment"
+          }
+        ],
+        "validation_plans_digest": [
+          {
+            "plan_id": "VP1",
+            "hypothesis_id": "H1",
+            "method": "problem_interview",
+            "current_evidence_level": "E2",
+            "target_evidence_level": "E3",
+            "duration_weeks": 2,
+            "needs_human_review": true
+          },
+          {
+            "plan_id": "VP2",
+            "hypothesis_id": "H2",
+            "method": "pricing_experiment",
+            "current_evidence_level": "E0",
+            "target_evidence_level": "E4",
+            "duration_weeks": 3,
+            "needs_human_review": true
+          },
+          {
+            "plan_id": "VP3",
+            "hypothesis_id": "H3",
+            "method": "problem_interview",
+            "current_evidence_level": "E2",
+            "target_evidence_level": "E3",
+            "duration_weeks": 2,
+            "needs_human_review": true
+          }
+        ],
+        "missing_information": [
+          {
+            "field": "target_users.raw_description",
+            "state": "unknown",
+            "why_it_matters": "The target user description lacks quantified qualifiers, so persona confidence is reduced.",
+            "affected_units": [
+              "s1",
+              "s2"
+            ],
+            "affected_dimensions": [],
+            "how_to_obtain": "Add behavioural qualifiers: frequency, budget, deadline, current alternative."
+          }
+        ],
+        "needs_human_review": true,
+        "contract_note": "User-side judgment only; no project-level recommendation is included. user_value_judgment is the internal five-band verdict; overall_judgment is the shared four-value field. The score is an ordinal for demand-side evidence strength, not a success probability and not a measure of liking."
+      }
+    },
+    "regression_comparison": null,
+    "run_manifest": {
+      "product_tasks_hash": "a3ca0315dff486cfcd48961cbd45a2915825332101e91678fed63e46256797af",
+      "scoring_schema_version": "0.1",
+      "skill_version": "1.0.5",
+      "task_id": "T-UVD-20260809-004",
+      "project_id": "PRJ-KAOYAN-NOTES",
+      "mode": "first_validation",
+      "effective_retry_limit": 2,
+      "product_version": "V1.0",
+      "capabilities": {
+        "product_reader": "available",
+        "evidence_writer": "available",
+        "simulation_engine": "available",
+        "kb_retriever": "not_bound"
+      },
+      "standard_change_reason": null,
+      "state_hash": "602c9accd9187d2bf91aa8e3ef2c2e4b3c92ef98875d3f8cbb28ea4940adfd1d",
+      "upstream_evidence_refs": []
+    },
+    "integrity_diagnostics": [
+      {
+        "code": "product_version_mismatch",
+        "ref": "EV-USR-SIMONLY-0001",
+        "detail": "unknown does not apply to V1.0"
+      },
+      {
+        "code": "applicability_gap",
+        "ref": "EV-USR-SIMONLY-0001",
+        "detail": "integrity/version scope invalid"
+      }
+    ],
+    "rejected_output": [],
+    "execution_log": [
+      {
+        "step_id": "s1",
+        "capability": null,
+        "tool_call_id": null,
+        "outcome": "completed",
+        "detail": "Envelope valid. Mode first_validation. Retriever bound: false. Capabilities: {\"product_reader\":\"available\",\"evidence_writer\":\"available\",\"simulation_engine\":\"available\",\"kb_retriever\":\"not_bound\"}.",
+        "evidence_ids": [],
+        "retries": 0,
+        "kb_ids": []
+      },
+      {
+        "step_id": "s1",
+        "capability": null,
+        "tool_call_id": null,
+        "outcome": "completed",
+        "detail": "Admission borderline. The audience is demographic-only or missing behavioural, situational, pain, payer, or adoption constraints; modelling may proceed only with reduced confidence.",
+        "evidence_ids": [],
+        "retries": 0,
+        "kb_ids": [
+          "KB-USR-R04",
+          "KB-USR-S1",
+          "KB-USR-P02"
+        ]
+      },
+      {
+        "step_id": "s2",
+        "capability": "simulation_engine",
+        "tool_call_id": "T-UVD-20260809-004:s2:1",
+        "outcome": "completed",
+        "detail": "3 personas modelled across high_need / skeptic / edge_case",
+        "evidence_ids": [
+          "EV-uvd-1"
+        ],
+        "retries": 0,
+        "kb_ids": [
+          "KB-USR-F01",
+          "KB-USR-G01",
+          "KB-USR-G02",
+          "KB-USR-G03",
+          "KB-USR-S1"
+        ]
+      },
+      {
+        "step_id": "s3",
+        "capability": "simulation_engine",
+        "tool_call_id": "T-UVD-20260809-004:s3:1",
+        "outcome": "completed",
+        "detail": "3 scenarios with alternatives and switching forces",
+        "evidence_ids": [],
+        "retries": 0,
+        "kb_ids": [
+          "KB-USR-F02",
+          "KB-USR-F03",
+          "KB-USR-F04",
+          "KB-USR-S2"
+        ]
+      },
+      {
+        "step_id": "s4a",
+        "capability": "simulation_engine,product_reader",
+        "tool_call_id": "T-UVD-20260809-004:s4a:1",
+        "outcome": "completed",
+        "detail": "first-experience simulation for 3 personas",
+        "evidence_ids": [
+          "EV-uvd-2"
+        ],
+        "retries": 0,
+        "kb_ids": [
+          "KB-USR-F03",
+          "KB-USR-F06",
+          "KB-USR-S3"
+        ]
+      },
+      {
+        "step_id": "s4b",
+        "capability": "simulation_engine,product_reader",
+        "tool_call_id": "T-UVD-20260809-004:s4b:1",
+        "outcome": "completed",
+        "detail": "core task test across 3 personas",
+        "evidence_ids": [
+          "EV-uvd-3"
+        ],
+        "retries": 0,
+        "kb_ids": [
+          "KB-USR-F06",
+          "KB-USR-F04",
+          "KB-USR-S4"
+        ]
+      },
+      {
+        "step_id": "s5",
+        "capability": "simulation_engine",
+        "tool_call_id": "T-UVD-20260809-004:s5:1",
+        "outcome": "completed",
+        "detail": "simulated interviews, insights and hypotheses",
+        "evidence_ids": [
+          "EV-uvd-4"
+        ],
+        "retries": 0,
+        "kb_ids": [
+          "KB-USR-F07",
+          "KB-USR-F05",
+          "KB-USR-S5"
+        ]
+      },
+      {
+        "step_id": "s6",
+        "capability": null,
+        "tool_call_id": "T-UVD-20260809-004:s6:1",
+        "outcome": "completed",
+        "detail": "2 validation plans designed (design only; execution is human)",
+        "evidence_ids": [],
+        "retries": 0,
+        "kb_ids": [
+          "KB-USR-V01",
+          "KB-USR-V02",
+          "KB-USR-V03",
+          "KB-USR-V04",
+          "KB-USR-S6"
+        ]
+      },
+      {
+        "step_id": "s7_synthesis",
+        "capability": null,
+        "tool_call_id": null,
+        "outcome": "completed",
+        "detail": "Issued cards 4, ingested records 1, max tier E2, real-user evidence false. Uncounted dimensions 4. user_value_judgment unverified. Plans published 3, rejected 0.",
+        "evidence_ids": [],
+        "retries": 0,
+        "kb_ids": [
+          "KB-USR-VS01",
+          "KB-USR-VS02",
+          "KB-USR-VS03"
+        ]
+      }
+    ],
+    "human_report": "# 考研资料速筛助手｜用户验证\n\n> **用户需求：待验证**　**证据可信度：低**\n> 目前还不能确认用户是否真正需要并会持续使用，先补最关键的真实用户证据。\n\n## 1. 一眼看懂\n- **核心用户：** 下载完一批资料，发现和上周的重复，需要快速筛掉重复资料的人\n- **可争取：** 已经在用机构自建资料库 + 人工校对，但仍想要更好结果的人\n- **暂不优先：** 当前痛点不强、切换动力较弱的人\n- **为什么会用：** 距离初试只剩 4 个月，重复资料让我焦虑\n- **为什么不用：** 学生资料上传第三方有合规顾虑\n- **最大问题：** 导出功能失效，机构型用户核心任务中断\n\n## 2. 当前最关键的问题\n1. **导出功能失效，机构型用户核心任务中断**：这个问题会削弱用户对产品价值的判断。\n2. **上传过程存在阻塞**：这个问题会削弱用户对产品价值的判断。\n3. **首屏价值主张无法被复述**：这个问题会削弱用户对产品价值的判断。\n\n## 3. 下一版先改什么\n- **P0**｜围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。\n- **P0**｜围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。\n- **P1**｜围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。\n\n## 4. 为什么这么判断\n| 维度 | 判断 | 依据 |\n|---|---|---|\n| 用户需求 | 强 | 模拟 Persona 表现出高绕行成本（） |\n| 使用频率 | 待验证 | 备考期近似日频 |\n| 痛点强度 | 强 | 频率 5 × 强度 4 × 绕行成本 4 |\n| 替代差距 | 待验证 | 替代方案有明确缺点但已被接受 |\n| 付费意愿 | 待验证 | 仅口头意愿，按 记为弱信号（） |\n| 传播性 | 待验证 | 私用场景，缺乏天然传播动机 |\n- **AI 模拟推演，仅供参考**：2/3 Persona 无法复述价值主张\n> **仍待确认：** The target user description lacks quantified qualifie…\n\n## 5. 下一步怎么验证\n1. **目标用户每周为筛选重复资料花费 2 小时以上**｜流失用户访谈：你上一次整理重复资料是什么时候？｜看：≥60% 受访者主动提及每周 2 小时以上耗时\n2. **学生用户愿意为该产品付费 50 元以内**｜真实收费测试：在定价页选择套餐并提交预约｜看：真实预约转化 ≥10%",
+    "human_report_html": "<!doctype html>\n<html lang=\"zh-CN\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>考研资料速筛助手｜用户验证精简版</title>\n<style>\n:root{--bg:#f5f7fb;--ink:#152033;--muted:#6b7485;--line:#e5e9f0;--brand:#3157d5;--core:#0f8b70;--core-soft:#eaf8f3;--core-line:#bde8d9;--consider:#5264d9;--consider-soft:#eef0ff;--consider-line:#d3d8ff;--later:#bd781b;--later-soft:#fff7e8;--later-line:#f1d6a8;--danger:#c2413b;--danger-soft:#fff0ef;--success:#14855f;--warning:#b87316}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",\"PingFang SC\",\"Microsoft YaHei\",sans-serif;line-height:1.65}.wrap{max-width:980px;margin:auto;padding:22px}.hero{background:linear-gradient(135deg,#17264a,#3157d5);color:#fff;border-radius:20px;padding:28px 30px;box-shadow:0 16px 40px #213a8224}.hero-top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.hero h1{font-size:26px;margin:0}.hero p{margin:12px 0 0;font-size:14px;max-width:760px;color:#eef2ff}.badges{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.badge{font-size:12px;padding:5px 10px;border:1px solid #ffffff3b;background:#ffffff17;border-radius:999px}.reading-path{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px;font-size:12px;color:#d9e1ff}.section{background:#fff;border:1px solid var(--line);border-radius:17px;padding:22px;margin-top:14px;box-shadow:0 2px 10px #17203308}.section h2{font-size:18px;margin:0 0 15px}.section-lead{font-size:12px;color:var(--muted);margin:-7px 0 14px}.audiences{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.audience-card{position:relative;padding:16px;border-radius:14px;border:1px solid;min-height:126px}.audience-card:before{content:\"\";position:absolute;left:0;right:0;top:0;height:4px;border-radius:14px 14px 0 0}.audience-core{background:var(--core-soft);border-color:var(--core-line)}.audience-core:before{background:var(--core)}.audience-consider{background:var(--consider-soft);border-color:var(--consider-line)}.audience-consider:before{background:var(--consider)}.audience-later{background:var(--later-soft);border-color:var(--later-line)}.audience-later:before{background:var(--later)}.audience-kicker{font-size:12px;font-weight:800;margin:1px 0 7px}.audience-core .audience-kicker{color:var(--core)}.audience-consider .audience-kicker{color:var(--consider)}.audience-later .audience-kicker{color:var(--later)}.audience-card strong{display:block;font-size:14px}.audience-card p{font-size:12px;color:var(--muted);margin:7px 0 0}.best-fit{margin:12px 0 0;padding:10px 13px;border-radius:10px;background:#f8fafc;border:1px solid #edf0f4;font-size:13px;font-weight:650}.decision-strip{display:grid;grid-template-columns:1fr 1fr 1.15fr;margin-top:12px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff}.decision-item{padding:11px 13px;min-height:72px}.decision-item+.decision-item{border-left:1px solid var(--line)}.decision-item b{display:block;font-size:12px;margin-bottom:4px}.decision-use b{color:var(--success)}.decision-no b{color:var(--warning)}.decision-risk{background:var(--danger-soft)}.decision-risk b{color:var(--danger)}.decision-item span{font-size:13px}.problem-card{display:flex;gap:13px;padding:12px 0;border-bottom:1px solid var(--line)}.problem-card:last-child{border-bottom:0}.problem-index{display:flex;align-items:center;justify-content:center;min-width:34px;height:28px;border-radius:8px;background:var(--danger-soft);color:var(--danger);font-weight:800;font-size:12px}.problem-card strong{font-size:14px}.problem-card p{margin:3px 0 0;color:var(--muted);font-size:13px}.priority{list-style:none;padding:0;margin:0}.priority li{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--line)}.priority li:last-child{border-bottom:0}.priority-tag{min-width:36px;color:#fff;border-radius:7px;text-align:center;height:25px;line-height:25px;font-size:11px}.priority-p0{background:var(--danger)}.priority-p1{background:var(--brand)}.priority span{font-size:13px;padding-top:2px}.full-cta{display:flex;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(90deg,#f1f4ff,#f8faff);border:1px solid #dce3ff;border-radius:14px;padding:14px 16px;margin-top:14px}.full-cta strong{display:block;font-size:13px}.full-cta span{font-size:12px;color:var(--muted)}.full-cta b{white-space:nowrap;background:var(--brand);color:#fff;border-radius:9px;padding:8px 12px;font-size:12px}.muted{color:var(--muted);font-size:13px}.footer{text-align:center;color:#8790a4;font-size:11px;padding:14px}\n@media(max-width:760px){.wrap{padding:12px}.hero{padding:22px}.hero-top{display:block}.badges{justify-content:flex-start;margin-top:10px}.audiences{grid-template-columns:1fr}.decision-strip{grid-template-columns:1fr}.decision-item+.decision-item{border-left:0;border-top:1px solid var(--line)}.section{padding:17px}.full-cta{align-items:flex-start}.full-cta b{display:none}}\n</style></head><body><main class=\"wrap\">\n<section class=\"hero\"><div class=\"hero-top\"><div><h1>考研资料速筛助手｜用户验证精简版</h1></div><div class=\"badges\"><span class=\"badge\">用户需求：待验证</span><span class=\"badge\">证据可信度：低</span></div></div><p>目前还不能确认用户是否真正需要并会持续使用，先补最关键的真实用户证据。</p><div class=\"reading-path\"><span>3–5 秒：先看客户与结论</span><span>→</span><span>30 秒：看关键问题与动作</span></div></section>\n<section class=\"section\"><h2>1. 一眼看懂</h2><div class=\"audiences\">\n      <article class=\"audience-card audience-core\">\n        <div class=\"audience-kicker\">核心用户</div>\n        <strong>下载完一批资料，发现和上周的重复，需要快速筛掉重复资料的人</strong>\n        <p>距离初试只剩 4 个月，重复资料让我焦虑</p>\n      </article>\n      <article class=\"audience-card audience-consider\">\n        <div class=\"audience-kicker\">可争取用户</div>\n        <strong>已经在用机构自建资料库 + 人工校对，但仍想要更好结果的人</strong>\n        <p>机构已有资料库，换工具要说服负责人</p>\n      </article>\n      <article class=\"audience-card audience-later\">\n        <div class=\"audience-kicker\">暂不优先</div>\n        <strong>当前痛点不强、切换动力较弱的人</strong>\n        <p>弱网加载不出来</p>\n      </article></div><div class=\"best-fit\">当前最值得争取的是下载完一批资料，发现和上周的重复，需要快速筛掉重复资料的人群，而不是所有目标用户。</div><div class=\"decision-strip\"><div class=\"decision-item decision-use\"><b>为什么会用</b><span>距离初试只剩 4 个月，重复资料让我焦虑</span></div><div class=\"decision-item decision-no\"><b>为什么不用</b><span>学生资料上传第三方有合规顾虑</span></div><div class=\"decision-item decision-risk\"><b>最大问题</b><span>导出功能失效，机构型用户核心任务中断</span></div></div></section>\n<section class=\"section\"><h2>2. 当前最关键的问题</h2><p class=\"section-lead\">只保留会改变下一版产品决策的 Top 问题。</p>\n      <article class=\"problem-card\">\n        <span class=\"problem-index\">01</span>\n        <div><strong>导出功能失效，机构型用户核心任务中断</strong><p>这个问题会削弱用户对产品价值的判断。</p></div>\n      </article>\n      <article class=\"problem-card\">\n        <span class=\"problem-index\">02</span>\n        <div><strong>上传过程存在阻塞</strong><p>这个问题会削弱用户对产品价值的判断。</p></div>\n      </article>\n      <article class=\"problem-card\">\n        <span class=\"problem-index\">03</span>\n        <div><strong>首屏价值主张无法被复述</strong><p>这个问题会削弱用户对产品价值的判断。</p></div>\n      </article></section>\n<section class=\"section\"><h2>3. 下一版先改什么</h2><p class=\"section-lead\">优先处理最影响用户切换和复用的事项。</p><ul class=\"priority\"><li><b class=\"priority-tag priority-p0\">P0</b><span>围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。</span></li><li><b class=\"priority-tag priority-p0\">P0</b><span>围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。</span></li><li><b class=\"priority-tag priority-p1\">P1</b><span>围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。</span></li></ul><div class=\"full-cta\"><div><strong>需要写策划书、比赛材料或核查证据？</strong><span>同次运行会同时生成《用户验证完备版》，包含用户画像、证据、评分依据与完整执行方案。</span></div><b>查看完备版</b></div></section>\n<div class=\"footer\">精简版用于快速决策；完备版用于证据核查、执行与材料引用。</div></main></body></html>",
+    "summary_report": "# 考研资料速筛助手｜用户验证\n\n> **用户需求：待验证**　**证据可信度：低**\n> 目前还不能确认用户是否真正需要并会持续使用，先补最关键的真实用户证据。\n\n## 1. 一眼看懂\n- **核心用户：** 下载完一批资料，发现和上周的重复，需要快速筛掉重复资料的人\n- **可争取：** 已经在用机构自建资料库 + 人工校对，但仍想要更好结果的人\n- **暂不优先：** 当前痛点不强、切换动力较弱的人\n- **为什么会用：** 距离初试只剩 4 个月，重复资料让我焦虑\n- **为什么不用：** 学生资料上传第三方有合规顾虑\n- **最大问题：** 导出功能失效，机构型用户核心任务中断\n\n## 2. 当前最关键的问题\n1. **导出功能失效，机构型用户核心任务中断**：这个问题会削弱用户对产品价值的判断。\n2. **上传过程存在阻塞**：这个问题会削弱用户对产品价值的判断。\n3. **首屏价值主张无法被复述**：这个问题会削弱用户对产品价值的判断。\n\n## 3. 下一版先改什么\n- **P0**｜围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。\n- **P0**｜围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。\n- **P1**｜围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。\n\n## 4. 为什么这么判断\n| 维度 | 判断 | 依据 |\n|---|---|---|\n| 用户需求 | 强 | 模拟 Persona 表现出高绕行成本（） |\n| 使用频率 | 待验证 | 备考期近似日频 |\n| 痛点强度 | 强 | 频率 5 × 强度 4 × 绕行成本 4 |\n| 替代差距 | 待验证 | 替代方案有明确缺点但已被接受 |\n| 付费意愿 | 待验证 | 仅口头意愿，按 记为弱信号（） |\n| 传播性 | 待验证 | 私用场景，缺乏天然传播动机 |\n- **AI 模拟推演，仅供参考**：2/3 Persona 无法复述价值主张\n> **仍待确认：** The target user description lacks quantified qualifie…\n\n## 5. 下一步怎么验证\n1. **目标用户每周为筛选重复资料花费 2 小时以上**｜流失用户访谈：你上一次整理重复资料是什么时候？｜看：≥60% 受访者主动提及每周 2 小时以上耗时\n2. **学生用户愿意为该产品付费 50 元以内**｜真实收费测试：在定价页选择套餐并提交预约｜看：真实预约转化 ≥10%",
+    "summary_report_html": "<!doctype html>\n<html lang=\"zh-CN\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>考研资料速筛助手｜用户验证精简版</title>\n<style>\n:root{--bg:#f5f7fb;--ink:#152033;--muted:#6b7485;--line:#e5e9f0;--brand:#3157d5;--core:#0f8b70;--core-soft:#eaf8f3;--core-line:#bde8d9;--consider:#5264d9;--consider-soft:#eef0ff;--consider-line:#d3d8ff;--later:#bd781b;--later-soft:#fff7e8;--later-line:#f1d6a8;--danger:#c2413b;--danger-soft:#fff0ef;--success:#14855f;--warning:#b87316}\n*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",\"PingFang SC\",\"Microsoft YaHei\",sans-serif;line-height:1.65}.wrap{max-width:980px;margin:auto;padding:22px}.hero{background:linear-gradient(135deg,#17264a,#3157d5);color:#fff;border-radius:20px;padding:28px 30px;box-shadow:0 16px 40px #213a8224}.hero-top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.hero h1{font-size:26px;margin:0}.hero p{margin:12px 0 0;font-size:14px;max-width:760px;color:#eef2ff}.badges{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.badge{font-size:12px;padding:5px 10px;border:1px solid #ffffff3b;background:#ffffff17;border-radius:999px}.reading-path{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px;font-size:12px;color:#d9e1ff}.section{background:#fff;border:1px solid var(--line);border-radius:17px;padding:22px;margin-top:14px;box-shadow:0 2px 10px #17203308}.section h2{font-size:18px;margin:0 0 15px}.section-lead{font-size:12px;color:var(--muted);margin:-7px 0 14px}.audiences{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.audience-card{position:relative;padding:16px;border-radius:14px;border:1px solid;min-height:126px}.audience-card:before{content:\"\";position:absolute;left:0;right:0;top:0;height:4px;border-radius:14px 14px 0 0}.audience-core{background:var(--core-soft);border-color:var(--core-line)}.audience-core:before{background:var(--core)}.audience-consider{background:var(--consider-soft);border-color:var(--consider-line)}.audience-consider:before{background:var(--consider)}.audience-later{background:var(--later-soft);border-color:var(--later-line)}.audience-later:before{background:var(--later)}.audience-kicker{font-size:12px;font-weight:800;margin:1px 0 7px}.audience-core .audience-kicker{color:var(--core)}.audience-consider .audience-kicker{color:var(--consider)}.audience-later .audience-kicker{color:var(--later)}.audience-card strong{display:block;font-size:14px}.audience-card p{font-size:12px;color:var(--muted);margin:7px 0 0}.best-fit{margin:12px 0 0;padding:10px 13px;border-radius:10px;background:#f8fafc;border:1px solid #edf0f4;font-size:13px;font-weight:650}.decision-strip{display:grid;grid-template-columns:1fr 1fr 1.15fr;margin-top:12px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff}.decision-item{padding:11px 13px;min-height:72px}.decision-item+.decision-item{border-left:1px solid var(--line)}.decision-item b{display:block;font-size:12px;margin-bottom:4px}.decision-use b{color:var(--success)}.decision-no b{color:var(--warning)}.decision-risk{background:var(--danger-soft)}.decision-risk b{color:var(--danger)}.decision-item span{font-size:13px}.problem-card{display:flex;gap:13px;padding:12px 0;border-bottom:1px solid var(--line)}.problem-card:last-child{border-bottom:0}.problem-index{display:flex;align-items:center;justify-content:center;min-width:34px;height:28px;border-radius:8px;background:var(--danger-soft);color:var(--danger);font-weight:800;font-size:12px}.problem-card strong{font-size:14px}.problem-card p{margin:3px 0 0;color:var(--muted);font-size:13px}.priority{list-style:none;padding:0;margin:0}.priority li{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--line)}.priority li:last-child{border-bottom:0}.priority-tag{min-width:36px;color:#fff;border-radius:7px;text-align:center;height:25px;line-height:25px;font-size:11px}.priority-p0{background:var(--danger)}.priority-p1{background:var(--brand)}.priority span{font-size:13px;padding-top:2px}.full-cta{display:flex;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(90deg,#f1f4ff,#f8faff);border:1px solid #dce3ff;border-radius:14px;padding:14px 16px;margin-top:14px}.full-cta strong{display:block;font-size:13px}.full-cta span{font-size:12px;color:var(--muted)}.full-cta b{white-space:nowrap;background:var(--brand);color:#fff;border-radius:9px;padding:8px 12px;font-size:12px}.muted{color:var(--muted);font-size:13px}.footer{text-align:center;color:#8790a4;font-size:11px;padding:14px}\n@media(max-width:760px){.wrap{padding:12px}.hero{padding:22px}.hero-top{display:block}.badges{justify-content:flex-start;margin-top:10px}.audiences{grid-template-columns:1fr}.decision-strip{grid-template-columns:1fr}.decision-item+.decision-item{border-left:0;border-top:1px solid var(--line)}.section{padding:17px}.full-cta{align-items:flex-start}.full-cta b{display:none}}\n</style></head><body><main class=\"wrap\">\n<section class=\"hero\"><div class=\"hero-top\"><div><h1>考研资料速筛助手｜用户验证精简版</h1></div><div class=\"badges\"><span class=\"badge\">用户需求：待验证</span><span class=\"badge\">证据可信度：低</span></div></div><p>目前还不能确认用户是否真正需要并会持续使用，先补最关键的真实用户证据。</p><div class=\"reading-path\"><span>3–5 秒：先看客户与结论</span><span>→</span><span>30 秒：看关键问题与动作</span></div></section>\n<section class=\"section\"><h2>1. 一眼看懂</h2><div class=\"audiences\">\n      <article class=\"audience-card audience-core\">\n        <div class=\"audience-kicker\">核心用户</div>\n        <strong>下载完一批资料，发现和上周的重复，需要快速筛掉重复资料的人</strong>\n        <p>距离初试只剩 4 个月，重复资料让我焦虑</p>\n      </article>\n      <article class=\"audience-card audience-consider\">\n        <div class=\"audience-kicker\">可争取用户</div>\n        <strong>已经在用机构自建资料库 + 人工校对，但仍想要更好结果的人</strong>\n        <p>机构已有资料库，换工具要说服负责人</p>\n      </article>\n      <article class=\"audience-card audience-later\">\n        <div class=\"audience-kicker\">暂不优先</div>\n        <strong>当前痛点不强、切换动力较弱的人</strong>\n        <p>弱网加载不出来</p>\n      </article></div><div class=\"best-fit\">当前最值得争取的是下载完一批资料，发现和上周的重复，需要快速筛掉重复资料的人群，而不是所有目标用户。</div><div class=\"decision-strip\"><div class=\"decision-item decision-use\"><b>为什么会用</b><span>距离初试只剩 4 个月，重复资料让我焦虑</span></div><div class=\"decision-item decision-no\"><b>为什么不用</b><span>学生资料上传第三方有合规顾虑</span></div><div class=\"decision-item decision-risk\"><b>最大问题</b><span>导出功能失效，机构型用户核心任务中断</span></div></div></section>\n<section class=\"section\"><h2>2. 当前最关键的问题</h2><p class=\"section-lead\">只保留会改变下一版产品决策的 Top 问题。</p>\n      <article class=\"problem-card\">\n        <span class=\"problem-index\">01</span>\n        <div><strong>导出功能失效，机构型用户核心任务中断</strong><p>这个问题会削弱用户对产品价值的判断。</p></div>\n      </article>\n      <article class=\"problem-card\">\n        <span class=\"problem-index\">02</span>\n        <div><strong>上传过程存在阻塞</strong><p>这个问题会削弱用户对产品价值的判断。</p></div>\n      </article>\n      <article class=\"problem-card\">\n        <span class=\"problem-index\">03</span>\n        <div><strong>首屏价值主张无法被复述</strong><p>这个问题会削弱用户对产品价值的判断。</p></div>\n      </article></section>\n<section class=\"section\"><h2>3. 下一版先改什么</h2><p class=\"section-lead\">优先处理最影响用户切换和复用的事项。</p><ul class=\"priority\"><li><b class=\"priority-tag priority-p0\">P0</b><span>围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。</span></li><li><b class=\"priority-tag priority-p0\">P0</b><span>围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。</span></li><li><b class=\"priority-tag priority-p1\">P1</b><span>围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。</span></li></ul><div class=\"full-cta\"><div><strong>需要写策划书、比赛材料或核查证据？</strong><span>同次运行会同时生成《用户验证完备版》，包含用户画像、证据、评分依据与完整执行方案。</span></div><b>查看完备版</b></div></section>\n<div class=\"footer\">精简版用于快速决策；完备版用于证据核查、执行与材料引用。</div></main></body></html>",
+    "full_report": "# 考研资料速筛助手｜用户验证完备版\n\n> **用户需求：待验证**　**证据可信度：低**\n> 目前还不能确认用户是否真正需要并会持续使用，先补最关键的真实用户证据。\n\n## 1. 核心结论与目标用户\n- **核心用户：** 下载完一批资料，发现和上周的重复，需要快速筛掉重复资料的人\n- **可争取：** 已经在用机构自建资料库 + 人工校对，但仍想要更好结果的人\n- **暂不优先：** 当前痛点不强、切换动力较弱的人\n- **总判断：** 当前最值得争取的是下载完一批资料，发现和上周的重复，需要快速筛掉重复资料的人群，而不是所有目标用户。\n- **最大问题：** 导出功能失效，机构型用户核心任务中断\n\n## 2. 用户画像与使用场景\n### 1. 二战考研生 · 每天刷资料超 1 小时，时间极紧\n- **典型场景：** 下载完一批资料，发现和上周的重复\n- **核心目标：** 当我在自习室复习时，我想快速筛掉重复资料，以便把时间花在真正没掌握的考点上\n- **当前替代：** 手动整理文件夹 + Excel 清单\n- **为什么会用：** 距离初试只剩 4 个月，重复资料让我焦虑\n- **为什么可能不用：** 怕筛掉自己还没掌握的考点\n- **切换判断：** 切换动力较强\n- **主要痛点：** 同一考点资料重复下载，筛选耗时\n### 2. 考研机构助教 · 已有内部资料库，最挑剔\n- **典型场景：** 负责人要求核对本期资料版本\n- **核心目标：** 当我给学生发资料时，我想确认资料没有重复和过期，以便不被学生质疑专业度\n- **当前替代：** 机构自建资料库 + 人工校对\n- **为什么会用：** 机构已有资料库，换工具要说服负责人\n- **为什么可能不用：** 学生资料上传第三方有合规顾虑\n- **切换判断：** 当前切换动力较弱\n- **主要痛点：** 现有资料库维护靠人工，版本混乱\n### 3. 在职跨考生 · 通勤碎片时间，弱网络低预算\n- **典型场景：** 地铁上想利用碎片时间\n- **核心目标：** 当我通勤时，我想用碎片时间看最该看的资料，以便不浪费仅有的学习时间\n- **当前替代：** 什么都不做，随便看看公众号\n- **为什么会用：** 每天只有 1 小时通勤可用\n- **为什么可能不用：** 弱网加载不出来\n- **切换判断：** 当前切换动力较弱\n- **主要痛点：** 弱网下加载慢，干脆放弃\n\n## 3. 关键证据与判断依据\n- **AI 模拟推演，仅供参考：** 2/3 Persona 无法复述价值主张\n- **AI 模拟推演，仅供参考：** 机构型用户先问数据存放位置\n\n## 4. 当前最关键的用户问题\n### 问题 1：导出功能失效，机构型用户核心任务中断\n- **发现依据：** 导出功能失效，机构型用户核心任务中断\n- **为什么重要：** 这个问题会削弱用户对产品价值的判断。\n- **建议：** 围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。\n### 问题 2：上传过程存在阻塞\n- **发现依据：** 弱网环境下上传超时且无提示\n- **为什么重要：** 这个问题会削弱用户对产品价值的判断。\n- **建议：** 围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。\n### 问题 3：首屏价值主张无法被复述\n- **发现依据：** 首屏价值主张无法被复述\n- **为什么重要：** 这个问题会削弱用户对产品价值的判断。\n- **建议：** 围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。\n\n## 5. 用户价值评分框架\n| 维度 | 当前判断 | 一句话依据 |\n|---|---|---|\n| 用户需求 | 强 | 模拟 Persona 表现出高绕行成本（） |\n| 使用频率 | 待验证 | 备考期近似日频 |\n| 痛点强度 | 强 | 频率 5 × 强度 4 × 绕行成本 4 |\n| 替代差距 | 待验证 | 替代方案有明确缺点但已被接受 |\n| 付费意愿 | 待验证 | 仅口头意愿，按 记为弱信号（） |\n| 传播性 | 待验证 | 私用场景，缺乏天然传播动机 |\n\n> 评分用于说明用户侧证据强弱和判断依据，不代表产品成功率。待验证维度不会被当作低分处理。\n\n## 6. 产品改进优先级\n- **P0**｜围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。\n- **P0**｜围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。\n- **P1**｜围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。\n\n## 7. 完整用户验证执行方案\n### 方案 1：目标用户每周为筛选重复资料花费 2 小时以上\n- **方法：** 流失用户访谈\n- **验证对象：** 距初试 6 个月内的二战考研生\n- **样本：** 6 persons_per_persona\n- **周期：** 2 周\n- **成本：** 约 ¥600\n- **执行步骤：**\n 1. 你上一次整理重复资料是什么时候？\n 2. 那次花了多少时间／花了多少钱？\n- **看什么结果：** ≥60% 受访者主动提及每周 2 小时以上耗时\n### 方案 2：学生用户愿意为该产品付费 50 元以内\n- **方法：** 真实收费测试\n- **验证对象：** 距初试 6 个月内的二战考研生\n- **样本：** 100 persons_total\n- **周期：** 3 周\n- **成本：** 约 ¥1500\n- **执行步骤：**\n 1. 在定价页选择套餐并提交预约\n- **看什么结果：** 真实预约转化 ≥10%\n### 方案 3：机构型用户的合规顾虑会阻断采购\n- **方法：** 流失用户访谈\n- **验证对象：** 机构型用户\n- **样本：** 6 persons_per_persona\n- **周期：** 2 周\n- **成本：** 约 ¥600\n- **执行步骤：**\n 1. 你上一次因为合规要求放弃或延迟采购是什么时候？\n 2. 当时具体哪项要求阻断了流程，最后如何处理？\n- **看什么结果：** ≥60% 受访机构用户描述最近一次真实合规阻断行为\n\n## 8. 仍缺什么信息与使用边界\n- The target user description lacks quantified qualifiers, so persona confidence is…\n\n---\n**阅读说明：** 完备版用于核查判断、制定执行方案和引用到比赛/策划材料；内部审计 ID、状态机与 Agent 交接仍保留在机器输出，不在本报告中展示。",
+    "full_report_html": "<!doctype html><html lang=\"zh-CN\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>考研资料速筛助手｜用户验证完备版</title><style>\n:root{--bg:#f4f6fa;--card:#fff;--ink:#182235;--muted:#667085;--line:#e4e8ef;--brand:#3157d5;--brand-soft:#eef2ff;--core:#0f8b70;--core-soft:#eaf8f3;--consider:#5264d9;--consider-soft:#eef0ff;--later:#bd781b;--later-soft:#fff6e5;--danger:#c2413b;--danger-soft:#fff0ef;--success:#177d59}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,\"Segoe UI\",\"PingFang SC\",\"Microsoft YaHei\",sans-serif;line-height:1.72}.wrap{max-width:1040px;margin:auto;padding:24px}.hero{background:#17264a;color:#fff;border-radius:20px;padding:30px;box-shadow:0 16px 40px #213a8220}.hero h1{margin:0;font-size:28px}.hero p{color:#e6ebff;margin:12px 0 0;max-width:800px}.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.badge{font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid #ffffff35;background:#ffffff12}.hero-note{margin-top:15px;padding-top:12px;border-top:1px solid #ffffff2b;font-size:12px;color:#cfd7f5}.section{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:24px;margin-top:15px;box-shadow:0 2px 10px #17203308}.section h2{font-size:19px;margin:0 0 15px}.section>p.lead{margin:-7px 0 15px;color:var(--muted);font-size:13px}.summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.summary-cell{padding:13px;border-radius:12px;background:#f8fafc;border:1px solid #edf0f4}.summary-cell b{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}.summary-cell span{font-size:14px;font-weight:650}.summary-cell.risk{background:var(--danger-soft);border-color:#f3cdca}.summary-cell.risk b{color:var(--danger)}table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{font-size:12px;color:var(--muted);background:#fafbfc}.pill{display:inline-block;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:800}.pill-core{background:var(--core-soft);color:var(--core)}.pill-consider{background:var(--consider-soft);color:var(--consider)}.pill-later{background:var(--later-soft);color:var(--later)}.confidence{font-size:11px;padding:3px 8px;border-radius:999px}.confidence.solid{background:#eaf8f3;color:var(--success)}.confidence.pending{background:#fff6e5;color:var(--later)}.problem{display:grid;grid-template-columns:42px 1fr;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}.problem:last-child{border-bottom:0}.problem-no{display:flex;align-items:center;justify-content:center;width:38px;height:30px;background:var(--danger-soft);color:var(--danger);border-radius:8px;font-weight:800;font-size:12px}.problem h3{margin:1px 0 8px;font-size:15px}.problem p{margin:5px 0;font-size:13px}.persona{border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:10px}.persona-title{display:flex;align-items:center;gap:10px}.persona-title>span{color:var(--brand);font-size:12px;font-weight:800}.persona-title h3{font-size:15px;margin:0;flex:1}.persona-title em{font-style:normal;font-size:11px;color:var(--brand);background:var(--brand-soft);padding:3px 8px;border-radius:999px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;margin-top:12px}.grid2 div{padding-top:7px;border-top:1px solid #f0f2f5}.grid2 b{font-size:11px;color:var(--muted)}.grid2 p{font-size:13px;margin:3px 0}.priority{list-style:none;padding:0;margin:0}.priority li{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}.priority li:last-child{border-bottom:0}.priority-tag{min-width:38px;height:25px;line-height:25px;text-align:center;color:#fff;border-radius:7px;font-size:11px}.p0{background:var(--danger)}.p1{background:var(--brand)}.plan{border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:10px}.plan-head{display:flex;gap:10px;align-items:flex-start}.plan-head span{color:var(--brand);font-size:11px;font-weight:800}.plan-head h3{font-size:14px;margin:0}.meta{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}.meta i{font-style:normal;background:#f4f6fa;color:#53607a;border-radius:999px;padding:3px 8px;font-size:11px}.plan p,.plan li{font-size:13px}.plan ol{margin:6px 0;padding-left:21px}.callout{padding:13px 15px;border-radius:12px;background:var(--brand-soft);border:1px solid #d9e0ff;font-size:13px}.missing{margin:0;padding-left:20px;font-size:13px}.missing li{margin:7px 0}.muted{color:var(--muted);font-size:13px}.footer{text-align:center;color:#8790a4;font-size:11px;padding:16px}\n@media(max-width:760px){.wrap{padding:12px}.hero{padding:22px}.summary-grid,.grid2{grid-template-columns:1fr}.section{padding:17px}.persona-title{align-items:flex-start;flex-wrap:wrap}}\n</style></head><body><main class=\"wrap\"><section class=\"hero\"><h1>考研资料速筛助手｜用户验证完备版</h1><p>目前还不能确认用户是否真正需要并会持续使用，先补最关键的真实用户证据。</p><div class=\"badges\"><span class=\"badge\">用户需求：待验证</span><span class=\"badge\">证据可信度：低</span></div><div class=\"hero-note\">本报告用于核查判断、制定用户验证与产品改进方案，以及引用到比赛/策划材料。所有结论仍以同次运行的结构化结果为基础。</div></section>\n<section class=\"section\"><h2>1. 核心结论与目标用户</h2><div class=\"summary-grid\"><div class=\"summary-cell\"><b>核心用户</b><span>下载完一批资料，发现和上周的重复，需要快速筛掉重复资料的人</span></div><div class=\"summary-cell\"><b>可争取用户</b><span>已经在用机构自建资料库 + 人工校对，但仍想要更好结果的人</span></div><div class=\"summary-cell\"><b>暂不优先</b><span>当前痛点不强、切换动力较弱的人</span></div><div class=\"summary-cell risk\"><b>当前最大问题</b><span>导出功能失效，机构型用户核心任务中断</span></div></div><div class=\"callout\" style=\"margin-top:12px\"><b>总判断：</b>当前最值得争取的是下载完一批资料，发现和上周的重复，需要快速筛掉重复资料的人群，而不是所有目标用户。</div></section>\n<section class=\"section\"><h2>2. 目标用户分群与判断依据</h2><p class=\"lead\">身份标签只作为背景，核心仍看触发场景、替代方案和切换动力。</p><table><thead><tr><th>层级</th><th>用户描述</th><th>为什么这样判断</th></tr></thead><tbody><tr><td><span class=\"pill pill-core\">核心用户</span></td><td>下载完一批资料，发现和上周的重复，需要快速筛掉重复资料的人</td><td>距离初试只剩 4 个月，重复资料让我焦虑</td></tr><tr><td><span class=\"pill pill-consider\">可争取用户</span></td><td>已经在用机构自建资料库 + 人工校对，但仍想要更好结果的人</td><td>机构已有资料库，换工具要说服负责人</td></tr><tr><td><span class=\"pill pill-later\">暂不优先</span></td><td>当前痛点不强、切换动力较弱的人</td><td>弱网加载不出来</td></tr></tbody></table><article class=\"persona\"><div class=\"persona-title\"><span>01</span><h3>二战考研生 · 每天刷资料超 1 小时，时间极紧</h3><em>切换动力较强</em></div><div class=\"grid2\"><div><b>典型场景</b><p>下载完一批资料，发现和上周的重复</p></div><div><b>核心目标</b><p>当我在自习室复习时，我想快速筛掉重复资料，以便把时间花在真正没掌握的考点上</p></div><div><b>当前替代</b><p>手动整理文件夹 + Excel 清单</p></div><div><b>为什么会用</b><p>距离初试只剩 4 个月，重复资料让我焦虑</p></div><div><b>为什么可能不用</b><p>怕筛掉自己还没掌握的考点</p></div><div><b>主要痛点</b><p>同一考点资料重复下载，筛选耗时</p></div></div></article><article class=\"persona\"><div class=\"persona-title\"><span>02</span><h3>考研机构助教 · 已有内部资料库，最挑剔</h3><em>当前切换动力较弱</em></div><div class=\"grid2\"><div><b>典型场景</b><p>负责人要求核对本期资料版本</p></div><div><b>核心目标</b><p>当我给学生发资料时，我想确认资料没有重复和过期，以便不被学生质疑专业度</p></div><div><b>当前替代</b><p>机构自建资料库 + 人工校对</p></div><div><b>为什么会用</b><p>机构已有资料库，换工具要说服负责人</p></div><div><b>为什么可能不用</b><p>学生资料上传第三方有合规顾虑</p></div><div><b>主要痛点</b><p>现有资料库维护靠人工，版本混乱</p></div></div></article><article class=\"persona\"><div class=\"persona-title\"><span>03</span><h3>在职跨考生 · 通勤碎片时间，弱网络低预算</h3><em>当前切换动力较弱</em></div><div class=\"grid2\"><div><b>典型场景</b><p>地铁上想利用碎片时间</p></div><div><b>核心目标</b><p>当我通勤时，我想用碎片时间看最该看的资料，以便不浪费仅有的学习时间</p></div><div><b>当前替代</b><p>什么都不做，随便看看公众号</p></div><div><b>为什么会用</b><p>每天只有 1 小时通勤可用</p></div><div><b>为什么可能不用</b><p>弱网加载不出来</p></div><div><b>主要痛点</b><p>弱网下加载慢，干脆放弃</p></div></div></article></section>\n<section class=\"section\"><h2>3. 关键证据</h2><p class=\"lead\">优先展示真实行为与真实访谈；没有真实证据时会明确标记为参考。</p><table><thead><tr><th>来源</th><th>观察</th><th>用途</th></tr></thead><tbody><tr><td>AI 模拟推演，仅供参考</td><td>2/3 Persona 无法复述价值主张</td><td><span class=\"confidence pending\">参考</span></td></tr><tr><td>AI 模拟推演，仅供参考</td><td>机构型用户先问数据存放位置</td><td><span class=\"confidence pending\">参考</span></td></tr></tbody></table></section>\n<section class=\"section\"><h2>4. 当前最关键的用户问题</h2><article class=\"problem\"><div class=\"problem-no\">01</div><div><h3>导出功能失效，机构型用户核心任务中断</h3><p><b>发现依据：</b>导出功能失效，机构型用户核心任务中断</p><p><b>为什么重要：</b>这个问题会削弱用户对产品价值的判断。</p><p><b>建议：</b>围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。</p></div></article><article class=\"problem\"><div class=\"problem-no\">02</div><div><h3>上传过程存在阻塞</h3><p><b>发现依据：</b>弱网环境下上传超时且无提示</p><p><b>为什么重要：</b>这个问题会削弱用户对产品价值的判断。</p><p><b>建议：</b>围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。</p></div></article><article class=\"problem\"><div class=\"problem-no\">03</div><div><h3>首屏价值主张无法被复述</h3><p><b>发现依据：</b>首屏价值主张无法被复述</p><p><b>为什么重要：</b>这个问题会削弱用户对产品价值的判断。</p><p><b>建议：</b>围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。</p></div></article></section>\n<section class=\"section\"><h2>5. 用户价值评分与依据</h2><table><thead><tr><th>维度</th><th>判断</th><th>一句话依据</th></tr></thead><tbody><tr><td>用户需求</td><td><b>强</b></td><td>模拟 Persona 表现出高绕行成本（）</td></tr><tr><td>使用频率</td><td><b>待验证</b></td><td>备考期近似日频</td></tr><tr><td>痛点强度</td><td><b>强</b></td><td>频率 5 × 强度 4 × 绕行成本 4</td></tr><tr><td>替代差距</td><td><b>待验证</b></td><td>替代方案有明确缺点但已被接受</td></tr><tr><td>付费意愿</td><td><b>待验证</b></td><td>仅口头意愿，按 记为弱信号（）</td></tr><tr><td>传播性</td><td><b>待验证</b></td><td>私用场景，缺乏天然传播动机</td></tr></tbody></table><div class=\"callout\" style=\"margin-top:12px\">评分用于说明用户侧证据强弱，不是“用户喜欢程度”或产品成功概率；待验证不等于低分。</div></section>\n<section class=\"section\"><h2>6. 产品改进优先级</h2><ul class=\"priority\"><li><b class=\"priority-tag p0\">P0</b><span>围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。</span></li><li><b class=\"priority-tag p0\">P0</b><span>围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。</span></li><li><b class=\"priority-tag p1\">P1</b><span>围绕该问题做最小改动，用同一用户任务验证问题是否明显下降。</span></li></ul></section>\n<section class=\"section\"><h2>7. 完整用户验证执行方案</h2><p class=\"lead\">可以直接作为下一轮用户研究或比赛方案材料的执行骨架。</p><article class=\"plan\"><div class=\"plan-head\"><span>方案 01</span><h3>目标用户每周为筛选重复资料花费 2 小时以上</h3></div><div class=\"meta\"><i>流失用户访谈</i><i>6 persons_per_persona</i><i>2 周</i><i>约 ¥600</i></div><p><b>验证对象：</b>距初试 6 个月内的二战考研生</p><div><b>执行步骤：</b><ol><li>你上一次整理重复资料是什么时候？</li><li>那次花了多少时间／花了多少钱？</li></ol></div><p><b>看什么结果：</b>≥60% 受访者主动提及每周 2 小时以上耗时</p></article><article class=\"plan\"><div class=\"plan-head\"><span>方案 02</span><h3>学生用户愿意为该产品付费 50 元以内</h3></div><div class=\"meta\"><i>真实收费测试</i><i>100 persons_total</i><i>3 周</i><i>约 ¥1500</i></div><p><b>验证对象：</b>距初试 6 个月内的二战考研生</p><div><b>执行步骤：</b><ol><li>在定价页选择套餐并提交预约</li></ol></div><p><b>看什么结果：</b>真实预约转化 ≥10%</p></article><article class=\"plan\"><div class=\"plan-head\"><span>方案 03</span><h3>机构型用户的合规顾虑会阻断采购</h3></div><div class=\"meta\"><i>流失用户访谈</i><i>6 persons_per_persona</i><i>2 周</i><i>约 ¥600</i></div><p><b>验证对象：</b>机构型用户</p><div><b>执行步骤：</b><ol><li>你上一次因为合规要求放弃或延迟采购是什么时候？</li><li>当时具体哪项要求阻断了流程，最后如何处理？</li></ol></div><p><b>看什么结果：</b>≥60% 受访机构用户描述最近一次真实合规阻断行为</p></article></section>\n<section class=\"section\"><h2>8. 仍缺什么信息与使用边界</h2><ul class=\"missing\"><li>The target user description lacks quantified qualifiers, so persona confidence is…</li></ul><div class=\"callout\" style=\"margin-top:12px\">完备版仍不会暴露内部审计 ID、状态机或 Agent 交接字段；这些只留在机器输出，避免把工程日志当成用户报告。</div></section><div class=\"footer\">完备版与精简版来自同一份结构化结果；结论必须保持一致。</div></main></body></html>"
+  },
+  "evidence_refs": [
+    "EV-uvd-1",
+    "EV-uvd-2",
+    "EV-uvd-3",
+    "EV-uvd-4"
+  ],
+  "confidence": 0.2,
+  "risks": [
+    "Switching friction exceeds drive: users may not switch even if the product is better.",
+    "Value communication failure: fix positioning and copy before features.",
+    "Journey breaks between first use and continued use: retention risk.",
+    "Feedback was polite but behaviourally empty; treated as weight 0."
+  ],
+  "needs_human_review": true,
+  "failure_reason": null,
+  "retryable": false
+}

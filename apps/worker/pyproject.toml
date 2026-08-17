@@ -9,7 +9,10 @@ description = "LaunchScope isolated Skill and Tool execution boundary"
 requires-python = ">=3.11,<3.15"
 dependencies = [
   "pydantic>=2.9,<3",
-  "launchscope-domain>=0.1.0"
+  "launchscope-domain>=0.1.0",
+  "pdfplumber>=0.11,<1",
+  "pypdfium2>=4.30,<5",
+  "Pillow>=11,<13"
 ]
 
 [project.optional-dependencies]

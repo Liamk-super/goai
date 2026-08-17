@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/run-manifest/run-manifest.v5.json",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version", "architecture_generation", "feature_flag", "physical_topology", "agent_contract_generation",
+    "agents", "contracts", "score_profile", "skills", "tools", "budget", "limits", "failure_policy"
+  ],
+  "properties": {
+    "schema_version": {"const": "5.0"},
+    "architecture_generation": {"const": "supervisor-1p4-material-routing-v2"},
+    "feature_flag": {"const": "LAUNCHSCOPE_MATERIAL_ROUTING_V2_ENABLED"},
+    "physical_topology": {
+      "type": "object", "additionalProperties": false,
+      "required": ["worker_count", "leader", "workers", "peer_mentions"],
+      "properties": {
+        "worker_count": {"const": 5},
+        "leader": {"const": "evaluation-manager"},
+        "workers": {
+          "type": "array", "minItems": 4, "maxItems": 4, "uniqueItems": true,
+          "items": {"enum": ["user-evidence", "product-engineering", "business-investment", "evidence-auditor"]}
+        },
+        "peer_mentions": {"const": false}
+      }
+    },
+    "agent_contract_generation": {"const": "v5"},
+    "agents": {"type": "object", "minProperties": 5, "maxProperties": 5, "additionalProperties": {"$ref": "#/$defs/versionedHash"}},
+    "contracts": {"type": "object", "minProperties": 12, "additionalProperties": {"$ref": "#/$defs/versionedHash"}},
+    "score_profile": {"$ref": "#/$defs/versionedHash"},
+    "skills": {"type": "object", "additionalProperties": {"$ref": "#/$defs/versionedHash"}},
+    "tools": {"type": "object", "required": ["launchscope-context.get.v2", "material.read.v1"], "additionalProperties": {"type": "string"}},
+    "budget": {"type": "object"},
+    "limits": {
+      "type": "object", "required": ["targeted_remediation_rounds", "reaudit_rounds", "material_read_units", "material_read_bytes"],
+      "properties": {
+        "targeted_remediation_rounds": {"const": 1},
+        "reaudit_rounds": {"const": 1},
+        "material_read_units": {"const": 8},
+        "material_read_bytes": {"const": 65536}
+      }
+    },
+    "failure_policy": {
+      "type": "object", "required": ["SUBMISSION_UNKNOWN", "USAGE_UNKNOWN", "BILLING_UNKNOWN", "PAID_TIMEOUT", "MATERIAL_INTEGRITY_FAILED"],
+      "properties": {
+        "SUBMISSION_UNKNOWN": {"const": "NEEDS_ATTENTION_NO_RETRY"},
+        "USAGE_UNKNOWN": {"const": "NEEDS_ATTENTION_NO_RETRY"},
+        "BILLING_UNKNOWN": {"const": "NEEDS_ATTENTION_NO_RETRY"},
+        "PAID_TIMEOUT": {"const": "NEEDS_ATTENTION_NO_RETRY"},
+        "MATERIAL_INTEGRITY_FAILED": {"const": "NEEDS_ATTENTION_NO_RETRY"}
+      }
+    }
+  },
+  "$defs": {
+    "versionedHash": {
+      "type": "object", "additionalProperties": false, "required": ["version", "sha256"],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    }
+  }
+}

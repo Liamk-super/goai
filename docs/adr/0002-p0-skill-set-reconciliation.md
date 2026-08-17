@@ -1,6 +1,6 @@
 # ADR 0002: Reconcile the P0 Skill set
 
-- Status: Accepted for T1; promotion gate remains open
+- Status: Accepted for T1; `user-validation-designer` promotion gate satisfied by ADR 0007
 - Date: 2026-08-05
 - Scope: LaunchScope V0.1 Skill catalog and UnifiedModel descriptors
 
@@ -80,3 +80,9 @@ an alias.
   budget, permissions, test surface or Demo scope.
 - The six P0 names can be used by later T6/T7 work with stable versioned
   descriptors; later promotion remains an explicit architectural choice.
+
+## 2026-08-11 amendment
+
+ADR 0007 satisfies the promotion gate for `user-validation-designer@1.0.4` and authorizes it as an executable,
+feature-flagged P0 Skill using new V2/V3 contracts. The historical V0.1 catalog and all released V1 contracts remain
+unchanged. The other reference candidates in this ADR remain unpromoted.

@@ -1,0 +1,115 @@
+apiVersion: agentteams.io/v1beta1
+kind: Worker
+metadata:
+  name: launchscope-evaluation-supervisor-v6-live
+  annotations: {launchscope.io/agent-code: evaluation-manager, launchscope.io/agent-version: "6.0"}
+spec:
+  model: __LAUNCHSCOPE_MODEL_EVALUATION_MANAGER__
+  runtime: copaw
+  env: {COPAW_REACT_MAX_ITERS: "__LAUNCHSCOPE_COPAW_MAX_ITERS__"}
+  package: file://./generated/packages-v6/evaluation-manager.zip
+  identity: "LaunchScope supervisor; plans scoped work and synthesizes one immutable report without changing deterministic scores."
+  agents: "Use only launchscope-context.get.v2. Preserve deterministic scores and emit the assigned v2.2 report contract."
+  mcpServers:
+    - {name: launchscope-context, url: "http://host.docker.internal:8091/mcp/context/", transport: http}
+  state: Running
+---
+apiVersion: agentteams.io/v1beta1
+kind: Worker
+metadata:
+  name: launchscope-user-evidence-v6-live
+  annotations: {launchscope.io/agent-code: user-evidence, launchscope.io/agent-version: "6.0"}
+spec:
+  model: __LAUNCHSCOPE_MODEL_USER_EVIDENCE__
+  runtime: copaw
+  env: {COPAW_REACT_MAX_ITERS: "__LAUNCHSCOPE_USER_COPAW_MAX_ITERS__"}
+  package: file://./generated/packages-v6/user-evidence.zip
+  identity: "LaunchScope user agent; produces one immutable cited user report from its assigned scope."
+  agents: "Read only assigned MaterialUnits and permitted sources; save and return one SpecialistReportDocumentV2."
+  mcpServers:
+    - {name: launchscope-context, url: "http://host.docker.internal:8091/mcp/context/", transport: http}
+    - {name: material, url: "http://host.docker.internal:8091/mcp/material/", transport: http}
+    - {name: browser-audit, url: "http://host.docker.internal:8091/mcp/browser-audit/", transport: http}
+    - {name: public-research-search, url: "http://host.docker.internal:8091/mcp/public-research-search/", transport: http}
+  state: Running
+---
+apiVersion: agentteams.io/v1beta1
+kind: Worker
+metadata:
+  name: launchscope-product-engineering-v6-live
+  annotations: {launchscope.io/agent-code: product-engineering, launchscope.io/agent-version: "6.0"}
+spec:
+  model: __LAUNCHSCOPE_MODEL_PRODUCT_ENGINEERING__
+  runtime: copaw
+  env: {COPAW_REACT_MAX_ITERS: "__LAUNCHSCOPE_COPAW_MAX_ITERS__"}
+  package: file://./generated/packages-v6/product-engineering.zip
+  identity: "LaunchScope product agent; produces one immutable cited product report from its assigned scope."
+  agents: "Read only assigned MaterialUnits and permitted product evidence; save and return one SpecialistReportDocumentV2."
+  mcpServers:
+    - {name: launchscope-context, url: "http://host.docker.internal:8091/mcp/context/", transport: http}
+    - {name: material, url: "http://host.docker.internal:8091/mcp/material/", transport: http}
+    - {name: browser-audit, url: "http://host.docker.internal:8091/mcp/browser-audit/", transport: http}
+  state: Running
+---
+apiVersion: agentteams.io/v1beta1
+kind: Worker
+metadata:
+  name: launchscope-business-investment-v6-live
+  annotations: {launchscope.io/agent-code: business-investment, launchscope.io/agent-version: "6.0"}
+spec:
+  model: __LAUNCHSCOPE_MODEL_BUSINESS_INVESTMENT__
+  runtime: copaw
+  env: {COPAW_REACT_MAX_ITERS: "__LAUNCHSCOPE_COPAW_MAX_ITERS__"}
+  package: file://./generated/packages-v6/business-investment.zip
+  identity: "LaunchScope investment agent; produces one immutable cited business report from its assigned scope."
+  agents: "Read only assigned MaterialUnits and permitted market evidence; save and return one SpecialistReportDocumentV2."
+  mcpServers:
+    - {name: launchscope-context, url: "http://host.docker.internal:8091/mcp/context/", transport: http}
+    - {name: material, url: "http://host.docker.internal:8091/mcp/material/", transport: http}
+    - {name: public-research-search, url: "http://host.docker.internal:8091/mcp/public-research-search/", transport: http}
+  state: Running
+---
+apiVersion: agentteams.io/v1beta1
+kind: Worker
+metadata:
+  name: launchscope-evidence-auditor-v6-live
+  annotations: {launchscope.io/agent-code: evidence-auditor, launchscope.io/agent-version: "6.0"}
+spec:
+  model: __LAUNCHSCOPE_MODEL_EVIDENCE_AUDITOR__
+  runtime: copaw
+  env: {COPAW_REACT_MAX_ITERS: "__LAUNCHSCOPE_COPAW_MAX_ITERS__"}
+  package: file://./generated/packages-v6/evidence-auditor.zip
+  identity: "LaunchScope evidence auditor; calibrates citations and produces one immutable audit report."
+  agents: "Read only cited evidence and immutable reports; save and return AuditResultV4 plus one SpecialistReportDocumentV2."
+  mcpServers:
+    - {name: launchscope-context, url: "http://host.docker.internal:8091/mcp/context/", transport: http}
+    - {name: material, url: "http://host.docker.internal:8091/mcp/material/", transport: http}
+    - {name: user-validation-audit-context, url: "http://host.docker.internal:8091/mcp/user-validation-audit-context/", transport: http}
+  state: Running
+---
+apiVersion: agentteams.io/v1beta1
+kind: Team
+metadata:
+  name: launchscope-potential-review-v6-operational
+spec:
+  description: "LaunchScope evidence-driven supervisor 1+4 generation-v6 report-v2.2 review team"
+  peerMentions: false
+  humanMembers:
+    - {name: launchscope-human-coordinator-v6-live, role: coordinator}
+  workerMembers:
+    - {name: launchscope-evaluation-supervisor-v6-live, role: team_leader}
+    - {name: launchscope-user-evidence-v6-live, role: worker}
+    - {name: launchscope-product-engineering-v6-live, role: worker}
+    - {name: launchscope-business-investment-v6-live, role: worker}
+    - {name: launchscope-evidence-auditor-v6-live, role: worker}
+---
+apiVersion: agentteams.io/v1beta1
+kind: Human
+metadata:
+  name: launchscope-human-coordinator-v6-live
+spec:
+  displayName: LaunchScope Human Coordinator V6
+  permissionLevel: 2
+  accessibleTeams: [launchscope-potential-review-v6-operational]
+  accessibleWorkers: []
+  note: "LaunchScope generation-v6 report-v2.2 bridge principal; credentials are provisioned outside Git"

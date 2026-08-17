@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/events/run-control-events.v1.json",
+  "title": "Run control event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["event_type", "run_id", "control_state", "control_epoch", "occurred_at"],
+  "properties": {
+    "event_type": {
+      "enum": ["run.pause_requested", "run.paused", "run.pause_blocked", "run.resumed"]
+    },
+    "run_id": {"type": "string", "format": "uuid"},
+    "control_state": {
+      "enum": ["ACTIVE", "PAUSE_REQUESTED", "PAUSED", "PAUSE_BLOCKED", "CLOSED"]
+    },
+    "control_epoch": {"type": "integer", "minimum": 0},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "in_flight_count": {"type": "integer", "minimum": 0},
+    "usage_settlement_status": {"enum": ["NONE", "PENDING", "SETTLED", "UNKNOWN"]},
+    "reason": {"type": ["string", "null"], "maxLength": 1000}
+  }
+}
+

@@ -1,0 +1,33 @@
+schema_version: '2.0'
+code: geo-policy-trend
+version: '2.0'
+role: specialist
+responsibilities:
+- assess region-specific policy
+- timing
+- trend
+- and geopolitical risks
+inputs:
+- run_manifest
+- product_profile
+- evidence_refs
+- assigned_task
+outputs:
+- finding
+- state_change_request
+- information_request
+allowed_skills: []
+allowed_tools:
+- launchscope-context.get.v1
+- public-research-search.v1
+risk_boundaries:
+- public_read_only
+- region_and_freshness_required
+- no_business_state_writes
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- direct_external_action
+content_sha256: bd9fe8fecf72fc863ebe306035f923610f3fdd560b4d080d0cb0f20d0e56d4cd

@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>势能引擎 · 设计预览</title>
+<style>
+/* ============================================================================
+   势能引擎 — design.md 预览
+   锚句：一台放在暖色台灯下的黄铜评审仪器，盘面只被真实证据推动。
+   不是抽奖转盘，不是暗色 SaaS 仪表台，不是拟物皮革。
+   单一光源：左上 34% / 24%，暖白。凸起元素顶部内高光 + 底部零饱和黑阴影。
+   ========================================================================= */
+
+/* ── L1 · 原子色板 ───────────────────────────────────────────── */
+:root {
+  /* 环境 —— 暖奶油，取自参考图 96–97% 明度带 */
+  --sw-cream-000: #fdfaf8;
+  --sw-cream-050: #fbf7f4;
+  --sw-cream-100: #faf4f0;
+  --sw-cream-200: #f5eae1;
+  --sw-cream-300: #ecded0;
+  --sw-cream-400: #e8e1dc;
+
+  /* 暖茶描边 */
+  --sw-tea-300: #ddcabb;
+  --sw-tea-400: #cbb6a2;
+  --sw-tea-500: #b8a08c;
+
+  /* 墨 —— 零饱和度偏暖 */
+  --sw-ink-900: #000000;
+  --sw-ink-800: #2a2622;
+  --sw-ink-600: #55504a;
+  /* 400 档做到 AA 4.5：在卡片 5.59 / 背景 5.47 / 轨道 4.52 */
+  --sw-ink-400: #6b625b;
+
+  /* 金属金 —— 五阶，装饰用 */
+  --sw-gold-700: #754608;
+  /* 600 是唯一合法的金色文字值，压深到 gold-100 上 5.61 */
+  --sw-gold-600: #775824;
+  --sw-gold-500: #a38355;
+  --sw-gold-400: #d39847;
+  --sw-gold-300: #e6c18c;
+  --sw-gold-100: #f6ecdf;
+
+  /* 橄榄 —— 投资人 / 商业 */
+  --sw-olive-700: #4c6225;
+  --sw-olive-600: #5b7133;
+  --sw-olive-200: #d4d3bb;
+  --sw-olive-100: #e6e8d5;
+
+  /* 紫 —— 用户 / 共创 */
+  --sw-plum-700: #72499b;
+  --sw-plum-600: #8b63b1;
+  --sw-plum-200: #e2d6e0;
+  --sw-plum-100: #e8dde7;
+
+  /* 信号红 —— 只归评审 */
+  --sw-red-700: #ba1109;
+  --sw-red-600: #c92318;
+  --sw-red-100: #f8e2df;
+
+  /* 冷钢 —— 来源标记「模型推断」。原 azure，改名以描述角色而非颜色 */
+  --sw-steel-600: #2a627a;
+  --sw-steel-200: #bcd6e0;
+
+  --sw-white: #ffffff;
+}
+
+/* ── L2 · 语义 token ─────────────────────────────────────────── */
+:root {
+  --surface-base: var(--sw-cream-100);
+  --surface-card: var(--sw-cream-050);
+  --surface-raised: var(--sw-cream-000);
+  --surface-sunk: var(--sw-cream-200);
+
+  /* 文字承载力：正文只用 ink-on-surface；ink-faint 仅 ≥13px 且非正文 */
+  --ink-on-surface: var(--sw-ink-900);
+  --ink-secondary: var(--sw-ink-600);
+  --ink-faint: var(--sw-ink-400);
+
+  /* 金有两个 token：装饰金不可承载文字，文字金是唯一合法的金色文字值 */
+  --gold-decorative: var(--sw-gold-500);
+  --gold-text: var(--sw-gold-600);
+
+  --rule-hair: var(--sw-cream-400);
+  --rule-mid: var(--sw-tea-300);
+  --rule-strong: var(--sw-tea-400);
+
+  /* 三色域 —— 只在盘面与进度条出现，不进状态胶囊 */
+  --zone-dev: var(--sw-gold-400);
+  --zone-dev-field: var(--sw-cream-200);
+  --zone-investor: var(--sw-olive-600);
+  --zone-investor-field: var(--sw-olive-200);
+  --zone-user: var(--sw-plum-600);
+  --zone-user-field: var(--sw-plum-200);
+
+  /* 评审红 —— 独立通道 */
+  --review: var(--sw-red-600);
+  --review-field: var(--sw-red-100);
+
+  /* 来源标记 —— 颜色不是唯一信道，另用线型区分（见 .source-tag） */
+  --source-model: var(--sw-steel-600);
+  --source-user: var(--sw-olive-700);
+  --source-missing: var(--sw-red-600);
+
+  /* 形状 —— 三档 + 圆 */
+  --r-pill: 999px;
+  --r-card: 16px;
+  --r-input: 8px;
+
+  /* 间距 —— 4px 基数 */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px;
+  --s5: 20px; --s6: 24px; --s8: 32px; --s10: 40px;
+
+  /* 复合材质 token —— 阴影永不带色相 */
+  --lift-card:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.05);
+  --recess-dial:
+    inset 0 2px 6px rgba(0, 0, 0, 0.10),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.80);
+  --metal-rim:
+    0 0 0 1px var(--sw-tea-400),
+    0 0 0 6px var(--sw-cream-050),
+    0 0 0 7px var(--sw-tea-300);
+  --pill-raise:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+
+  /* 字体 —— 系统栈，无运行时 CDN。
+     等宽栈按"本机实际存在的概率"排序：Windows 上 IBM Plex Mono 通常没有，
+     Cascadia/Consolas 才是真正命中的那个，放前面避免白跑一轮 fallback。 */
+  --font-sans: -apple-system, "PingFang SC", "Microsoft YaHei", "Segoe UI", "Noto Sans SC", sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", "SFMono-Regular", Consolas, "IBM Plex Mono", monospace;
+
+  --dur-micro: 140ms;
+  --dur-detent: 320ms;
+  --ease-detent: cubic-bezier(0.16, 0.9, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.68;
+  font-weight: 400;
+  color: var(--ink-on-surface);
+  background: var(--surface-base);
+  /* 单一光源：左上 34%/24% 暖白 + 极细噪点 */
+  background-image:
+    radial-gradient(900px 620px at 34% 24%, rgba(255, 255, 255, 0.85), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 汉字字距为正，绝不收紧 */
+h1, h2, h3, .card-title { margin: 0; font-weight: 700; letter-spacing: 0.01em; }
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* ── 外壳 ─────────────────────────────────────────────────── */
+.shell { max-width: 1320px; margin: 0 auto; padding: var(--s6) var(--s8) var(--s10); }
+
+header.bar {
+  display: flex; align-items: center; gap: var(--s6);
+  padding-bottom: var(--s4);
+  border-bottom: 1px solid var(--rule-hair);
+}
+.mark { display: flex; align-items: center; gap: var(--s3); }
+.mark-name { font-size: 16px; font-weight: 700; letter-spacing: 0.02em; }
+.mark-sub {
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+nav.tabs { display: flex; gap: var(--s5); margin-left: var(--s8); }
+nav.tabs a {
+  position: relative; padding: var(--s2) 0;
+  font-size: 14px; font-weight: 500; text-decoration: none;
+  color: var(--ink-secondary);
+}
+nav.tabs a[aria-current="page"] { color: var(--ink-on-surface); font-weight: 700; }
+nav.tabs a[aria-current="page"]::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 2px; border-radius: var(--r-pill);
+  background: var(--gold-decorative);
+}
+
+.bar-right { margin-left: auto; display: flex; align-items: center; gap: var(--s4); }
+
+/* ── 状态胶囊：五态语义表，组件不得自造 ─────────────────── */
+.pill {
+  display: inline-flex; align-items: center; gap: var(--s2);
+  padding: 3px 10px 3px 8px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--rule-mid);
+  background: var(--surface-raised);
+  box-shadow: var(--pill-raise);
+  font-size: 12px; font-weight: 500; line-height: 1.5;
+  white-space: nowrap;
+}
+.pill::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor; flex: none;
+}
+.pill[data-state="running"]   { color: var(--sw-ink-800); background: #efe9e4; }
+.pill[data-state="await"]     { color: var(--gold-text);   background: var(--sw-gold-100); }
+.pill[data-state="calibrated"]{ color: var(--sw-olive-700); background: var(--sw-olive-100); }
+.pill[data-state="attention"] { color: var(--review);      background: var(--review-field); }
+.pill[data-state="idle"]      { color: var(--ink-faint);   background: #f2ede9; } /* 5.13 */
+
+/* ── 主栅格 ───────────────────────────────────────────────── */
+.main {
+  display: grid; grid-template-columns: minmax(0, 1fr) 404px;
+  gap: var(--s8); margin-top: var(--s8); align-items: start;
+}
+
+/* ── 仪器盘 ───────────────────────────────────────────────── */
+.stage { display: flex; flex-direction: column; align-items: center; gap: var(--s6); }
+.stage-head { text-align: center; }
+.stage-head h1 { font-size: 26px; line-height: 1.25; }
+.stage-head p {
+  margin: var(--s2) 0 0; font-size: 13px; color: var(--ink-secondary);
+  max-width: 46ch;
+}
+
+.dial-wrap {
+  position: relative; width: 560px; height: 560px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 24%, var(--sw-white) 0%, var(--sw-cream-050) 46%, var(--sw-cream-200) 100%);
+  box-shadow: var(--recess-dial), var(--metal-rim), 0 18px 50px rgba(0, 0, 0, 0.07);
+}
+.dial-wrap svg { display: block; width: 100%; height: 100%; }
+
+/* 盘面用色一律走 token —— SVG 呈现属性不支持 var()，故用 CSS 属性接管 */
+.field-dev      { stroke: var(--zone-dev-field); }
+.field-investor { stroke: var(--zone-investor-field); }
+.field-user     { stroke: var(--zone-user-field); }
+.arc-dev        { stroke: var(--zone-dev); }
+.arc-investor   { stroke: var(--zone-investor); }
+.arc-user       { stroke: var(--zone-user); }
+.dial-tick      { stroke: var(--sw-tea-500); }
+.dial-split     { stroke: var(--rule-strong); }
+.dial-label     { fill: var(--ink-on-surface); font-family: var(--font-sans); }
+.dial-reading   { fill: var(--ink-secondary); font-family: var(--font-mono); }
+.needle         { stroke: var(--sw-gold-700); }
+.needle-cap     { fill: var(--sw-gold-700); }
+.hub-screw      { fill: var(--sw-ink-800); }
+.hub-jewel      { fill: var(--sw-gold-300); }
+
+.hub {
+  position: absolute; inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  width: 214px; height: 214px; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 36% 26%, var(--sw-white), var(--sw-cream-050) 72%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 0 0 1px var(--rule-mid),
+    0 10px 26px rgba(0, 0, 0, 0.09);
+}
+.reading-hero {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 76px; font-weight: 700; line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink-on-surface);
+}
+.reading-unit { font-size: 22px; font-weight: 500; color: var(--ink-faint); }
+.reading-label {
+  margin-top: var(--s2);
+  font-size: 11px; font-weight: 500; letter-spacing: 0.16em;
+  color: var(--ink-secondary);
+}
+.reading-delta {
+  margin-top: var(--s1);
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--sw-olive-700);
+}
+
+.zone-key { display: flex; gap: var(--s6); }
+.zone-key div { display: flex; align-items: center; gap: var(--s2); font-size: 12.5px; }
+.zone-key i {
+  width: 12px; height: 12px; border-radius: 3px; display: block;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+}
+.key-dev      { background: var(--zone-dev); }
+.key-investor { background: var(--zone-investor); }
+.key-user     { background: var(--zone-user); }
+.key-review   { background: var(--review); }
+
+/* ── 侧栏卡片 ─────────────────────────────────────────────── */
+.rail { display: flex; flex-direction: column; gap: var(--s5); }
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--rule-hair);
+  border-radius: var(--r-card);
+  box-shadow: var(--lift-card);
+  padding: var(--s5);
+}
+.card-head {
+  display: flex; align-items: center; gap: var(--s3);
+  padding-bottom: var(--s3); margin-bottom: var(--s4);
+  border-bottom: 1px solid var(--rule-hair);
+}
+.card-title { font-size: 14px; }
+.card-head .pill { margin-left: auto; }
+.card-meta {
+  margin-left: auto; font-family: var(--font-mono);
+  font-size: 11px; color: var(--ink-faint); letter-spacing: 0.04em;
+}
+
+/* 进度条 —— 色域色只在这里和盘面出现 */
+.meter + .meter { margin-top: var(--s4); }
+.meter-top {
+  display: flex; align-items: baseline; gap: var(--s2);
+  margin-bottom: var(--s2);
+}
+.meter-name { font-size: 13px; font-weight: 500; }
+.meter-val {
+  margin-left: auto; font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px; font-weight: 700;
+}
+.track {
+  height: 8px; border-radius: var(--r-pill);
+  background: var(--sw-cream-300);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+.fill {
+  height: 100%; border-radius: var(--r-pill);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: width var(--dur-detent) var(--ease-detent);
+}
+.fill[data-zone="dev"]      { background: linear-gradient(90deg, var(--sw-gold-500), var(--sw-gold-400)); }
+.fill[data-zone="investor"] { background: linear-gradient(90deg, var(--sw-olive-700), var(--sw-olive-600)); }
+.fill[data-zone="user"]     { background: linear-gradient(90deg, var(--sw-plum-700), var(--sw-plum-600)); }
+
+/* 证据行 */
+.ev { display: flex; align-items: flex-start; gap: var(--s3); padding: var(--s3) 0; }
+.ev + .ev { border-top: 1px solid var(--rule-hair); }
+.ev-body { min-width: 0; }
+.ev-title { font-size: 13px; font-weight: 500; }
+.ev-src {
+  margin-top: 2px; font-family: var(--font-mono);
+  font-size: 11px; color: var(--ink-faint);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ev-time {
+  margin-left: auto; flex: none;
+  font-family: var(--font-mono); font-size: 11px; color: var(--ink-faint);
+}
+
+/* 评审通道 —— 红色唯一合法用途 */
+.review-card { border-left: 3px solid var(--review); }
+.review-card .card-title { color: var(--review); }
+.review-q { font-size: 13.5px; line-height: 1.6; }
+.review-actions { display: flex; gap: var(--s2); margin-top: var(--s4); }
+.btn {
+  padding: 7px 14px; border-radius: var(--r-input);
+  border: 1px solid var(--rule-strong);
+  background: var(--surface-raised);
+  box-shadow: var(--pill-raise);
+  font-family: inherit; font-size: 13px; font-weight: 500;
+  color: var(--ink-on-surface); cursor: pointer;
+  transition: transform var(--dur-micro) var(--ease-detent);
+}
+.btn:hover { transform: translateY(-1px); }
+.btn[data-variant="primary"] {
+  border-color: var(--sw-ink-800);
+  background: var(--sw-ink-800);
+  color: var(--sw-cream-050);
+}
+
+/* 来源标记 —— 双信道：颜色 + 线型。
+   色盲用户靠线型也能区分「模型推断」和「用户确认」。 */
+.source-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: var(--r-tight, 3px);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.source-tag[data-source="model"] {
+  border: 1px dashed var(--source-model);
+  color: var(--source-model);
+}
+.source-tag[data-source="user"] {
+  border: 1px solid var(--source-user);
+  color: var(--source-user);
+}
+.source-tag[data-source="missing"] {
+  border: 1px dotted var(--source-missing);
+  color: var(--source-missing);
+}
+
+/* 五态图例条 */
+.legend {
+  margin-top: var(--s10); padding-top: var(--s5);
+  border-top: 1px solid var(--rule-hair);
+}
+.legend-title {
+  font-size: 11px; font-weight: 500; letter-spacing: 0.16em;
+  color: var(--ink-faint); margin-bottom: var(--s3);
+}
+.legend-row { display: flex; flex-wrap: wrap; gap: var(--s3) var(--s4); align-items: center; }
+
+.swatches { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s5); }
+.sw {
+  width: 116px; border-radius: var(--r-input); overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+.sw i { display: block; height: 34px; }
+.sw span {
+  display: block; padding: 3px 5px; background: var(--surface-raised);
+  font-family: var(--font-mono); font-size: 10px; color: var(--ink-secondary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* 角色标记：文字金 / 装饰金 的区分不能丢，单独一行 */
+.sw em {
+  display: block; padding: 0 5px 3px; background: var(--surface-raised);
+  font-family: var(--font-sans); font-size: 9.5px; font-style: normal;
+  color: var(--gold-text); letter-spacing: 0.04em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill { transition-duration: 0s; }
+  .btn:hover { transform: none; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <header class="bar">
+    <div class="mark">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+        <circle cx="15" cy="15" r="13" fill="none" stroke="#cbb6a2" stroke-width="1.4"/>
+        <circle cx="15" cy="15" r="9.5" fill="none" stroke="#e8e1dc" stroke-width="1"/>
+        <line x1="15" y1="15" x2="21.5" y2="8.5" stroke="#754608" stroke-width="2.2" stroke-linecap="round"/>
+        <circle cx="15" cy="15" r="2.1" fill="#2a2622"/>
+      </svg>
+      <div>
+        <div class="mark-name">势能引擎</div>
+        <div class="mark-sub">LaunchScope</div>
+      </div>
+    </div>
+
+    <nav class="tabs">
+      <a href="#" aria-current="page">评审盘</a>
+      <a href="#">证据链</a>
+      <a href="#">版本对比</a>
+      <a href="#">报告</a>
+    </nav>
+
+    <div class="bar-right">
+      <span class="pill" data-state="running">运行中 · RUN-4718</span>
+      <span class="card-meta">预算 12.40 / 40.00 USD</span>
+    </div>
+  </header>
+
+  <div class="main">
+
+    <section class="stage">
+      <div class="stage-head">
+        <h1>三视角评审盘</h1>
+        <p>指针读数由已校准证据推动，不做插值、不做动画补间；未校准的字段不参与偏转。</p>
+      </div>
+
+      <div class="dial-wrap">
+        <svg viewBox="-280 -280 560 560" role="img" aria-label="三视角评审盘，当前势能指数 72">
+          <!-- 扇区场：开发者(金) 顶部 / 投资人(橄榄) 左下 / 用户(紫) 右下 -->
+          <g fill="none" stroke-linecap="butt">
+            <circle class="field-dev" r="185" stroke-width="132"
+                    stroke-dasharray="374.5 787.9" transform="rotate(-148)"/>
+            <circle class="field-investor" r="185" stroke-width="132"
+                    stroke-dasharray="374.5 787.9" transform="rotate(92)"/>
+            <circle class="field-user" r="185" stroke-width="132"
+                    stroke-dasharray="374.5 787.9" transform="rotate(-28)"/>
+          </g>
+
+          <!-- 已校准弧：每个色域的实际读数 -->
+          <g fill="none" stroke-linecap="round">
+            <circle class="arc-dev" r="238" stroke-width="7"
+                    stroke-dasharray="307.2 1188.5" transform="rotate(-148)"/>
+            <circle class="arc-investor" r="238" stroke-width="7"
+                    stroke-dasharray="239.7 1256.0" transform="rotate(92)"/>
+            <circle class="arc-user" r="238" stroke-width="7"
+                    stroke-dasharray="265.9 1229.8" transform="rotate(-28)"/>
+          </g>
+
+          <!-- 刻度环 -->
+          <g id="ticks" class="dial-tick"></g>
+
+          <!-- 扇区分隔尺线 -->
+          <g class="dial-split" stroke-width="1.2">
+            <line x1="0" y1="-119" x2="0" y2="-251" transform="rotate(60)"/>
+            <line x1="0" y1="-119" x2="0" y2="-251" transform="rotate(180)"/>
+            <line x1="0" y1="-119" x2="0" y2="-251" transform="rotate(300)"/>
+          </g>
+
+          <!-- 扇区标签 -->
+          <g class="dial-label" font-size="15" font-weight="500" text-anchor="middle">
+            <text x="0" y="-158">开发者视角</text>
+            <text x="-136" y="96">投资人视角</text>
+            <text x="136" y="96">用户视角</text>
+          </g>
+          <g class="dial-reading" font-size="13" font-weight="700" text-anchor="middle">
+            <text x="0" y="-134">82</text>
+            <text x="-136" y="120">64</text>
+            <text x="136" y="120">71</text>
+          </g>
+
+          <!-- 指针：72 → 顶部起算 259.2° -->
+          <g transform="rotate(259.2)">
+            <line class="needle" x1="0" y1="0" x2="0" y2="-232" stroke-width="3.4" stroke-linecap="round"/>
+            <circle class="needle-cap" cx="0" cy="-232" r="5"/>
+          </g>
+          <circle class="hub-screw" r="13"/>
+          <circle class="hub-jewel" r="5.5"/>
+        </svg>
+
+        <div class="hub">
+          <div class="reading-hero">72<span class="reading-unit">%</span></div>
+          <div class="reading-label">势能指数</div>
+          <div class="reading-delta mono">+6 自 v0.3</div>
+        </div>
+      </div>
+
+      <div class="zone-key">
+        <div><i class="key-dev"></i>开发者 / 内容</div>
+        <div><i class="key-investor"></i>投资人 / 商业</div>
+        <div><i class="key-user"></i>用户 / 共创</div>
+        <div><i class="key-review"></i>评审（独立通道）</div>
+      </div>
+    </section>
+
+    <aside class="rail">
+
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">本轮读数</h2>
+          <span class="pill" data-state="attention">1 项冻结</span>
+        </div>
+
+        <div class="meter">
+          <div class="meter-top">
+            <span class="meter-name">开发者视角</span>
+            <span class="meter-val">82</span>
+          </div>
+          <div class="track"><div class="fill" data-zone="dev" style="width:82%"></div></div>
+        </div>
+
+        <div class="meter">
+          <div class="meter-top">
+            <span class="meter-name">投资人视角</span>
+            <span class="meter-val">64</span>
+          </div>
+          <div class="track"><div class="fill" data-zone="investor" style="width:64%"></div></div>
+        </div>
+
+        <div class="meter">
+          <div class="meter-top">
+            <span class="meter-name">用户视角</span>
+            <span class="meter-val">71</span>
+          </div>
+          <div class="track"><div class="fill" data-zone="user" style="width:71%"></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2 class="card-title">证据链</h2>
+          <span class="card-meta">14 条 · 最新在前</span>
+        </div>
+
+        <div class="ev">
+          <span class="pill" data-state="running">运行中</span>
+          <div class="ev-body">
+            <div class="ev-title">技术可行性抽样</div>
+            <div class="ev-src">ev:3ab0d4 · 采集中 6/10</div>
+          </div>
+          <span class="ev-time">10:31</span>
+        </div>
+
+        <div class="ev">
+          <span class="pill" data-state="attention">已冻结</span>
+          <div class="ev-body">
+            <div class="ev-title">投资人留存假设 D30</div>
+            <div class="ev-src">ev:c40e18 · 与访谈结论冲突</div>
+          </div>
+          <span class="ev-time">10:27</span>
+        </div>
+
+        <div class="ev">
+          <span class="pill" data-state="calibrated">已校准</span>
+          <div class="ev-body">
+            <div class="ev-title">竞品定价区间</div>
+            <div class="ev-src">ev:7f21c9 · 3 个来源交叉</div>
+          </div>
+          <span class="ev-time">10:22</span>
+        </div>
+
+        <div class="ev">
+          <span class="pill" data-state="await">待输入</span>
+          <div class="ev-body">
+            <div class="ev-title">目标用户获取成本</div>
+            <div class="ev-src">ev:—— · 需你确认渠道假设</div>
+          </div>
+          <span class="ev-time">10:19</span>
+        </div>
+
+        <div class="ev">
+          <span class="pill" data-state="idle">空闲</span>
+          <div class="ev-body">
+            <div class="ev-title">监管合规检查</div>
+            <div class="ev-src">ev:—— · 未排程</div>
+          </div>
+          <span class="ev-time">——</span>
+        </div>
+      </div>
+
+      <div class="card review-card">
+        <div class="card-head">
+          <h2 class="card-title">需注意</h2>
+          <span class="pill" data-state="attention">需注意</span>
+        </div>
+        <p class="review-q" style="margin:0">
+          投资人视角的留存假设与用户访谈结论冲突：模型取 D30 = 22%，访谈样本中位数为 9%。
+          盘面已冻结该字段，等你裁决后再推动指针。
+        </p>
+        <div class="review-actions">
+          <button class="btn" data-variant="primary" type="button">采用访谈值</button>
+          <button class="btn" type="button">保留模型值</button>
+          <button class="btn" type="button">查看对比</button>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <div class="legend">
+    <div class="legend-title">五态语义表 · 组件不得自造</div>
+    <div class="legend-row">
+      <span class="pill" data-state="running">运行中</span>
+      <span class="pill" data-state="await">待输入</span>
+      <span class="pill" data-state="calibrated">已校准</span>
+      <span class="pill" data-state="attention">需注意</span>
+      <span class="pill" data-state="idle">空闲</span>
+    </div>
+
+    <div class="legend-title" style="margin-top: var(--s5)">
+      来源标记 · 双信道（颜色 + 线型），不把猜测当事实
+    </div>
+    <div class="legend-row">
+      <span class="source-tag" data-source="user">user · 实线</span>
+      <span class="source-tag" data-source="model">model · 虚线</span>
+      <span class="source-tag" data-source="missing">missing · 点线</span>
+    </div>
+
+    <!-- 色板由 token 实时生成：hex 标注不可能与实现漂移 -->
+    <div class="swatches" id="swatches"></div>
+  </div>
+
+</div>
+
+<script>
+/* 刻度环：120 格，每 10 格为主刻度 */
+(function () {
+  var g = document.getElementById("ticks");
+  if (!g) return;
+  var ns = "http://www.w3.org/2000/svg";
+  for (var i = 0; i < 120; i++) {
+    var major = i % 10 === 0;
+    var mid = !major && i % 5 === 0;
+    var len = major ? 13 : mid ? 8 : 4.5;
+    var l = document.createElementNS(ns, "line");
+    l.setAttribute("x1", "0");
+    l.setAttribute("y1", String(-258));
+    l.setAttribute("x2", "0");
+    l.setAttribute("y2", String(-258 + len));
+    l.setAttribute("stroke-width", major ? "1.6" : mid ? "1.1" : "0.8");
+    l.setAttribute("opacity", major ? "0.85" : mid ? "0.55" : "0.32");
+    l.setAttribute("transform", "rotate(" + (i * 3) + ")");
+    g.appendChild(l);
+  }
+})();
+
+/* 色板：从 computed token 取值，标注永远等于实现 */
+(function () {
+  var host = document.getElementById("swatches");
+  if (!host) return;
+  var cs = getComputedStyle(document.documentElement);
+  [
+    ["--sw-cream-100", "cream-100"], ["--sw-cream-200", "cream-200"],
+    ["--sw-cream-300", "cream-300"], ["--sw-tea-400", "tea-400"],
+    ["--sw-tea-500", "tea-500"],
+    ["--sw-gold-700", "gold-700"], ["--sw-gold-600", "gold-600", "文字金"],
+    ["--sw-gold-500", "gold-500", "装饰金"], ["--sw-gold-400", "gold-400"],
+    ["--sw-gold-300", "gold-300"],
+    ["--sw-olive-700", "olive-700"], ["--sw-olive-600", "olive-600"],
+    ["--sw-olive-200", "olive-200"],
+    ["--sw-plum-700", "plum-700"], ["--sw-plum-600", "plum-600"],
+    ["--sw-plum-200", "plum-200"],
+    ["--sw-red-600", "red-600"],
+    ["--sw-ink-900", "ink-900"], ["--sw-ink-600", "ink-600"],
+    ["--sw-ink-400", "ink-400"]
+  ].forEach(function (pair) {
+    var hex = cs.getPropertyValue(pair[0]).trim();
+    var el = document.createElement("div");
+    el.className = "sw";
+    var i = document.createElement("i");
+    i.style.background = "var(" + pair[0] + ")";
+    var s = document.createElement("span");
+    s.textContent = pair[1] + " " + hex;
+    el.appendChild(i);
+    el.appendChild(s);
+    if (pair[2]) {
+      var em = document.createElement("em");
+      em.textContent = pair[2];
+      el.appendChild(em);
+    }
+    host.appendChild(el);
+  });
+})();
+</script>
+</body>
+</html>

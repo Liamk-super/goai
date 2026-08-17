@@ -21,7 +21,8 @@ $temporaryRoot = $null
 for ($index = 0; $index -lt $CliArguments.Count; $index++) {
     $argument = $CliArguments[$index]
     $containerArguments.Add($argument)
-    if ($argument -in @('-f', '--filename') -and $index + 1 -lt $CliArguments.Count) {
+    if ($argument -in @('-f', '--filename', '--zip') -and $index + 1 -lt $CliArguments.Count) {
+        $isResourceFile = $argument -in @('-f', '--filename')
         $index++
         $source = (Resolve-Path -LiteralPath $CliArguments[$index]).Path
         if (-not $temporaryRoot) {
@@ -33,27 +34,30 @@ for ($index = 0; $index -lt $CliArguments.Count; $index++) {
         & docker cp $source "agentteams-controller:$target" | Out-Null
         if ($LASTEXITCODE -ne 0) { throw "Could not copy AgentTeams resource into controller: $source" }
         $containerArguments.Add($target)
-        $resource = Get-Content -LiteralPath $source -Raw
-        foreach ($match in [regex]::Matches($resource, 'file://\./([^\s"''}]+)')) {
-            $relative = $match.Groups[1].Value
-            $localReference = $null
-            foreach ($base in @((Get-Location).Path, (Split-Path -Parent $source), (Split-Path -Parent (Split-Path -Parent $source)))) {
-                $candidate = Join-Path $base ($relative.Replace('/', [IO.Path]::DirectorySeparatorChar))
-                if (Test-Path -LiteralPath $candidate -PathType Leaf) { $localReference = (Resolve-Path -LiteralPath $candidate).Path; break }
+        if ($isResourceFile) {
+            $resource = Get-Content -LiteralPath $source -Raw
+            foreach ($match in [regex]::Matches($resource, 'file://\./([^\s"''}]+)')) {
+                $relative = $match.Groups[1].Value
+                $localReference = $null
+                foreach ($base in @((Get-Location).Path, (Split-Path -Parent $source), (Split-Path -Parent (Split-Path -Parent $source)))) {
+                    $candidate = Join-Path $base ($relative.Replace('/', [IO.Path]::DirectorySeparatorChar))
+                    if (Test-Path -LiteralPath $candidate -PathType Leaf) { $localReference = (Resolve-Path -LiteralPath $candidate).Path; break }
+                }
+                if (-not $localReference) { throw "Referenced AgentTeams package not found: $relative" }
+                $containerReference = "$temporaryRoot/$($relative.Replace('\','/'))"
+                $containerParent = $containerReference.Substring(0, $containerReference.LastIndexOf('/'))
+                & docker exec agentteams-controller mkdir -p -- $containerParent
+                & docker cp $localReference "agentteams-controller:$containerReference" | Out-Null
+                if ($LASTEXITCODE -ne 0) { throw "Could not copy AgentTeams package into controller: $relative" }
+                # Resource reconciliation is asynchronous. Keep a controller-local
+                # copy at AgentTeams' documented file-package fallback after this
+                # CLI process removes its short-lived import workspace.
+                $packageTarget = "/$($relative.Replace('\','/'))"
+                $packageParent = $packageTarget.Substring(0, $packageTarget.LastIndexOf('/'))
+                & docker exec agentteams-controller mkdir -p -- $packageParent
+                & docker cp $localReference "agentteams-controller:$packageTarget" | Out-Null
+                if ($LASTEXITCODE -ne 0) { throw "Could not stage AgentTeams package for reconciliation: $relative" }
             }
-            if (-not $localReference) { throw "Referenced AgentTeams package not found: $relative" }
-            $containerReference = "$temporaryRoot/$($relative.Replace('\','/'))"
-            $containerParent = $containerReference.Substring(0, $containerReference.LastIndexOf('/'))
-            & docker exec agentteams-controller mkdir -p -- $containerParent
-            & docker cp $localReference "agentteams-controller:$containerReference" | Out-Null
-            if ($LASTEXITCODE -ne 0) { throw "Could not copy AgentTeams package into controller: $relative" }
-            # Resource reconciliation is asynchronous. Keep a controller-local
-            # copy at AgentTeams' documented file-package fallback after this
-            # CLI process removes its short-lived import workspace.
-            $packageTarget = "/generated/packages/$([IO.Path]::GetFileName($localReference))"
-            & docker exec agentteams-controller mkdir -p -- '/generated/packages'
-            & docker cp $localReference "agentteams-controller:$packageTarget" | Out-Null
-            if ($LASTEXITCODE -ne 0) { throw "Could not stage AgentTeams package for reconciliation: $relative" }
         }
     }
 }

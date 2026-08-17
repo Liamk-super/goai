@@ -1,0 +1,119 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-08-09",
+  "hash_algorithm": "SHA-256",
+  "files": [
+    {
+      "id": "ARCH-BASELINE",
+      "path": "docs/势能引擎技术架构基线_V1.0.md",
+      "sha256": "d8676e84b8386ccfe84871cf411ed93c36a55e03545c71fe66cc547d6fb6ea3a",
+      "purpose": "architecture",
+      "read_only": true
+    },
+    {
+      "id": "KB-SUP",
+      "path": "reference/agent知识库/势能评审主管Agent知识库与决策逻辑_副本.md",
+      "sha256": "9dbef1f31bb5abe9715ed27f3d80affcd3ff8f43e639e9528712bfa8b91b2610",
+      "purpose": "agent_knowledge",
+      "read_only": true
+    },
+    {
+      "id": "KB-TEC",
+      "path": "reference/agent知识库/产品与团队专家Agent知识库与决策逻辑_副本.md",
+      "sha256": "5f984f81283a254d34e4e10103e954ac5c7e1a18090f3bea47e8d48a3858bb3d",
+      "purpose": "agent_knowledge",
+      "read_only": true
+    },
+    {
+      "id": "KB-USR",
+      "path": "reference/agent知识库/用户共创Agent知识库与行为决策逻辑_副本.md",
+      "sha256": "9209e64f311894b46c5bd84bc615021f155b3c58307ab48828937f62da9d3c31",
+      "purpose": "agent_knowledge",
+      "read_only": true
+    },
+    {
+      "id": "KB-INV",
+      "path": "reference/agent知识库/投资人Agent知识库与决策逻辑_副本.md",
+      "sha256": "639ff7704f7cc8755c68ecb743b90955fa5945ebab5bc49c9cbd6a450f8886b3",
+      "purpose": "agent_knowledge",
+      "read_only": true
+    },
+    {
+      "id": "KB-CTX",
+      "path": "reference/agent知识库/时间地域Agent知识库与决策逻辑_副本.md",
+      "sha256": "110c49c441f81f366fd08a0b0b062721e5013cad3dc9aa7febdcbabef85e46c4",
+      "purpose": "agent_knowledge",
+      "read_only": true
+    },
+    {
+      "id": "KB-EVD",
+      "path": "reference/agent知识库/证据校准Agent知识库与决策逻辑_副本.md",
+      "sha256": "ca19b8dcb3c0e96c6035a584f91cadcd7547a4a17482d838c528996a75ea8afb",
+      "purpose": "agent_knowledge",
+      "read_only": true
+    },
+    {
+      "id": "ANCHOR-T-TRANS-01",
+      "path": "reference/翻译产品匿名基模测试包_T-TRANS-01 (1).txt",
+      "sha256": "e269275a438c6c35d1e3a3f35f3e2dac70f5c3dd0dbbfb041f7c27042066ab9b",
+      "purpose": "public_anchor",
+      "read_only": true
+    },
+    {
+      "id": "ANCHOR-SOCIAL-HARD-01",
+      "path": "reference/01_社交类匿名测试输入_直接给模型.txt",
+      "sha256": "275be97a0f23174b1e0dc7e93a81d5caff668f376dfd35928be148d357460ef8",
+      "purpose": "public_anchor",
+      "read_only": true
+    },
+    {
+      "id": "ANCHOR-ACADEMIC-HARD-01",
+      "path": "reference/01_第三轮学术应用测试输入_直接给模型_ACADEMIC-HARD-01.txt",
+      "sha256": "d16612160245cb4c020b7f4b0341754a6b3d1617865738ebf3bddbc5f4e13677",
+      "purpose": "public_anchor",
+      "read_only": true
+    },
+    {
+      "id": "SKILL-BROWSER-AUDIT",
+      "path": "packages/skills/manifests/browser-product-audit/1.0.json",
+      "sha256": "0ec1be3b12ddd21315ef7adb2a6240410dbdc0db54c8fedca4de0d5c64680cdc",
+      "purpose": "skill_manifest",
+      "read_only": true
+    },
+    {
+      "id": "SKILL-BUSINESS-ASSESSMENT",
+      "path": "packages/skills/manifests/business-investment-assessment/1.0.json",
+      "sha256": "83a894f70d1f66e4c3bf9c87c7676d61b0e3cffe69e31baa054ca2c964e24024",
+      "purpose": "skill_manifest",
+      "read_only": true
+    },
+    {
+      "id": "SKILL-EVIDENCE-AUDIT",
+      "path": "packages/skills/manifests/evidence-grounding-audit/1.0.json",
+      "sha256": "c1b116e75851e678b1ad4f14861c668509ce70579f540a7da0e83130166bc3c9",
+      "purpose": "skill_manifest",
+      "read_only": true
+    },
+    {
+      "id": "SKILL-INTAKE-GAP",
+      "path": "packages/skills/manifests/intake-gap-diagnosis/1.0.json",
+      "sha256": "c57e345b5be64545cd514332580784c78f8a4b255d67443a44ab227fe1a20bd7",
+      "purpose": "skill_manifest",
+      "read_only": true
+    },
+    {
+      "id": "SKILL-PRODUCT-INTAKE",
+      "path": "packages/skills/manifests/product-intake-normalizer/1.0.json",
+      "sha256": "8aea639eefa0fb7bd459463aee02fdd0d4647a6db12ab1755f7f228843717822",
+      "purpose": "skill_manifest",
+      "read_only": true
+    },
+    {
+      "id": "SKILL-VERSION-REGRESSION",
+      "path": "packages/skills/manifests/version-regression-verification/1.0.json",
+      "sha256": "59a0639c28fdc911f1203771cb2239b4723a3688b01926c828ede249e4d3bdbc",
+      "purpose": "skill_manifest",
+      "read_only": true
+    }
+  ]
+}

@@ -1,0 +1,3325 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "launchscope://skills/user-validation-designer/0.2/output",
+  "title": "user-validation-designer output v0.2",
+  "description": "Project-standard wrapper, field names and semantics identical to product-technical-audit. overall_judgment reuses that skill's exact four-value enum for cross-agent handoff; the user-side five-band verdict lives separately in user_value_judgment (DECISIONS D-02). Keyword set restricted to the shared validator subset: boolean constants use enum:[true].",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "task_id",
+    "status",
+    "result_summary",
+    "structured_output",
+    "evidence_refs",
+    "confidence",
+    "risks",
+    "needs_human_review",
+    "failure_reason",
+    "retryable"
+  ],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "partial",
+        "blocked",
+        "failed"
+      ]
+    },
+    "result_summary": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Conclusion first, <=200 chars. KB-USR-T01 section 0 shape: user value [band] + reason in <=40 chars."
+    },
+    "structured_output": {
+      "$ref": "#/definitions/structured_output"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "needs_human_review": {
+      "type": "boolean"
+    },
+    "failure_reason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        null,
+        "target_user_too_broad",
+        "insufficient_product_context",
+        "missing_product_task",
+        "incomplete_task_matrix",
+        "conflicting_real_evidence",
+        "simulation_invalid",
+        "persona_modeling_failed",
+        "external_action_requires_approval",
+        "unsupported_validation_method",
+        "invalid_output_schema",
+        "pii_in_input",
+        "script_mismatch",
+        "invalid_task_envelope",
+        "schema_validation_failed",
+        "tool_unavailable",
+        "tool_timeout",
+        "step_execution_failed",
+        "invalid_previous_state",
+        "previous_state_integrity_mismatch"
+      ]
+    },
+    "retryable": {
+      "type": "boolean"
+    }
+  },
+  "definitions": {
+    "fact_type": {
+      "type": "string",
+      "enum": [
+        "fact",
+        "inference",
+        "assumption"
+      ]
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "E0",
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5"
+      ]
+    },
+    "sim_tier": {
+      "type": "string",
+      "enum": [
+        "E0",
+        "E1",
+        "E2"
+      ]
+    },
+    "refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "score_1_5": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1,
+      "maximum": 5
+    },
+    "unit_id": {
+      "type": "string",
+      "enum": [
+        "s1",
+        "s2",
+        "s3",
+        "s4a",
+        "s4b",
+        "s5",
+        "s6",
+        "s7_synthesis"
+      ]
+    },
+    "dimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "score",
+        "weight",
+        "counted",
+        "cap_reason",
+        "evidence_refs",
+        "basis",
+        "max_tier",
+        "needs_rescore",
+        "real_evidence_overrides_simulation"
+      ],
+      "properties": {
+        "score": {
+          "$ref": "#/definitions/score_1_5"
+        },
+        "weight": {
+          "type": "integer",
+          "enum": [
+            10,
+            15,
+            20
+          ],
+          "description": "User-side weight set (DECISIONS D-03). Deliberately distinct from product-technical-audit's [15,20,25]; the two scoring systems answer different questions."
+        },
+        "counted": {
+          "type": "boolean",
+          "description": "false when the dimension has only <=E1 backing, per KB-USR-VS01. An uncounted dimension has score null and is excluded from counted_weight; it is NOT scored as low."
+        },
+        "cap_reason": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            null,
+            "team_self_report_only",
+            "no_user_evidence",
+            "simulation_only",
+            "no_product_access",
+            "no_task_script",
+            "persona_ineligible",
+            "real_evidence_requires_rescore"
+          ]
+        },
+        "evidence_refs": {
+          "$ref": "#/definitions/refs"
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1
+        },
+        "max_tier": {
+          "$ref": "#/definitions/tier"
+        },
+        "needs_rescore": {
+          "type": "boolean"
+        },
+        "real_evidence_overrides_simulation": {
+          "type": "boolean"
+        }
+      }
+    },
+    "structured_output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "simulation_disclaimer",
+        "overall_judgment",
+        "user_value_judgment",
+        "evidence_confidence",
+        "user_value_score",
+        "target_user_definition",
+        "personas",
+        "persona_outcomes",
+        "persona_set_check",
+        "jobs_to_be_done",
+        "scenarios_and_alternatives",
+        "simulated_findings",
+        "user_hypotheses",
+        "top_user_problems",
+        "validation_plans",
+        "deferred_validations",
+        "evidence_level_summary",
+        "evidence_effect_ledger",
+        "missing_information",
+        "conflicts",
+        "flags",
+        "out_of_scope_redirects",
+        "evidence_cards",
+        "handoff",
+        "run_manifest",
+        "integrity_diagnostics",
+        "rejected_output",
+        "execution_log"
+      ],
+      "properties": {
+        "simulation_disclaimer": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Program-injected fixed text. Every simulated product of this skill is capped at E2."
+        },
+        "overall_judgment": {
+          "type": "string",
+          "enum": [
+            "strong",
+            "medium",
+            "weak",
+            "insufficient_evidence"
+          ],
+          "description": "PUBLIC cross-agent field. Enum copied verbatim from product-technical-audit/0.1/output so review_supervisor_agent consumes one vocabulary. Mapping from user_value_judgment: strong->strong, medium->medium, weak->weak, very_weak->weak, unverified->insufficient_evidence. On blocked/failed this is insufficient_evidence, never weak."
+        },
+        "user_value_judgment": {
+          "type": "string",
+          "enum": [
+            "strong",
+            "medium",
+            "weak",
+            "very_weak",
+            "unverified"
+          ],
+          "description": "INTERNAL user-side five-band verdict, KB-USR-VS03 verbatim. >=80 and demand_strength>=4 -> strong; 65-79 medium; 50-64 weak; <50 very_weak; >=3 uncounted dimensions -> unverified; no E3+ evidence caps it at medium."
+        },
+        "evidence_confidence": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "user_value_score": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "raw_total",
+            "counted_weight",
+            "normalized_total",
+            "uncounted_dimension_count",
+            "dimensions",
+            "preliminary",
+            "evidence_ceiling",
+            "user_value_ceiling"
+          ],
+          "properties": {
+            "raw_total": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "description": "Sum over counted dimensions of (score/5 x weight). Program-computed; a model-supplied total is discarded."
+            },
+            "counted_weight": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "normalized_total": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 100,
+              "description": "raw_total / counted_weight x 100, rounded to 2dp. All VS03 thresholds apply to THIS value (DECISIONS D-01). null when counted_weight is 0."
+            },
+            "uncounted_dimension_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            },
+            "dimensions": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "demand_strength",
+                "usage_frequency",
+                "pain_severity",
+                "alternative_gap",
+                "willingness_to_pay",
+                "virality"
+              ],
+              "properties": {
+                "demand_strength": {
+                  "$ref": "#/definitions/dimension"
+                },
+                "usage_frequency": {
+                  "$ref": "#/definitions/dimension"
+                },
+                "pain_severity": {
+                  "$ref": "#/definitions/dimension"
+                },
+                "alternative_gap": {
+                  "$ref": "#/definitions/dimension"
+                },
+                "willingness_to_pay": {
+                  "$ref": "#/definitions/dimension"
+                },
+                "virality": {
+                  "$ref": "#/definitions/dimension"
+                }
+              }
+            },
+            "preliminary": {
+              "type": "boolean",
+              "description": "true whenever no E3+ evidence exists. Report wording must say preliminary / E2."
+            },
+            "evidence_ceiling": {
+              "$ref": "#/definitions/tier"
+            },
+            "user_value_ceiling": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "applied",
+                "ceiling",
+                "reason"
+              ],
+              "properties": {
+                "applied": {
+                  "type": "boolean"
+                },
+                "ceiling": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "enum": [
+                    null,
+                    "medium",
+                    "unverified"
+                  ]
+                },
+                "reason": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            },
+            "scoring_note": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Forbidden reading, restated for downstream: this total is an ordinal of demand-side evidence strength, not a like-ability or success probability (KB-USR-VS03)."
+            }
+          }
+        },
+        "target_user_definition": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "admitted",
+            "breadth_check",
+            "converged_segments",
+            "excluded_segments",
+            "clarification_questions"
+          ],
+          "properties": {
+            "admitted": {
+              "type": "boolean"
+            },
+            "breadth_check": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "verdict",
+                "matched_broad_patterns",
+                "reason"
+              ],
+              "properties": {
+                "verdict": {
+                  "type": "string",
+                  "enum": [
+                    "executable",
+                    "too_broad",
+                    "borderline"
+                  ]
+                },
+                "matched_broad_patterns": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "converged_segments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "segment_id",
+                  "label",
+                  "who_hurts_most",
+                  "who_pays",
+                  "who_adopts_first",
+                  "fact_type"
+                ],
+                "properties": {
+                  "segment_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "label": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "who_hurts_most": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "who_pays": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "who_adopts_first": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "payer_differs_from_user": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "fact_type": {
+                    "$ref": "#/definitions/fact_type"
+                  },
+                  "evidence_refs": {
+                    "$ref": "#/definitions/refs"
+                  }
+                }
+              }
+            },
+            "excluded_segments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "label",
+                  "reason"
+                ],
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "clarification_questions": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": "Populated when verdict is too_broad: who hurts most, who pays, who adopts first (KB-USR-R04)."
+            }
+          }
+        },
+        "personas": {
+          "type": "array",
+          "items": {
+            "$ref": "launchscope://skills/user-validation-designer/0.1/persona"
+          }
+        },
+        "persona_outcomes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "persona_id",
+              "verdict",
+              "core_task_failed",
+              "failed_task_keys",
+              "reason"
+            ],
+            "properties": {
+              "persona_id": {
+                "type": "string",
+                "pattern": "^P[0-9]+$"
+              },
+              "verdict": {
+                "type": "string",
+                "enum": [
+                  "accept",
+                  "at_risk",
+                  "reject",
+                  "unverified"
+                ]
+              },
+              "core_task_failed": {
+                "type": "boolean"
+              },
+              "failed_task_keys": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "persona_set_check": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "count",
+            "archetype_coverage",
+            "differentiation"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "archetype_coverage": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "high_need",
+                "skeptic",
+                "edge_case"
+              ],
+              "properties": {
+                "high_need": {
+                  "type": "boolean"
+                },
+                "skeptic": {
+                  "type": "boolean"
+                },
+                "edge_case": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "differentiation": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "pairwise_min_distinct_keys",
+                "homogeneous_pairs",
+                "verdict"
+              ],
+              "properties": {
+                "pairwise_min_distinct_keys": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "minimum": 0,
+                  "maximum": 5
+                },
+                "homogeneous_pairs": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "persona_a",
+                      "persona_b",
+                      "shared_keys"
+                    ],
+                    "properties": {
+                      "persona_a": {
+                        "type": "string",
+                        "pattern": "^P[0-9]+$"
+                      },
+                      "persona_b": {
+                        "type": "string",
+                        "pattern": "^P[0-9]+$"
+                      },
+                      "shared_keys": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "verdict": {
+                  "type": "string",
+                  "enum": [
+                    "pass",
+                    "fail"
+                  ]
+                }
+              }
+            },
+            "retries_used": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 2
+            }
+          }
+        },
+        "jobs_to_be_done": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "job_id",
+              "persona_ids",
+              "statement",
+              "job_type",
+              "outcome_metric",
+              "fact_type"
+            ],
+            "properties": {
+              "job_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "persona_ids": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string",
+                  "pattern": "^P[0-9]+$"
+                }
+              },
+              "statement": {
+                "type": "string",
+                "minLength": 1
+              },
+              "job_type": {
+                "type": "string",
+                "enum": [
+                  "functional",
+                  "emotional",
+                  "social"
+                ]
+              },
+              "outcome_metric": {
+                "type": "string",
+                "minLength": 1,
+                "description": "What cost is reduced or what result is obtained. Quantified preferred; a feature name is not an outcome (KB-USR-P02)."
+              },
+              "fact_type": {
+                "$ref": "#/definitions/fact_type"
+              },
+              "evidence_refs": {
+                "$ref": "#/definitions/refs"
+              }
+            }
+          }
+        },
+        "scenarios_and_alternatives": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "scenario_id",
+              "persona_id",
+              "trigger_event",
+              "limits",
+              "alternatives",
+              "switching_forces",
+              "journey",
+              "flags"
+            ],
+            "properties": {
+              "scenario_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "persona_id": {
+                "type": "string",
+                "pattern": "^P[0-9]+$"
+              },
+              "trigger_event": {
+                "type": "string",
+                "minLength": 1
+              },
+              "environment": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "limits": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "time": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "budget": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "skill": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "device": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "network": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "permission": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              },
+              "alternatives": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "name",
+                    "alternative_type",
+                    "cost",
+                    "gap",
+                    "fact_type"
+                  ],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "alternative_type": {
+                      "type": "string",
+                      "enum": [
+                        "direct_product",
+                        "workaround",
+                        "manual",
+                        "do_nothing"
+                      ],
+                      "description": "do_nothing must be considered explicitly: 'not solving it' is a real competitor (KB-USR-B01)."
+                    },
+                    "cost": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "money": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "time": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "effort": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      }
+                    },
+                    "gap": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "fact_type": {
+                      "$ref": "#/definitions/fact_type"
+                    },
+                    "evidence_refs": {
+                      "$ref": "#/definitions/refs"
+                    }
+                  }
+                }
+              },
+              "switching_forces": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "push",
+                  "pull",
+                  "anxiety",
+                  "habit",
+                  "verdict",
+                  "basis"
+                ],
+                "properties": {
+                  "push": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5
+                  },
+                  "pull": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5
+                  },
+                  "anxiety": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5
+                  },
+                  "habit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5
+                  },
+                  "verdict": {
+                    "type": "string",
+                    "enum": [
+                      "will_switch",
+                      "will_not_switch",
+                      "borderline"
+                    ],
+                    "description": "Program-decided: push+pull <= anxiety+habit -> will_not_switch, even when the product is objectively better (KB-USR-F02)."
+                  },
+                  "basis": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "push_forced_by_workaround_cost": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  }
+                }
+              },
+              "journey": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "stage",
+                    "behavior",
+                    "emotion",
+                    "drop_off_risk"
+                  ],
+                  "properties": {
+                    "stage": {
+                      "type": "string",
+                      "enum": [
+                        "awareness",
+                        "trial",
+                        "first_use",
+                        "continued_use",
+                        "referral"
+                      ]
+                    },
+                    "behavior": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "thought": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "emotion": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 5
+                    },
+                    "touchpoint": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "pain": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "drop_off_risk": {
+                      "type": "string",
+                      "enum": [
+                        "high",
+                        "medium",
+                        "low"
+                      ]
+                    }
+                  }
+                }
+              },
+              "flags": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "pseudo_demand_risk",
+                  "high_switching_friction"
+                ],
+                "properties": {
+                  "pseudo_demand_risk": {
+                    "type": "boolean",
+                    "description": "No alternative found at all. If nobody is solving this today, the need may not exist (KB-USR-S2)."
+                  },
+                  "high_switching_friction": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "simulated_findings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "executed",
+            "skip_reasons",
+            "evidence_tier",
+            "first_experience",
+            "value_communication_failure",
+            "task_test_matrix",
+            "experience_issues",
+            "simulated_interview",
+            "hidden_needs",
+            "insights",
+            "politeness_feedback_removed",
+            "realism_check"
+          ],
+          "properties": {
+            "executed": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "first_experience",
+                "task_test"
+              ],
+              "properties": {
+                "first_experience": {
+                  "type": "boolean"
+                },
+                "task_test": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "skip_reasons": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "unit",
+                  "reason",
+                  "missing_input"
+                ],
+                "properties": {
+                  "unit": {
+                    "$ref": "#/definitions/unit_id"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "missing_input": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "evidence_tier": {
+              "type": "string",
+              "enum": [
+                "E2"
+              ],
+              "description": "Pinned. Simulation output can never be anything else."
+            },
+            "first_experience": {
+              "type": "array",
+              "description": "Forced to [] when S4a is not executable. Never inferred.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "persona_id",
+                  "five_second_impression",
+                  "can_restate_value",
+                  "continue_intent",
+                  "reason"
+                ],
+                "properties": {
+                  "persona_id": {
+                    "type": "string",
+                    "pattern": "^P[0-9]+$"
+                  },
+                  "five_second_impression": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "can_restate_value": {
+                    "type": "boolean"
+                  },
+                  "restated_value": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "deviation_from_claim": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "continue_intent": {
+                    "type": "string",
+                    "enum": [
+                      "willing",
+                      "hesitant",
+                      "refuse"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "patience_exceeded": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "evidence_refs": {
+                    "$ref": "#/definitions/refs"
+                  }
+                }
+              }
+            },
+            "value_communication_failure": {
+              "type": "boolean",
+              "description": "Program-set true when >=2 personas cannot restate the value claim. Then the top improvement must be copy/positioning, not features (KB-USR-S3)."
+            },
+            "task_test_matrix": {
+              "type": "array",
+              "description": "Forced to [] when product_tasks is absent. Fabricating task results without a script is the single most damaging failure mode for this skill.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "persona_id",
+                  "task_key",
+                  "result",
+                  "cause_type"
+                ],
+                "properties": {
+                  "persona_id": {
+                    "type": "string",
+                    "pattern": "^P[0-9]+$"
+                  },
+                  "task_key": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "result": {
+                    "type": "string",
+                    "enum": [
+                      "completed",
+                      "completed_with_difficulty",
+                      "failed",
+                      "not_executed"
+                    ]
+                  },
+                  "reason": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "description": "Required when result=not_executed; explains why the required Persona x task pair could not be executed."
+                  },
+                  "path": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "hesitation_steps": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "errors": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "abandon_reason": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "cognitive_walkthrough": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "additionalProperties": false,
+                    "required": [
+                      "will_try_correct_goal",
+                      "will_notice_correct_action",
+                      "can_link_action_to_goal",
+                      "can_understand_feedback"
+                    ],
+                    "description": "Required on failed steps (KB-USR-F06 four questions).",
+                    "properties": {
+                      "will_try_correct_goal": {
+                        "type": "boolean"
+                      },
+                      "will_notice_correct_action": {
+                        "type": "boolean"
+                      },
+                      "can_link_action_to_goal": {
+                        "type": "boolean"
+                      },
+                      "can_understand_feedback": {
+                        "type": "boolean"
+                      }
+                    }
+                  },
+                  "cause_type": {
+                    "type": "string",
+                    "enum": [
+                      "cognitive",
+                      "functional",
+                      "performance",
+                      "content",
+                      "unknown"
+                    ]
+                  },
+                  "evidence_refs": {
+                    "$ref": "#/definitions/refs"
+                  }
+                }
+              }
+            },
+            "experience_issues": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "issue_id",
+                  "description",
+                  "severity",
+                  "frequency_persona_count",
+                  "cause_type",
+                  "affected_personas"
+                ],
+                "properties": {
+                  "issue_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "blocker",
+                      "major",
+                      "minor"
+                    ]
+                  },
+                  "frequency_persona_count": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "cause_type": {
+                    "type": "string",
+                    "enum": [
+                      "cognitive",
+                      "functional",
+                      "performance",
+                      "content",
+                      "unknown"
+                    ]
+                  },
+                  "affected_personas": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^P[0-9]+$"
+                    }
+                  },
+                  "step_ref": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "cognitive_break_point": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ],
+                    "description": "true when >=2 personas hesitate at the same step (KB-USR-F06)."
+                  },
+                  "carried_from_previous": {
+                    "type": [
+                      "boolean",
+                      "null"
+                    ]
+                  },
+                  "evidence_refs": {
+                    "$ref": "#/definitions/refs"
+                  }
+                }
+              }
+            },
+            "simulated_interview": {
+              "type": "array",
+              "description": "The only place verbatim-style prose is retained (KB-USR-T01 section 4). Downstream agents consume signals and insights, not the transcript.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "persona_id",
+                  "turns",
+                  "signals",
+                  "questions_raised",
+                  "complaints"
+                ],
+                "properties": {
+                  "persona_id": {
+                    "type": "string",
+                    "pattern": "^P[0-9]+$"
+                  },
+                  "turns": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "speaker",
+                        "text"
+                      ],
+                      "properties": {
+                        "speaker": {
+                          "type": "string",
+                          "enum": [
+                            "researcher",
+                            "user"
+                          ]
+                        },
+                        "text": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  },
+                  "signals": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "text",
+                        "strength",
+                        "reason"
+                      ],
+                      "properties": {
+                        "text": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "strength": {
+                          "type": "string",
+                          "enum": [
+                            "strong",
+                            "weak",
+                            "politeness"
+                          ],
+                          "description": "strong = past behaviour with a cost; weak = opinion or promise; politeness = vague praise, weight 0 (KB-USR-F07 / B02)."
+                        },
+                        "reason": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      }
+                    }
+                  },
+                  "questions_raised": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": "At least one genuine question per persona; a real user always has one (KB-USR-F07)."
+                  },
+                  "complaints": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": "At least one concrete dissatisfaction per persona."
+                  }
+                }
+              }
+            },
+            "hidden_needs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "description",
+                  "derived_from",
+                  "persona_ids",
+                  "fact_type"
+                ],
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "derived_from": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "persona_ids": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^P[0-9]+$"
+                    }
+                  },
+                  "fact_type": {
+                    "$ref": "#/definitions/fact_type"
+                  }
+                }
+              }
+            },
+            "insights": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "observation",
+                  "root_cause",
+                  "kano_type",
+                  "theme",
+                  "recommendation"
+                ],
+                "properties": {
+                  "observation": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "root_cause": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "kano_type": {
+                    "type": "string",
+                    "enum": [
+                      "basic",
+                      "performance",
+                      "delight",
+                      "reverse",
+                      "indifferent"
+                    ],
+                    "description": "reverse means remove or hide, not optimise (KB-USR-F05)."
+                  },
+                  "theme": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "recommendation": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_refs": {
+                    "$ref": "#/definitions/refs"
+                  }
+                }
+              }
+            },
+            "politeness_feedback_removed": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "text",
+                  "persona_id",
+                  "reason"
+                ],
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "persona_id": {
+                    "type": "string",
+                    "pattern": "^P[0-9]+$"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "realism_check": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "negative_findings_count",
+                "hidden_needs_count",
+                "verdict",
+                "retries_used"
+              ],
+              "properties": {
+                "negative_findings_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "hidden_needs_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "verdict": {
+                  "type": "string",
+                  "enum": [
+                    "pass",
+                    "fail",
+                    "not_applicable"
+                  ],
+                  "description": "fail when either count is 0: a simulation with zero negatives is unrealistic and must be rerun (KB-USR-B02 / S5). not_applicable when no simulation ran at all."
+                },
+                "retries_used": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 2
+                }
+              }
+            }
+          }
+        },
+        "user_hypotheses": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "hypothesis_id",
+              "statement",
+              "claim_type",
+              "fact_type",
+              "current_evidence_level",
+              "affected_dimensions",
+              "priority_score",
+              "priority_rank",
+              "decision_impact",
+              "status",
+              "linked_plan_ids",
+              "deferred_reason",
+              "carried_from_previous"
+            ],
+            "properties": {
+              "hypothesis_id": {
+                "type": "string",
+                "pattern": "^H[0-9]+$"
+              },
+              "statement": {
+                "type": "string",
+                "minLength": 1,
+                "description": "One falsifiable sentence."
+              },
+              "claim_type": {
+                "type": "string",
+                "enum": [
+                  "demand",
+                  "behavior",
+                  "willingness_to_pay",
+                  "usability",
+                  "retention",
+                  "segment",
+                  "alternative"
+                ]
+              },
+              "fact_type": {
+                "$ref": "#/definitions/fact_type"
+              },
+              "current_evidence_level": {
+                "$ref": "#/definitions/tier"
+              },
+              "supporting_refs": {
+                "$ref": "#/definitions/refs"
+              },
+              "contradicting_refs": {
+                "$ref": "#/definitions/refs"
+              },
+              "affected_dimensions": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "demand_strength",
+                    "usage_frequency",
+                    "pain_severity",
+                    "alternative_gap",
+                    "willingness_to_pay",
+                    "virality"
+                  ]
+                }
+              },
+              "priority_score": {
+                "type": "number",
+                "minimum": 0
+              },
+              "priority_rank": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "decision_impact": {
+                "type": "string",
+                "enum": [
+                  "blocking",
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "open",
+                  "validated",
+                  "falsified",
+                  "partially_validated",
+                  "abandoned"
+                ]
+              },
+              "linked_plan_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^VP[0-9]+$"
+                },
+                "description": "An open hypothesis must have a non-empty list here OR a non-empty deferred_reason (KB-USR-P01 item 4)."
+              },
+              "deferred_reason": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "carried_from_previous": {
+                "type": "boolean"
+              },
+              "reopened": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "reopen_reason": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "transition_driver": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "standard_changed": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "reframe_reason": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "top_user_problems": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "problem_id",
+              "question",
+              "why_it_matters",
+              "blocks_which_judgment",
+              "rank"
+            ],
+            "properties": {
+              "problem_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "question": {
+                "type": "string",
+                "minLength": 1
+              },
+              "why_it_matters": {
+                "type": "string",
+                "minLength": 1
+              },
+              "blocks_which_judgment": {
+                "type": "string",
+                "minLength": 1
+              },
+              "related_hypothesis_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^H[0-9]+$"
+                }
+              },
+              "related_issue_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "rank": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+              }
+            }
+          }
+        },
+        "validation_plans": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "$ref": "launchscope://skills/user-validation-designer/0.1/validation-plan"
+          }
+        },
+        "deferred_validations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "hypothesis_id",
+              "reason",
+              "revisit_condition"
+            ],
+            "properties": {
+              "hypothesis_id": {
+                "type": "string",
+                "pattern": "^H[0-9]+$"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "revisit_condition": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "evidence_level_summary": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "max_tier_achieved",
+            "max_ingested_tier",
+            "max_applicable_tier",
+            "has_real_user_evidence",
+            "tier_distribution",
+            "ingested_tier_distribution",
+            "applicable_tier_distribution",
+            "simulation_capped",
+            "downgraded_entries",
+            "per_claim",
+            "judgment_ceiling"
+          ],
+          "properties": {
+            "max_tier_achieved": {
+              "$ref": "#/definitions/tier"
+            },
+            "max_ingested_tier": {
+              "$ref": "#/definitions/tier"
+            },
+            "max_applicable_tier": {
+              "$ref": "#/definitions/tier"
+            },
+            "has_real_user_evidence": {
+              "type": "boolean",
+              "description": "true only when at least one E3+ caller-supplied record is explicitly applicable to, and referenced by, a scored dimension. Unrelated E3+ evidence does not unlock the judgment."
+            },
+            "tier_distribution": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "E0",
+                "E1",
+                "E2",
+                "E3",
+                "E4",
+                "E5"
+              ],
+              "properties": {
+                "E0": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "E1": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "E2": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "E3": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "E4": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "E5": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            },
+            "ingested_tier_distribution": {
+              "$ref": "#/definitions/tier_distribution"
+            },
+            "applicable_tier_distribution": {
+              "$ref": "#/definitions/tier_distribution"
+            },
+            "simulation_capped": {
+              "type": "boolean"
+            },
+            "downgraded_entries": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "ref",
+                  "from_tier",
+                  "to_tier",
+                  "reason"
+                ],
+                "properties": {
+                  "ref": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "from_tier": {
+                    "$ref": "#/definitions/tier"
+                  },
+                  "to_tier": {
+                    "$ref": "#/definitions/tier"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "expiry_unknown_refs": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "description": "Evidence lacking expiry. Forwarded to evidence_calibration_agent; this skill assumes neither validity nor staleness (DECISIONS D-04)."
+            },
+            "per_claim": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "claim_id",
+                  "claim",
+                  "current_tier",
+                  "target_tier",
+                  "upgrade_plan_id",
+                  "upgradable"
+                ],
+                "properties": {
+                  "claim_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "claim": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "current_tier": {
+                    "$ref": "#/definitions/tier"
+                  },
+                  "target_tier": {
+                    "$ref": "#/definitions/tier"
+                  },
+                  "upgrade_plan_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "upgradable": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            "judgment_ceiling": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "applied",
+                "ceiling",
+                "reason"
+              ],
+              "properties": {
+                "applied": {
+                  "type": "boolean"
+                },
+                "ceiling": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "enum": [
+                    null,
+                    "medium",
+                    "unverified"
+                  ]
+                },
+                "reason": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "evidence_effect_ledger": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "evidence_id",
+              "claim_id",
+              "relation",
+              "effective_tier",
+              "scope_valid",
+              "product_version_valid",
+              "semantic_valid"
+            ],
+            "properties": {
+              "evidence_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "claim_id": {
+                "type": "string",
+                "pattern": "^H[0-9]+$"
+              },
+              "relation": {
+                "type": "string",
+                "enum": [
+                  "support",
+                  "contradict",
+                  "neutral",
+                  "not_applicable"
+                ]
+              },
+              "effective_tier": {
+                "$ref": "#/definitions/tier"
+              },
+              "scope_valid": {
+                "type": "boolean"
+              },
+              "product_version_valid": {
+                "type": "boolean"
+              },
+              "semantic_valid": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "missing_information": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "field",
+              "state",
+              "why_it_matters",
+              "affected_units",
+              "how_to_obtain"
+            ],
+            "properties": {
+              "field": {
+                "type": "string",
+                "minLength": 1
+              },
+              "state": {
+                "type": "string",
+                "enum": [
+                  "missing",
+                  "unknown",
+                  "low_confidence",
+                  "insufficient_real_evidence"
+                ]
+              },
+              "why_it_matters": {
+                "type": "string",
+                "minLength": 1
+              },
+              "affected_units": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/unit_id"
+                }
+              },
+              "affected_dimensions": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "demand_strength",
+                    "usage_frequency",
+                    "pain_severity",
+                    "alternative_gap",
+                    "willingness_to_pay",
+                    "virality"
+                  ]
+                }
+              },
+              "how_to_obtain": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "conflict_id",
+              "conflict_type",
+              "side_a",
+              "side_b",
+              "resolution",
+              "note"
+            ],
+            "properties": {
+              "conflict_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "conflict_type": {
+                "type": "string",
+                "enum": [
+                  "simulation_vs_real",
+                  "real_vs_real",
+                  "persona_vs_persona",
+                  "team_claim_vs_user",
+                  "upstream_vs_user",
+                  "threshold_vs_observed"
+                ]
+              },
+              "side_a": {
+                "$ref": "#/definitions/conflict_side"
+              },
+              "side_b": {
+                "$ref": "#/definitions/conflict_side"
+              },
+              "resolution": {
+                "type": "string",
+                "enum": [
+                  "real_evidence_wins",
+                  "both_retained",
+                  "unresolved"
+                ],
+                "description": "Averaging is forbidden (KB-USR-B04). Persona-vs-persona conflicts are both_retained and surfaced to the supervisor as a key tension."
+              },
+              "winner_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "demoted_ref": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "note": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "flags": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "target_user_too_broad",
+            "persona_homogeneous",
+            "simulation_unrealistic",
+            "pseudo_demand_risk",
+            "value_communication_failure",
+            "high_switching_friction",
+            "retention_risk",
+            "politeness_only_feedback",
+            "compliance_concern",
+            "external_action_pending_approval",
+            "prompt_injection_observed",
+            "conflict"
+          ],
+          "properties": {
+            "target_user_too_broad": {
+              "type": "boolean"
+            },
+            "persona_homogeneous": {
+              "type": "boolean"
+            },
+            "simulation_unrealistic": {
+              "type": "boolean"
+            },
+            "pseudo_demand_risk": {
+              "type": "boolean"
+            },
+            "value_communication_failure": {
+              "type": "boolean"
+            },
+            "high_switching_friction": {
+              "type": "boolean"
+            },
+            "retention_risk": {
+              "type": "boolean"
+            },
+            "politeness_only_feedback": {
+              "type": "boolean"
+            },
+            "compliance_concern": {
+              "type": "boolean"
+            },
+            "external_action_pending_approval": {
+              "type": "boolean"
+            },
+            "conflict": {
+              "type": "boolean"
+            },
+            "prompt_injection_observed": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "fabrication_blocked": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          }
+        },
+        "out_of_scope_redirects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "question",
+              "redirect_to"
+            ],
+            "properties": {
+              "question": {
+                "type": "string",
+                "minLength": 1
+              },
+              "redirect_to": {
+                "type": "string",
+                "enum": [
+                  "product_team_expert_agent",
+                  "investment_business_agent",
+                  "evidence_calibration_agent",
+                  "review_supervisor_agent",
+                  "human_operator"
+                ]
+              }
+            }
+          }
+        },
+        "evidence_cards": {
+          "type": "array",
+          "items": {
+            "$ref": "launchscope://skills/user-validation-designer/0.1/evidence-card"
+          }
+        },
+        "handoff": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "to_product_team_expert_agent",
+            "to_investment_business_agent",
+            "to_evidence_calibration_agent",
+            "to_review_supervisor_agent"
+          ],
+          "properties": {
+            "to_product_team_expert_agent": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "User-side phenomena and cognitive attribution only. Functional/technical attribution is theirs to decide; disagreement is retained as conflict.",
+              "properties": {
+                "experience_issues": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "journey_drop_offs": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "value_communication_failure": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "task_test_matrix": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "contract_note": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            },
+            "to_investment_business_agent": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Demand-side facts and evidence strength only. No market size, pricing or investment conclusions.",
+              "properties": {
+                "demand_strength": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "usage_frequency": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "willingness_to_pay": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "payer_vs_user": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "alternatives": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "switching_forces_summary": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "virality_potential": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "contract_note": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            },
+            "to_evidence_calibration_agent": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Full evidence package for audit. On rejection this skill supplements or downgrades; it never argues to keep a verdict.",
+              "properties": {
+                "evidence_cards": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "issued_evidence_cards": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "ingested_evidence_refs": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "ingested_evidence": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "fact_inference_assumption_split": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "conflict_pairs": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "downgraded_entries": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "expiry_unknown_refs": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "simulation_capped": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "contract_note": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            },
+            "to_review_supervisor_agent": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Dimension 'users and usage'. Explicitly excludes project-level recommendations.",
+              "properties": {
+                "overall_judgment": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "enum": [
+                    null,
+                    "strong",
+                    "medium",
+                    "weak",
+                    "insufficient_evidence"
+                  ]
+                },
+                "user_value_judgment": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "enum": [
+                    null,
+                    "strong",
+                    "medium",
+                    "weak",
+                    "very_weak",
+                    "unverified"
+                  ]
+                },
+                "evidence_confidence": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "enum": [
+                    null,
+                    "high",
+                    "medium",
+                    "low"
+                  ]
+                },
+                "critical_issue": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "key_real_evidence_refs": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "next_actions": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "top_risks": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "validation_plans_digest": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "missing_information": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "needs_human_review": {
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "contract_note": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "critical_issue": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": false,
+          "required": [
+            "issue",
+            "impact",
+            "recommendation"
+          ],
+          "properties": {
+            "issue": {
+              "type": "string",
+              "minLength": 1
+            },
+            "impact": {
+              "type": "string",
+              "minLength": 1
+            },
+            "recommendation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "evidence_refs": {
+              "$ref": "#/definitions/refs"
+            }
+          }
+        },
+        "top_risks": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "risk_id",
+              "category",
+              "description",
+              "probability",
+              "impact",
+              "recommendation"
+            ],
+            "properties": {
+              "risk_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "category": {
+                "type": "string",
+                "enum": [
+                  "demand",
+                  "usability",
+                  "retention",
+                  "monetization",
+                  "segment",
+                  "integrity",
+                  "compliance"
+                ]
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              },
+              "probability": {
+                "type": "string",
+                "enum": [
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              },
+              "impact": {
+                "type": "string",
+                "enum": [
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              },
+              "evidence_refs": {
+                "$ref": "#/definitions/refs"
+              },
+              "recommendation": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "next_actions": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "action",
+              "owner_hint",
+              "verifiable_outcome"
+            ],
+            "properties": {
+              "action": {
+                "type": "string",
+                "minLength": 1
+              },
+              "owner_hint": {
+                "type": "string",
+                "minLength": 1
+              },
+              "verifiable_outcome": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "regression_comparison": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": false,
+          "description": "Present only in version_regression mode. See spec section 7.",
+          "required": [
+            "previous_task_id",
+            "previous_product_version",
+            "product_tasks_hash_match",
+            "standard_changed",
+            "hypothesis_ledger",
+            "progress_verdict"
+          ],
+          "properties": {
+            "previous_task_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "previous_product_version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "product_tasks_hash_match": {
+              "type": "boolean"
+            },
+            "scoring_schema_version_match": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "standard_changed": {
+              "type": "boolean"
+            },
+            "standard_change_reasons": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "item",
+                  "from",
+                  "to",
+                  "reason"
+                ],
+                "properties": {
+                  "item": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "from": {
+                    "type": "string"
+                  },
+                  "to": {
+                    "type": "string"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "hypothesis_ledger": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "hypothesis_id",
+                  "status_prev",
+                  "status_now",
+                  "evidence_level_prev",
+                  "evidence_level_now",
+                  "transition",
+                  "driver"
+                ],
+                "properties": {
+                  "hypothesis_id": {
+                    "type": "string",
+                    "pattern": "^H[0-9]+$"
+                  },
+                  "statement_prev": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "statement_now": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "status_prev": {
+                    "type": "string",
+                    "enum": [
+                      "open",
+                      "validated",
+                      "falsified",
+                      "partially_validated",
+                      "abandoned"
+                    ]
+                  },
+                  "status_now": {
+                    "type": "string",
+                    "enum": [
+                      "open",
+                      "validated",
+                      "falsified",
+                      "partially_validated",
+                      "abandoned"
+                    ]
+                  },
+                  "evidence_level_prev": {
+                    "$ref": "#/definitions/tier"
+                  },
+                  "evidence_level_now": {
+                    "$ref": "#/definitions/tier"
+                  },
+                  "transition": {
+                    "type": "string",
+                    "enum": [
+                      "upgraded",
+                      "downgraded",
+                      "unchanged",
+                      "newly_settled",
+                      "reopened"
+                    ]
+                  },
+                  "driver": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence_refs": {
+                    "$ref": "#/definitions/refs"
+                  },
+                  "evidence_relations": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "evidence_id",
+                        "relation"
+                      ],
+                      "properties": {
+                        "evidence_id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "relation": {
+                          "type": "string",
+                          "enum": [
+                            "support",
+                            "contradict"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "settled": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "object"
+              }
+            },
+            "still_open": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "object"
+              }
+            },
+            "newly_added": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "object"
+              }
+            },
+            "task_comparison": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "task_key",
+                  "result_prev",
+                  "result_now",
+                  "threshold_reused",
+                  "delta"
+                ],
+                "properties": {
+                  "task_key": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "result_prev": {
+                    "type": "string",
+                    "enum": [
+                      "completed",
+                      "completed_with_difficulty",
+                      "failed",
+                      "not_executed"
+                    ]
+                  },
+                  "result_now": {
+                    "type": "string",
+                    "enum": [
+                      "completed",
+                      "completed_with_difficulty",
+                      "failed",
+                      "not_executed"
+                    ]
+                  },
+                  "threshold_expression": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "threshold_reused": {
+                    "type": "boolean"
+                  },
+                  "delta": {
+                    "type": "string",
+                    "enum": [
+                      "improved",
+                      "regressed",
+                      "unchanged",
+                      "incomparable"
+                    ]
+                  }
+                }
+              }
+            },
+            "persona_drift": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "object"
+              }
+            },
+            "unresolved_from_previous": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "object"
+              }
+            },
+            "inheritance_check": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "additionalProperties": false,
+              "required": [
+                "expected_ids",
+                "inherited_ids",
+                "missing_ids",
+                "complete"
+              ],
+              "properties": {
+                "expected_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "inherited_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "missing_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "complete": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "progress_verdict": {
+              "type": "string",
+              "enum": [
+                "real_progress",
+                "no_change",
+                "regression",
+                "mixed",
+                "incomparable"
+              ],
+              "description": "incomparable whenever the task baseline hash differs or the standard changed without a mapping. Last gate against moving the goalposts to manufacture progress."
+            }
+          }
+        },
+        "run_manifest": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": false,
+          "required": [
+            "product_tasks_hash",
+            "scoring_schema_version",
+            "skill_version",
+            "task_id",
+            "project_id",
+            "mode",
+            "effective_retry_limit",
+            "product_version",
+            "capabilities",
+            "standard_change_reason",
+            "state_hash",
+            "upstream_evidence_refs"
+          ],
+          "properties": {
+            "product_tasks_hash": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "scoring_schema_version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "skill_version": {
+              "type": "string",
+              "enum": [
+                "1.0.2",
+                "1.0.3",
+                "1.0.4",
+                "1.0.5"
+              ]
+            },
+            "task_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "project_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "mode": {
+              "type": "string",
+              "enum": [
+                "first_validation",
+                "version_regression",
+                "evidence_recheck"
+              ]
+            },
+            "effective_retry_limit": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 2
+            },
+            "product_version": {
+              "type": "string",
+              "minLength": 1
+            },
+            "capabilities": {
+              "type": "object"
+            },
+            "standard_change_reason": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "state_hash": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "upstream_evidence_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "integrity_diagnostics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "code",
+              "ref",
+              "detail"
+            ],
+            "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1
+              },
+              "entity": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "ref": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "detail": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "rejected_output": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "reason"
+            ],
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "execution_log": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "step_id",
+              "outcome",
+              "detail"
+            ],
+            "properties": {
+              "step_id": {
+                "$ref": "#/definitions/unit_id"
+              },
+              "capability": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "tool_call_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "completed",
+                  "partial",
+                  "completed_with_rejections",
+                  "candidate_rejected",
+                  "blocked",
+                  "failed",
+                  "skipped",
+                  "not_executable"
+                ],
+                "description": "not_executable means a required capability or input was absent. Such a step produces no evidence and no inferred result."
+              },
+              "detail": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidence_ids": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "string"
+                }
+              },
+              "retries": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0
+              },
+              "kb_ids": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "human_report": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Backward-compatible alias of summary_report. Concise human-facing Markdown for quick developer decisions."
+        },
+        "human_report_html": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Backward-compatible alias of summary_report_html. Concise human-facing HTML; no deep-analysis accordion."
+        },
+        "summary_report": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Canonical concise Markdown. Default user-facing report for 3-30 second reading: target users, key problems, and next development actions."
+        },
+        "summary_report_html": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Canonical concise HTML. Default first-view report. Does not embed the full report; the full report is a separate artifact."
+        },
+        "full_report": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Canonical complete human-readable Markdown generated from the same validated structured output. Includes evidence, detailed personas/scenarios, scoring rationale, problems, priorities, validation execution plans, and information gaps."
+        },
+        "full_report_html": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Canonical complete human-readable HTML generated from the same validated structured output. Intended for competition materials, planning, evidence review, and execution."
+        }
+      }
+    },
+    "conflict_side": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ref",
+        "tier",
+        "statement"
+      ],
+      "properties": {
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tier": {
+          "$ref": "#/definitions/tier"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "tier_distribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "E0",
+        "E1",
+        "E2",
+        "E3",
+        "E4",
+        "E5"
+      ],
+      "properties": {
+        "E0": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "E1": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "E2": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "E3": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "E4": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "E5": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}
+

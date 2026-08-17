@@ -1,0 +1,43 @@
+{
+  "schema_version": "2.0",
+  "skill_code": "evidence-grounding-audit",
+  "version": "2.0",
+  "content_sha256": "cd0870762fde65a806918afcbc20e09a9fa8deebb74f4323bb2311f8b80abd3e",
+  "package_sha256": "c1b116e75851e678b1ad4f14861c668509ce70579f540a7da0e83130166bc3c9",
+  "runner_sha256": "46a543c9a6baf99074a5b76cb8348b0dc0b18d03b2c4991d2cd1be2b7bb49caa",
+  "prompt_sha256": "f90f1c5a72d63a3865e3d661907a325325ca96cef280f00dbb9ff81e75ffbae5",
+  "knowledge_package_sha256": "ca19b8dcb3c0e96c6035a584f91cadcd7547a4a17482d838c528996a75ea8afb",
+  "input_schema_ref": "../../../contracts/audit/audit-request.v2.json",
+  "input_schema_sha256": "d1160a64b52e30d9f02fcd2f849483faa4afb02b9e21d8d5806608e329dcb502",
+  "output_schema_ref": "../../../contracts/audit/audit-result.v2.json",
+  "output_schema_sha256": "b0a060fcf9061057935f345aac870e7939d688a9c384bb492a6e6c7c4c65e8cb",
+  "preconditions": [
+    "auditable finding and evidence references",
+    "task-scoped evidence-auditor capability",
+    "integrity-bound Skill result reference when user validation is present"
+  ],
+  "permissions": [
+    "evidence.read",
+    "finding.read",
+    "user_validation.audit.read"
+  ],
+  "failure_classes": ["VALIDATION", "AUTHORIZATION", "DEPENDENCY", "POLICY"],
+  "budget": {
+    "max_cost": 0,
+    "currency": "USD",
+    "max_model_turns": 8,
+    "max_agent_iterations": 16,
+    "task_timeout_seconds": 600
+  },
+  "evidence_requirements": [
+    "every decision cites at least one exact KB-EVD rule id",
+    "simulation, self-claim, expiry, traceability, hash and conflict flags are explicit",
+    "the audit is independent and never rewrites the user Agent report"
+  ],
+  "lifecycle": {
+    "status": "APPROVED_DISABLED",
+    "feature_flag": "LAUNCHSCOPE_USER_VALIDATION_ENABLED",
+    "rollback": "Disable the feature flag for new Runs; retain immutable audit results."
+  },
+  "may_write_business_state": false
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@launchscope/user-validation-designer",
+  "version": "1.0.5",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "test": "node --test tests/*.mjs",
+    "runner": "node runner/cli.mjs"
+  }
+}

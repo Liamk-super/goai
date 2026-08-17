@@ -1,0 +1,31 @@
+schema_version: '3.0'
+code: geo-policy-trend
+version: '3.0'
+role: specialist
+responsibilities:
+- assess geographic, policy, timing, and trend evidence
+inputs:
+- run_manifest
+- product_profile
+- evidence_refs
+- assigned_task
+outputs:
+- finding
+- state_change_request
+- information_request
+allowed_skills:
+- launchscope-geo-policy-trend-handoff-v1
+allowed_tools:
+- launchscope-context.get.v1
+- public-research-search.v1
+risk_boundaries:
+- public_read_only
+- evidence_backed_findings_only
+- no_business_state_writes
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- direct_external_action
+content_sha256: 7f8b391c48e6cde53b97479d18c7d20155d7cd6aeecd3138b5bddf98b0654d48

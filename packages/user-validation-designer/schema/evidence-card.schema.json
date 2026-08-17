@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "launchscope://skills/user-validation-designer/0.1/evidence-card",
+  "title": "Evidence Card v1.0 (user-validation-designer variant)",
+  "description": "Same 12 required fields as the product-technical-audit Evidence Card, so evidence_calibration_agent audits one shape. Two deliberate narrowings: reliability_level is capped at E2 because every product of this skill is simulated (KB global convention), and evidence_type / valid_for_dimensions use the user-side vocabulary. expiry stays required but is never defaulted by this skill (DECISIONS D-04).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "evidence_id",
+    "evidence_type",
+    "source",
+    "source_tier",
+    "timestamp",
+    "reliability_level",
+    "supporting_claims",
+    "applicability",
+    "expiry",
+    "content_hash",
+    "observation",
+    "fact_type"
+  ],
+  "properties": {
+    "evidence_id": { "type": "string", "pattern": "^EV-[A-Za-z0-9._-]+-[0-9]+$" },
+    "evidence_type": {
+      "type": "string",
+      "enum": [
+        "persona_evidence",
+        "scenario_evidence",
+        "simulated_experience_evidence",
+        "simulated_task_evidence",
+        "simulated_interview_evidence",
+        "real_user_evidence",
+        "team_statement_evidence"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "description": "URL, upstream evidence id, experience report ref, or object-store key of the simulation transcript."
+    },
+    "source_tier": {
+      "type": "string",
+      "enum": ["tier_1", "tier_2", "tier_3", "untraceable"],
+      "description": "SOURCE CLASS (canonical contract launchscope://shared/evidence-card/1.0). Not an evidence level. Simulated output is typically tier_3 (model restatement); an upstream experience report is tier_2; the product surface itself is tier_1. Judged independently of reliability_level."
+    },
+    "timestamp": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Collection time, ISO8601. Never the publication time."
+    },
+    "reliability_level": {
+      "type": "string",
+      "enum": ["E0", "E1", "E2"],
+      "description": "LaunchScope EVIDENCE LEVEL. HARD CEILING E2: this skill never issues E3-E5, because real user evidence is only ever ingested (existing_user_evidence, kept as a separate ingested record) or planned (validation_plans) - never produced. A model-supplied E3+ is clamped to E2 and logged in evidence_level_summary.downgraded_entries."
+    },
+    "supporting_claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Claim / hypothesis / persona ids this card supports. Orphan cards are rejected."
+    },
+    "applicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product_version", "scope", "valid_for_dimensions"],
+      "properties": {
+        "product_version": { "type": "string", "minLength": 1 },
+        "scope": { "type": "string", "minLength": 1 },
+        "environment": { "type": ["string", "null"] },
+        "persona_ids": { "type": ["array", "null"], "items": { "type": "string", "pattern": "^P[0-9]+$" } },
+        "segment": { "type": ["string", "null"] },
+        "valid_for_dimensions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "demand_strength",
+              "usage_frequency",
+              "pain_severity",
+              "alternative_gap",
+              "willingness_to_pay",
+              "virality"
+            ]
+          }
+        }
+      }
+    },
+    "expiry": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Supplied by caller or runtime. This skill applies no default lifetime and makes no staleness judgement; evidence_calibration_agent decides (DECISIONS D-04). Use the literal \"unknown\" when genuinely unavailable, which also raises a missing_information entry."
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256 over the captured artefact, for replayability."
+    },
+    "observation": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Observed facts only. Inference belongs in dimensions[].basis, never here."
+    },
+    "fact_type": { "type": "string", "enum": ["fact", "inference", "assumption"] },
+    "conflict_with": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Conflicting evidence ids. Both sides are retained; arbitration belongs to evidence_calibration_agent (KB-USR-B04: never average)."
+    },
+    "simulation_note": {
+      "type": ["string", "null"],
+      "description": "Present on simulated cards: which persona and which simulation unit produced it."
+    }
+  }
+}

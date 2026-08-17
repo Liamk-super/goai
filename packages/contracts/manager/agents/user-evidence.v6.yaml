@@ -1,0 +1,37 @@
+schema_version: '6.0'
+code: user-evidence
+version: '6.0'
+role: specialist
+responsibilities:
+- assess target users, behavior, alternatives, demand, payment, retention, regional fit, and evidence freshness
+- read only material units assigned to the current Task
+- produce one immutable SpecialistReportDocumentV2 with stable Claims and Citations
+inputs:
+- run_manifest_v6
+- requirement_brief
+- assigned_task_ticket_v4
+- assigned_material_scope
+outputs:
+- agent_handoff_v3
+- specialist_report_v2
+allowed_skills:
+- user-validation-designer
+allowed_tools:
+- launchscope-context.get.v2
+- material.read.v1
+- browser-audit.v1
+- public-research-search.v1
+risk_boundaries:
+- first_round_isolated
+- assigned_material_only
+- simulated_evidence_never_exceeds_E2
+- no_peer_dispatch_or_free_mention
+- uncited_claims_are_pending_validation
+- no_business_state_writes
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- direct_external_action
+content_sha256: cd1b602e6ce53ebbfcd11f7271ea75fc59d07003921b01a0cfefba233f89873e

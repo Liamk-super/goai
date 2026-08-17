@@ -1,0 +1,344 @@
+{
+  "task_id": "T-UVD-20260808-002",
+  "status": "blocked",
+  "result_summary": "Blocked: The raw target description or at least one segment is universal or lacks enough constraints to be recruitable. Segments cannot bypass admission. Persona modelling is refused; answer the three questions and re-run.",
+  "structured_output": {
+    "simulation_disclaimer": "本报告中所有 Persona、模拟访谈、模拟体验与任务测试结果均为 AI 模拟产出，证据等级封顶 E2，不得作为真实用户结论使用；真实用户证据（E3+）永远优先。",
+    "overall_judgment": "insufficient_evidence",
+    "user_value_judgment": "unverified",
+    "evidence_confidence": "low",
+    "user_value_score": {
+      "raw_total": null,
+      "counted_weight": 0,
+      "normalized_total": null,
+      "uncounted_dimension_count": 6,
+      "dimensions": {
+        "demand_strength": {
+          "score": null,
+          "weight": 20,
+          "counted": false,
+          "cap_reason": "no_user_evidence",
+          "evidence_refs": [],
+          "basis": "unassessed",
+          "max_tier": "E0",
+          "needs_rescore": false,
+          "real_evidence_overrides_simulation": false
+        },
+        "usage_frequency": {
+          "score": null,
+          "weight": 20,
+          "counted": false,
+          "cap_reason": "no_user_evidence",
+          "evidence_refs": [],
+          "basis": "unassessed",
+          "max_tier": "E0",
+          "needs_rescore": false,
+          "real_evidence_overrides_simulation": false
+        },
+        "pain_severity": {
+          "score": null,
+          "weight": 20,
+          "counted": false,
+          "cap_reason": "no_user_evidence",
+          "evidence_refs": [],
+          "basis": "unassessed",
+          "max_tier": "E0",
+          "needs_rescore": false,
+          "real_evidence_overrides_simulation": false
+        },
+        "alternative_gap": {
+          "score": null,
+          "weight": 15,
+          "counted": false,
+          "cap_reason": "no_user_evidence",
+          "evidence_refs": [],
+          "basis": "unassessed",
+          "max_tier": "E0",
+          "needs_rescore": false,
+          "real_evidence_overrides_simulation": false
+        },
+        "willingness_to_pay": {
+          "score": null,
+          "weight": 15,
+          "counted": false,
+          "cap_reason": "no_user_evidence",
+          "evidence_refs": [],
+          "basis": "unassessed",
+          "max_tier": "E0",
+          "needs_rescore": false,
+          "real_evidence_overrides_simulation": false
+        },
+        "virality": {
+          "score": null,
+          "weight": 10,
+          "counted": false,
+          "cap_reason": "no_user_evidence",
+          "evidence_refs": [],
+          "basis": "unassessed",
+          "max_tier": "E0",
+          "needs_rescore": false,
+          "real_evidence_overrides_simulation": false
+        }
+      },
+      "preliminary": true,
+      "evidence_ceiling": "E2",
+      "user_value_ceiling": {
+        "applied": false,
+        "ceiling": null,
+        "reason": "not assessed"
+      }
+    },
+    "target_user_definition": {
+      "admitted": false,
+      "breadth_check": {
+        "verdict": "too_broad",
+        "matched_broad_patterns": [
+          "raw_description:universal_claim_zh"
+        ],
+        "reason": "The raw target description or at least one segment is universal or lacks enough constraints to be recruitable. Segments cannot bypass admission."
+      },
+      "converged_segments": [],
+      "excluded_segments": [],
+      "clarification_questions": [
+        "谁最痛？请给出具体人群、触发场景，以及当前为问题付出的时间、金钱或绕行成本。",
+        "谁付钱？使用者与付费者是否相同；若不同，谁做购买决策？",
+        "谁最先用？什么具体行为或场景会触发第一批真实使用？"
+      ]
+    },
+    "personas": [],
+    "persona_outcomes": [],
+    "persona_set_check": {
+      "count": 0,
+      "archetype_coverage": {
+        "high_need": false,
+        "skeptic": false,
+        "edge_case": false
+      },
+      "differentiation": {
+        "pairwise_min_distinct_keys": null,
+        "homogeneous_pairs": [],
+        "verdict": "fail"
+      },
+      "retries_used": 0
+    },
+    "jobs_to_be_done": [],
+    "scenarios_and_alternatives": [],
+    "simulated_findings": {
+      "executed": {
+        "first_experience": false,
+        "task_test": false
+      },
+      "skip_reasons": [],
+      "evidence_tier": "E2",
+      "first_experience": [],
+      "value_communication_failure": false,
+      "task_test_matrix": [],
+      "experience_issues": [],
+      "simulated_interview": [],
+      "hidden_needs": [],
+      "insights": [],
+      "politeness_feedback_removed": [],
+      "realism_check": {
+        "negative_findings_count": 0,
+        "hidden_needs_count": 0,
+        "verdict": "not_applicable",
+        "retries_used": 0
+      }
+    },
+    "user_hypotheses": [],
+    "top_user_problems": [],
+    "validation_plans": [],
+    "deferred_validations": [],
+    "evidence_level_summary": {
+      "max_tier_achieved": "E0",
+      "max_ingested_tier": "E0",
+      "max_applicable_tier": "E0",
+      "has_real_user_evidence": false,
+      "tier_distribution": {
+        "E0": 0,
+        "E1": 0,
+        "E2": 0,
+        "E3": 0,
+        "E4": 0,
+        "E5": 0
+      },
+      "ingested_tier_distribution": {
+        "E0": 0,
+        "E1": 0,
+        "E2": 0,
+        "E3": 0,
+        "E4": 0,
+        "E5": 0
+      },
+      "applicable_tier_distribution": {
+        "E0": 0,
+        "E1": 0,
+        "E2": 0,
+        "E3": 0,
+        "E4": 0,
+        "E5": 0
+      },
+      "simulation_capped": true,
+      "downgraded_entries": [],
+      "per_claim": [],
+      "judgment_ceiling": {
+        "applied": false,
+        "ceiling": null,
+        "reason": "not assessed"
+      }
+    },
+    "evidence_effect_ledger": [],
+    "missing_information": [
+      {
+        "field": "target_users.segments",
+        "state": "missing",
+        "why_it_matters": "Without an executable user definition, every persona, score and validation plan would be built on a description that predicts no behaviour.",
+        "affected_units": [
+          "s1",
+          "s2",
+          "s3",
+          "s4a",
+          "s4b",
+          "s5",
+          "s6"
+        ],
+        "affected_dimensions": [],
+        "how_to_obtain": "Answer 谁最痛 / 谁付钱 / 谁最先用 with a concrete, recruitable segment."
+      }
+    ],
+    "conflicts": [],
+    "critical_issue": null,
+    "flags": {
+      "target_user_too_broad": true,
+      "persona_homogeneous": false,
+      "simulation_unrealistic": false,
+      "pseudo_demand_risk": false,
+      "value_communication_failure": false,
+      "high_switching_friction": false,
+      "retention_risk": false,
+      "politeness_only_feedback": false,
+      "compliance_concern": false,
+      "external_action_pending_approval": false,
+      "prompt_injection_observed": false,
+      "conflict": false
+    },
+    "out_of_scope_redirects": [],
+    "evidence_cards": [],
+    "handoff": {
+      "to_product_team_expert_agent": {
+        "experience_issues": [],
+        "journey_drop_offs": [],
+        "value_communication_failure": false,
+        "task_test_matrix": [],
+        "contract_note": "User-side phenomena and cognitive attribution only; all of it is E2 simulation. Functional and technical attribution is your call. Where our cause_type disagrees with yours, both are retained as a conflict rather than reconciled here."
+      },
+      "to_investment_business_agent": {
+        "demand_strength": {
+          "score": null,
+          "counted": false,
+          "cap_reason": null,
+          "max_tier": "E0",
+          "evidence_refs": []
+        },
+        "usage_frequency": {
+          "score": null,
+          "counted": false,
+          "cap_reason": null,
+          "max_tier": "E0",
+          "evidence_refs": []
+        },
+        "willingness_to_pay": {
+          "score": null,
+          "counted": false,
+          "cap_reason": null,
+          "max_tier": "E0",
+          "evidence_refs": []
+        },
+        "virality_potential": {
+          "score": null,
+          "counted": false,
+          "cap_reason": null,
+          "max_tier": "E0",
+          "evidence_refs": []
+        },
+        "payer_vs_user": {
+          "segments": []
+        },
+        "alternatives": [],
+        "switching_forces_summary": [],
+        "contract_note": "Demand-side evidence strength only. Market sizing, pricing and investment value are yours. willingness_to_pay is an ordinal signal, not a price point; stated intent is recorded as a weak signal. Real-user evidence present: false."
+      },
+      "to_evidence_calibration_agent": {
+        "evidence_cards": [],
+        "issued_evidence_cards": [],
+        "ingested_evidence_refs": [],
+        "ingested_evidence": [],
+        "fact_inference_assumption_split": {
+          "fact": 0,
+          "inference": 0,
+          "assumption": 0
+        },
+        "conflict_pairs": [],
+        "downgraded_entries": [],
+        "expiry_unknown_refs": [],
+        "simulation_capped": true,
+        "contract_note": "All simulated cards are capped at E2 by program, never by prompt. This skill issues no E3+ card. Expiry is not defaulted here (DECISIONS D-04); entries in expiry_unknown_refs need your validity ruling. On rejection we re-evidence or downgrade; we do not argue."
+      },
+      "to_review_supervisor_agent": {
+        "overall_judgment": null,
+        "user_value_judgment": null,
+        "evidence_confidence": null,
+        "critical_issue": null,
+        "key_real_evidence_refs": [],
+        "next_actions": [],
+        "top_risks": [],
+        "validation_plans_digest": [],
+        "missing_information": [],
+        "needs_human_review": false,
+        "contract_note": "User-side judgment only; no project-level recommendation is included. user_value_judgment is the internal five-band verdict; overall_judgment is the shared four-value field. The score is an ordinal for demand-side evidence strength, not a success probability and not a measure of liking."
+      }
+    },
+    "regression_comparison": null,
+    "run_manifest": null,
+    "integrity_diagnostics": [],
+    "rejected_output": [],
+    "execution_log": [
+      {
+        "step_id": "s1",
+        "capability": null,
+        "tool_call_id": null,
+        "outcome": "completed",
+        "detail": "Envelope valid. Mode first_validation. Retriever bound: false. Capabilities: {\"product_reader\":\"available\",\"evidence_writer\":\"not_allowed\",\"simulation_engine\":\"available\",\"kb_retriever\":\"not_allowed\"}.",
+        "evidence_ids": [],
+        "retries": 0,
+        "kb_ids": []
+      },
+      {
+        "step_id": "s1",
+        "capability": null,
+        "tool_call_id": null,
+        "outcome": "blocked",
+        "detail": "The raw target description or at least one segment is universal or lacks enough constraints to be recruitable. Segments cannot bypass admission.",
+        "evidence_ids": [],
+        "retries": 0,
+        "kb_ids": [
+          "KB-USR-R04",
+          "KB-USR-S1",
+          "KB-USR-P02"
+        ]
+      }
+    ],
+    "human_report": null,
+    "human_report_html": null,
+    "summary_report": null,
+    "summary_report_html": null,
+    "full_report": null,
+    "full_report_html": null
+  },
+  "evidence_refs": [],
+  "confidence": 0,
+  "risks": [],
+  "needs_human_review": false,
+  "failure_reason": "target_user_too_broad",
+  "retryable": true
+}

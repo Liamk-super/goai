@@ -1,0 +1,22 @@
+{
+  "schema_version": "launchscope.agentteams.recorded-package-case.v1",
+  "fixture_id": "agentteams-v6-synthetic-package-validation",
+  "privacy": "SYNTHETIC_NO_PERSONAL_DATA",
+  "execution_mode": "RECORDED",
+  "network_allowed": false,
+  "external_actions_allowed": false,
+  "expected_topology": {
+    "team_count": 1,
+    "worker_count": 5,
+    "human_count": 1,
+    "leader": "evaluation-manager",
+    "workers": [
+      "user-evidence",
+      "product-engineering",
+      "business-investment",
+      "evidence-auditor"
+    ],
+    "peer_mentions": false
+  },
+  "entrypoint": "RUN_AGENTTEAMS_PACKAGE.ps1 -Mode Validate"
+}

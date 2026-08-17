@@ -33,15 +33,34 @@ pwsh -File scripts/demo-preflight.ps1 -RequireExternalCase
 pwsh -File scripts/demo-start.ps1
 ```
 
+For a one-click local start, double-click `start.cmd`. It prepares missing
+dependencies, starts Live mode with authorized public search and opens the project list.
+An existing browser Demo session is reused; only a browser without a valid
+session is redirected to the Demo login page.
+Clicking it again safely restarts a previously tracked LaunchScope instance.
+The same launcher also exposes the explicit modes used by the scripts above:
+
+```powershell
+.\start.ps1
+.\start.ps1 -Mode Material
+.\start.ps1 -Mode Recorded
+```
+
+Use `-Bootstrap` to refresh dependencies and `-NoBrowser` to skip opening the
+login page. `Live` fails closed when its required local credentials or authorized
+case are missing; use `Material` to execute only against private uploaded material.
+
 For an OpenAI-compatible model gateway, configure only the untracked local file:
 
 ```text
-AGENTTEAMS_MODEL_BASE_URL=https://provider.example/v1
-AGENTTEAMS_MODEL_API_KEY=...
+LAUNCHSCOPE_MODEL_UPSTREAM_BASE_URL=https://provider.example/v1
+LAUNCHSCOPE_MODEL_UPSTREAM_API_KEY=...
 AGENTTEAMS_MODEL_ID=...
 ```
 
-The browser never receives this key. Free-text extraction requires an explicit
+Only the local model egress service receives this key. AgentTeams Workers receive
+short-lived delivery capabilities and cannot address the provider directly. The
+browser never receives either credential. Free-text extraction requires an explicit
 checkbox before the material is sent to the configured provider.
 
 Open `http://127.0.0.1:3000/demo-login`. A nickname creates a random local Demo

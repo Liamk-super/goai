@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/manager/manager-synthesis.v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "synthesis_id", "run_id", "deterministic_decision_ref", "deterministic_recommendation",
+    "proposed_recommendation", "summary", "cross_domain_analysis", "risks", "conflicts", "actions",
+    "version_changes", "citations", "decision_conflict"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "synthesis_id": { "type": "string", "format": "uuid" },
+    "run_id": { "type": "string", "format": "uuid" },
+    "deterministic_decision_ref": { "type": "string", "format": "uuid" },
+    "deterministic_recommendation": { "enum": ["PROCEED", "VALIDATE_FURTHER", "ADJUST", "PAUSE"] },
+    "proposed_recommendation": { "enum": ["PROCEED", "VALIDATE_FURTHER", "ADJUST", "PAUSE"] },
+    "summary": { "type": "string", "minLength": 1, "maxLength": 8000 },
+    "cross_domain_analysis": { "type": "array", "maxItems": 20, "items": { "type": "string", "minLength": 1 } },
+    "risks": { "type": "array", "maxItems": 20, "items": { "type": "string", "minLength": 1 } },
+    "conflicts": { "type": "array", "maxItems": 20, "items": { "type": "string", "minLength": 1 } },
+    "actions": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "type": "string", "minLength": 1 } },
+    "version_changes": {
+      "type": "object", "additionalProperties": false,
+      "required": ["improved", "unchanged", "new_risks"],
+      "properties": {
+        "improved": { "type": "array", "items": { "type": "string" } },
+        "unchanged": { "type": "array", "items": { "type": "string" } },
+        "new_risks": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "citations": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["kind", "ref"],
+        "properties": {
+          "kind": { "enum": ["FINDING", "EVIDENCE"] },
+          "ref": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "decision_conflict": { "type": "boolean" }
+  }
+}

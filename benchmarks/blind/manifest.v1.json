@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "version": "1.0.0",
+  "status": "READY",
+  "case_ids": ["T-TRANS-01", "SOCIAL-HARD-01", "ACADEMIC-HARD-01", "SYS-E2E-12"],
+  "assignment_storage": "EXTERNAL_SEALED",
+  "governance": {
+    "minimum_reviewers": 2,
+    "hidden_fields": ["provider", "model", "prompt_version", "agent_version", "run_order"],
+    "unblind_condition": "Unblind only after every required rating, fact source and reviewer decision is locked.",
+    "disagreement_policy": "Keep disagreement explicit and require an independent adjudicator; never average it away."
+  }
+}

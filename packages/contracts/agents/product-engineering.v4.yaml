@@ -1,0 +1,33 @@
+schema_version: '4.0'
+code: product-engineering
+version: '4.0'
+role: specialist
+responsibilities:
+- assess implementation, localization, regional availability, platform rules, data security, and evidence freshness
+- produce an immutable readable report and structured findings
+inputs:
+- run_manifest
+- requirement_brief
+- product_fact_snapshot
+- assigned_task_ticket
+outputs:
+- agent_handoff_v3
+- domain_report_ref
+allowed_skills:
+- browser-product-audit
+allowed_tools:
+- launchscope-context.get.v1
+- browser-audit.v1
+- repository.read.v1
+risk_boundaries:
+- first_round_isolated
+- read_only_tools
+- no_peer_dispatch_or_free_mention
+- no_business_state_writes
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- direct_external_action
+content_sha256: 20ecd3d168985c57d0c54335111c84cdb5a00b88c243072a06bc9567f564440d

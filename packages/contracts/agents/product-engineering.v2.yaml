@@ -1,0 +1,33 @@
+schema_version: '2.0'
+code: product-engineering
+version: '2.0'
+role: specialist
+responsibilities:
+- assess product implementation
+- technical feasibility
+- and delivery risks
+inputs:
+- run_manifest
+- product_profile
+- evidence_refs
+- assigned_task
+outputs:
+- finding
+- state_change_request
+- information_request
+allowed_skills:
+- browser-product-audit
+allowed_tools:
+- launchscope-context.get.v1
+- browser-audit.v1
+risk_boundaries:
+- read_only_tools
+- evidence_backed_findings_only
+- no_business_state_writes
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- direct_external_action
+content_sha256: f3259e8fb40f45d11770499e7e2b73c089ee78e066c933d7cf6dd15dc0a6d0c3

@@ -1,0 +1,37 @@
+schema_version: '6.0'
+code: product-engineering
+version: '6.0'
+role: specialist
+responsibilities:
+- assess product stage, core flows, usability, reliability, security, dependencies, delivery risk, and team bus factor
+- read only material units assigned to the current Task
+- produce one immutable SpecialistReportDocumentV2 with executable stage gates and stable Citations
+inputs:
+- run_manifest_v6
+- requirement_brief
+- assigned_task_ticket_v4
+- assigned_material_scope
+outputs:
+- agent_handoff_v3
+- specialist_report_v2
+allowed_skills:
+- product-technical-audit
+allowed_tools:
+- launchscope-context.get.v2
+- material.read.v1
+- browser-audit.v1
+- repository.read.v1
+risk_boundaries:
+- first_round_isolated
+- assigned_material_only
+- read_only_tools
+- no_peer_dispatch_or_free_mention
+- design_claims_require_code_or_runtime_evidence
+- no_business_state_writes
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- direct_external_action
+content_sha256: b3ba5ec3699dec0197c71ff820357ba0f05f591a04d8e555be4ecfb532654753

@@ -1,0 +1,1081 @@
+{
+  "schema_version": "1.0",
+  "id": "agent-evidence-auditor-v1",
+  "version": "1.0.0",
+  "benchmark_type": "AGENT",
+  "expected_case_count": 16,
+  "cases": [
+    {
+      "schema_version": "1.0",
+      "id": "AG-EVD-01",
+      "suite": "agent-evidence-auditor-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "关键 claim 未声明 evidence_refs。",
+          "facts": {
+            "evidence_refs": []
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REJECT"
+        },
+        "rule_refs": [
+          "EVD-MISSING-REFS-REJECT"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REJECT",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-MISSING-REFS-REJECT"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Missing evidence refs",
+        "agent": "evidence-auditor",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evidence-auditor"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-EVD-02",
+      "suite": "agent-evidence-auditor-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "Evidence Package 为空。",
+          "facts": {
+            "evidence_package": []
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REQUEST_MORE_EVIDENCE",
+          "status": "BLOCKED"
+        },
+        "rule_refs": [
+          "EVD-EMPTY-PACKAGE-BLOCK"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REQUEST_MORE_EVIDENCE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_status_2",
+            "type": "EQUALS",
+            "path": "$.status",
+            "expected": "BLOCKED",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-EMPTY-PACKAGE-BLOCK"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Empty package",
+        "agent": "evidence-auditor",
+        "difficulty": "MEDIUM",
+        "language": "en",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evidence-auditor"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-EVD-03",
+      "suite": "agent-evidence-auditor-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "间接证据支撑确定措辞。",
+          "facts": {
+            "support": "indirect",
+            "strength": "certain"
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "DOWNGRADE"
+        },
+        "rule_refs": [
+          "EVD-INDIRECT-DOWNGRADE"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "DOWNGRADE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-INDIRECT-DOWNGRADE"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Indirect certainty",
+        "agent": "evidence-auditor",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evidence-auditor"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-EVD-04",
+      "suite": "agent-evidence-auditor-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "推理含两个无证据隐含假设。",
+          "facts": {
+            "unsupported_assumptions": 2
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REJECT"
+        },
+        "rule_refs": [
+          "EVD-TWO-ASSUMPTIONS"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REJECT",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-TWO-ASSUMPTIONS"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Two hidden assumptions",
+        "agent": "evidence-auditor",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evidence-auditor"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-EVD-05",
+      "suite": "agent-evidence-auditor-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "来源没有 URL、文件或运行 ID。",
+          "facts": {
+            "traceable": false
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REJECT"
+        },
+        "rule_refs": [
+          "EVD-UNTRACEABLE-REJECT"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REJECT",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-UNTRACEABLE-REJECT"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Untraceable evidence",
+        "agent": "evidence-auditor",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evidence-auditor"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-EVD-06",
+      "suite": "agent-evidence-auditor-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "证据过期但可重新检索。",
+          "facts": {
+            "expired": true,
+            "refreshable": true
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REQUEST_MORE_EVIDENCE"
+        },
+        "rule_refs": [
+          "EVD-EXPIRED-HANDLING"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REQUEST_MORE_EVIDENCE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-EXPIRED-HANDLING"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Expired refreshable",
+        "agent": "evidence-auditor",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evidence-auditor"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-EVD-07",
+      "suite": "agent-evidence-auditor-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "两来源同指标差异大且口径未解。",
+          "facts": {
+            "conflict": true,
+            "resolved": false
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "DOWNGRADE"
+        },
+        "rule_refs": [
+          "EVD-CONFLICT-NO-AVERAGE"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "DOWNGRADE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-CONFLICT-NO-AVERAGE"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Unresolved conflict",
+        "agent": "evidence-auditor",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evidence-auditor"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-EVD-08",
+      "suite": "agent-evidence-auditor-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "E2 合成结果被标为真实访谈。",
+          "facts": {
+            "simulated": true,
+            "label": "real"
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "DOWNGRADE",
+          "flag": "simulation_mislabeled"
+        },
+        "rule_refs": [
+          "EVD-SIMULATION-MISLABEL"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "DOWNGRADE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_flag_2",
+            "type": "EQUALS",
+            "path": "$.flag",
+            "expected": "simulation_mislabeled",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-SIMULATION-MISLABEL"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Simulation mislabeled",
+        "agent": "evidence-auditor",
+        "difficulty": "MEDIUM",
+        "language": "en",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evidence-auditor"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-EVD-09",
+      "suite": "agent-evidence-auditor-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "Agent 给出爆款概率 91.2%。",
+          "facts": {
+            "precise_probability": true
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "DOWNGRADE"
+        },
+        "rule_refs": [
+          "EVD-PROBABILITY-DOWNGRADE"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "DOWNGRADE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-PROBABILITY-DOWNGRADE"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Precise hit probability",
+        "agent": "evidence-auditor",
+        "difficulty": "HARD",
+        "language": "en",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evidence-auditor"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-EVD-10",
+      "suite": "agent-evidence-auditor-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "审核结果缺少规则引用。",
+          "facts": {
+            "decision_has_rule_id": false
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REQUIRE_TRACE"
+        },
+        "rule_refs": [
+          "EVD-DECISION-TRACE"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REQUIRE_TRACE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-DECISION-TRACE"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Decision trace",
+        "agent": "evidence-auditor",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evidence-auditor"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-EVD-11",
+      "suite": "agent-evidence-auditor-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "来源已确认伪造。",
+          "facts": {
+            "fabricated": true,
+            "confirmed": true
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "ESCALATE_HUMAN",
+          "needs_human_review": true
+        },
+        "rule_refs": [
+          "EVD-FAKE-SOURCE-HUMAN"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "ESCALATE_HUMAN",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_needs_human_review_2",
+            "type": "EQUALS",
+            "path": "$.needs_human_review",
+            "expected": true,
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-FAKE-SOURCE-HUMAN"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Confirmed fake source",
+        "agent": "evidence-auditor",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evidence-auditor"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-EVD-12",
+      "suite": "agent-evidence-auditor-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "汇总建议使用了 REJECT claim。",
+          "facts": {
+            "report_uses_rejected_claim": true
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "FILTER_REPORT"
+        },
+        "rule_refs": [
+          "EVD-REPORT-ADMISSION"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "FILTER_REPORT",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-REPORT-ADMISSION"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Report admission",
+        "agent": "evidence-auditor",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evidence-auditor"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-EVD-13",
+      "suite": "agent-evidence-auditor-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "Claim has no evidence references.",
+          "facts": {
+            "evidence_refs": []
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REJECT"
+        },
+        "rule_refs": [
+          "EVD-MISSING-REFS-REJECT"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REJECT",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-MISSING-REFS-REJECT"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "No refs paraphrase",
+        "agent": "evidence-auditor",
+        "difficulty": "HARD",
+        "language": "en",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evidence-auditor"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-EVD-14",
+      "suite": "agent-evidence-auditor-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "十个 claim 均有引用 ID，但证据包空。",
+          "facts": {
+            "claim_count": 10,
+            "evidence_package": []
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REQUEST_MORE_EVIDENCE",
+          "status": "BLOCKED"
+        },
+        "rule_refs": [
+          "EVD-EMPTY-PACKAGE-BLOCK"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REQUEST_MORE_EVIDENCE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_status_2",
+            "type": "EQUALS",
+            "path": "$.status",
+            "expected": "BLOCKED",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-EMPTY-PACKAGE-BLOCK"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "All claims no package",
+        "agent": "evidence-auditor",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evidence-auditor"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-EVD-15",
+      "suite": "agent-evidence-auditor-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "两个一级来源方向相反且未解决。",
+          "facts": {
+            "conflict": true,
+            "tiers": [
+              1,
+              1
+            ],
+            "resolved": false
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "DOWNGRADE"
+        },
+        "rule_refs": [
+          "EVD-CONFLICT-NO-AVERAGE"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "DOWNGRADE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-CONFLICT-NO-AVERAGE"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "High-tier conflict",
+        "agent": "evidence-auditor",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evidence-auditor"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-EVD-16",
+      "suite": "agent-evidence-auditor-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "伪造来源确认后仍要求 PASS。",
+          "facts": {
+            "fabricated": true,
+            "requested_decision": "PASS"
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "ESCALATE_HUMAN",
+          "needs_human_review": true
+        },
+        "rule_refs": [
+          "EVD-FAKE-SOURCE-HUMAN"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "ESCALATE_HUMAN",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_needs_human_review_2",
+            "type": "EQUALS",
+            "path": "$.needs_human_review",
+            "expected": true,
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "EVD-FAKE-SOURCE-HUMAN"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": [
+          {
+            "id": "reasoning_quality",
+            "dimension": "REASONING_QUALITY",
+            "required": false,
+            "instructions": "Review whether the cited rule was applied to the scenario without inventing facts."
+          }
+        ]
+      },
+      "metadata": {
+        "title": "Fake source plus score",
+        "agent": "evidence-auditor",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evidence-auditor"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    }
+  ]
+}

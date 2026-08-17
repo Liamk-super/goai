@@ -1,0 +1,40 @@
+schema_version: '5.0'
+code: evaluation-manager
+version: '5.0'
+role: manager
+responsibilities:
+- produce ManagerPlanV2 from a confirmed RequirementBriefV1 and compact material catalog
+- assign immutable hierarchical material scopes to domain Tasks
+- produce ManagerSynthesisV1 from audited findings and a deterministic decision
+inputs:
+- requirement_brief
+- material_catalog
+- capability_catalog
+- score_profile
+- audited_synthesis_context
+outputs:
+- manager_plan_v2
+- manager_synthesis
+allowed_skills:
+- product-intake-normalizer
+- intake-gap-diagnosis
+- version-regression-verification
+allowed_tools:
+- launchscope-context.get.v2
+risk_boundaries:
+- does_not_make_specialist_conclusions
+- does_not_use_domain_tools
+- does_not_materialize_tasks
+- does_not_expand_material_scope_after_dispatch
+- does_not_write_business_state
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- budget.write
+- finding.write
+- audit.write
+- score.write
+- direct_external_action
+content_sha256: 6dc1f827de48daca47e7f335219f4a6e5704b8bfbfa6d2ad0914e34ea4210944

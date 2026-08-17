@@ -1,0 +1,819 @@
+{
+  "schema_version": "1.0",
+  "id": "agent-user-evidence-v1",
+  "version": "1.0.0",
+  "benchmark_type": "AGENT",
+  "expected_case_count": 12,
+  "cases": [
+    {
+      "schema_version": "1.0",
+      "id": "AG-USR-01",
+      "suite": "agent-user-evidence-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "目标人群为任何人。",
+          "facts": {
+            "target_users": "任何人"
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "BLOCK"
+        },
+        "rule_refs": [
+          "USR-ALL-USERS-REJECT"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "BLOCK",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "USR-ALL-USERS-REJECT"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "All users rejected",
+        "agent": "user-evidence",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "user-evidence"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-USR-02",
+      "suite": "agent-user-evidence-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "没有提供任务脚本。",
+          "facts": {
+            "product_task": null
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "DOWNGRADE",
+          "scope": "FIRST_IMPRESSION_ONLY"
+        },
+        "rule_refs": [
+          "USR-MISSING-TASK-LIMIT"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "DOWNGRADE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_scope_2",
+            "type": "EQUALS",
+            "path": "$.scope",
+            "expected": "FIRST_IMPRESSION_ONLY",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "USR-MISSING-TASK-LIMIT"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Missing product task",
+        "agent": "user-evidence",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "user-evidence"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-USR-03",
+      "suite": "agent-user-evidence-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "只有合成 Persona 访谈。",
+          "facts": {
+            "simulated": true
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "DOWNGRADE",
+          "evidence_cap": "E2"
+        },
+        "rule_refs": [
+          "USR-SIMULATION-E2-CAP"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "DOWNGRADE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_evidence_cap_2",
+            "type": "EQUALS",
+            "path": "$.evidence_cap",
+            "expected": "E2",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "USR-SIMULATION-E2-CAP"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Simulation evidence cap",
+        "agent": "user-evidence",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "user-evidence"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-USR-04",
+      "suite": "agent-user-evidence-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "E3 访谈否定 E2 模拟结论。",
+          "facts": {
+            "real": "E3",
+            "simulation": "E2",
+            "conflict": true
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "PREFER_REAL_EVIDENCE"
+        },
+        "rule_refs": [
+          "USR-REAL-E3-PRIORITY"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "PREFER_REAL_EVIDENCE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "USR-REAL-E3-PRIORITY"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Real data priority",
+        "agent": "user-evidence",
+        "difficulty": "MEDIUM",
+        "language": "en",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "user-evidence"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-USR-05",
+      "suite": "agent-user-evidence-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "目标用户已明确，生成用户类型。",
+          "facts": {
+            "target_users": "独立设计师"
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "LIMIT_PERSONAS",
+          "persona_count": 5
+        },
+        "rule_refs": [
+          "USR-PERSONAS-3-5"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "LIMIT_PERSONAS",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_persona_count_2",
+            "type": "EQUALS",
+            "path": "$.persona_count",
+            "expected": 5,
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "USR-PERSONAS-3-5"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Persona bounds",
+        "agent": "user-evidence",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "user-evidence"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-USR-06",
+      "suite": "agent-user-evidence-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "模拟结果全部赞同产品。",
+          "facts": {
+            "negative_feedback_count": 0
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "INCLUDE_NEGATIVE"
+        },
+        "rule_refs": [
+          "USR-NEGATIVE-INCLUDED"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "INCLUDE_NEGATIVE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "USR-NEGATIVE-INCLUDED"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Negative persona",
+        "agent": "user-evidence",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "user-evidence"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-USR-07",
+      "suite": "agent-user-evidence-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "用问卷验证持续使用行为。",
+          "facts": {
+            "hypothesis_type": "behavior",
+            "methods": [
+              "survey"
+            ]
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REJECT_METHOD"
+        },
+        "rule_refs": [
+          "USR-BEHAVIOR-NOT-SURVEY"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REJECT_METHOD",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "USR-BEHAVIOR-NOT-SURVEY"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Survey-only behavior",
+        "agent": "user-evidence",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "user-evidence"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-USR-08",
+      "suite": "agent-user-evidence-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "访谈者口头说愿意付费。",
+          "facts": {
+            "commitment": "verbal_only"
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REQUEST_REAL_VALIDATION"
+        },
+        "rule_refs": [
+          "USR-PAYMENT-REAL-COMMITMENT"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REQUEST_REAL_VALIDATION",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "USR-PAYMENT-REAL-COMMITMENT"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Verbal willingness",
+        "agent": "user-evidence",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "user-evidence"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-USR-09",
+      "suite": "agent-user-evidence-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "Build personas for everyone.",
+          "facts": {
+            "target_users": "everyone"
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "BLOCK"
+        },
+        "rule_refs": [
+          "USR-ALL-USERS-REJECT"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "BLOCK",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "USR-ALL-USERS-REJECT"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Everyone in English",
+        "agent": "user-evidence",
+        "difficulty": "HARD",
+        "language": "en",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "user-evidence"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-USR-10",
+      "suite": "agent-user-evidence-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "将模拟访谈引语标记为真实受访者原话。",
+          "facts": {
+            "simulated": true,
+            "label": "real"
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "DOWNGRADE",
+          "evidence_cap": "E2"
+        },
+        "rule_refs": [
+          "USR-SIMULATION-E2-CAP"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "DOWNGRADE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_evidence_cap_2",
+            "type": "EQUALS",
+            "path": "$.evidence_cap",
+            "expected": "E2",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "USR-SIMULATION-E2-CAP"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Synthetic quote as real",
+        "agent": "user-evidence",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "user-evidence"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-USR-11",
+      "suite": "agent-user-evidence-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "付费假设仅计划态度问卷。",
+          "facts": {
+            "hypothesis_type": "payment",
+            "methods": [
+              "survey"
+            ]
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REQUEST_REAL_VALIDATION"
+        },
+        "rule_refs": [
+          "USR-PAYMENT-REAL-COMMITMENT"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REQUEST_REAL_VALIDATION",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "USR-PAYMENT-REAL-COMMITMENT"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Payment landing page",
+        "agent": "user-evidence",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "user-evidence"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-USR-12",
+      "suite": "agent-user-evidence-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "E4 留存与 Persona 预测冲突。",
+          "facts": {
+            "real": "E4",
+            "simulation": "E2",
+            "conflict": true
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "PREFER_REAL_EVIDENCE"
+        },
+        "rule_refs": [
+          "USR-REAL-E3-PRIORITY"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "PREFER_REAL_EVIDENCE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "USR-REAL-E3-PRIORITY"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": [
+          {
+            "id": "reasoning_quality",
+            "dimension": "REASONING_QUALITY",
+            "required": false,
+            "instructions": "Review whether the cited rule was applied to the scenario without inventing facts."
+          }
+        ]
+      },
+      "metadata": {
+        "title": "Real retention beats personas",
+        "agent": "user-evidence",
+        "difficulty": "HARD",
+        "language": "en",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "user-evidence"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    }
+  ]
+}

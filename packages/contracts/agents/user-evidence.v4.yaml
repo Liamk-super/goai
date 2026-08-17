@@ -1,0 +1,33 @@
+schema_version: '4.0'
+code: user-evidence
+version: '4.0'
+role: specialist
+responsibilities:
+- assess target users, behavior, alternatives, demand evidence, regional fit, and evidence freshness
+- produce an immutable readable report and structured findings
+inputs:
+- run_manifest
+- requirement_brief
+- product_fact_snapshot
+- assigned_task_ticket
+outputs:
+- agent_handoff_v3
+- domain_report_ref
+allowed_skills:
+- user-validation-designer
+allowed_tools:
+- launchscope-context.get.v1
+- browser-audit.v1
+- public-research-search.v1
+risk_boundaries:
+- first_round_isolated
+- simulated_evidence_never_exceeds_E2
+- no_peer_dispatch_or_free_mention
+- no_business_state_writes
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- direct_external_action
+content_sha256: 8765550c374e6fb9b27512bf9b7ea69b216ffaa092d1ce244c8547cf9d70c36d

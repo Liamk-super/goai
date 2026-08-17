@@ -1,0 +1,31 @@
+schema_version: '3.0'
+code: business-investment
+version: '3.0'
+role: specialist
+responsibilities:
+- assess business viability, monetization, and investment evidence
+inputs:
+- run_manifest
+- product_profile
+- evidence_refs
+- assigned_task
+outputs:
+- finding
+- state_change_request
+- information_request
+allowed_skills:
+- business-investment-assessment
+allowed_tools:
+- launchscope-context.get.v1
+- public-research-search.v1
+risk_boundaries:
+- public_read_only
+- evidence_backed_findings_only
+- no_business_state_writes
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- direct_external_action
+content_sha256: f56c4d72c4883e059487d2538d5f0c533271cffdfd89bf29469c2a6076c68390

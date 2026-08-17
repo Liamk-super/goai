@@ -24,6 +24,7 @@ from launchscope_api.infrastructure.db.schema import (
     rag_retrieval,
     report,
     retention_policy,
+    run_conversation_message,
     trace_metadata,
 )
 
@@ -221,6 +222,14 @@ class RetentionApplication:
             keys.extend(
                 session.execute(
                     select(report.c.object_key).where(report.c.tenant_id == tenant_id, report.c.run_id.in_(run_ids))
+                ).scalars()
+            )
+            keys.extend(
+                session.execute(
+                    select(run_conversation_message.c.object_key).where(
+                        run_conversation_message.c.tenant_id == tenant_id,
+                        run_conversation_message.c.run_id.in_(run_ids),
+                    )
                 ).scalars()
             )
         return sorted(set(keys))

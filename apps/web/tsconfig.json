@@ -12,6 +12,7 @@
     "allowImportingTsExtensions": true
   },
   "include": [
+    ".next-demo/types/**/*.ts",
     "next-env.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx",

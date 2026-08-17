@@ -1,11 +1,43 @@
 from __future__ import annotations
 
 from hashlib import sha256
+from types import SimpleNamespace
 from uuid import uuid4
 
 from launchscope_api.modules.project_dossier.material_ingestion import InMemoryQuarantineObjectStore, ObjectMetadata
 
 from .conftest import client_and_plane, create_tenant, headers
+
+
+def test_project_portrait_endpoint_returns_the_confirmed_profile_projection() -> None:
+    from fastapi.testclient import TestClient
+
+    from launchscope_api.main import ControlPlane, create_app
+    from launchscope_api.modules.experience.api import get_read_model
+
+    project_id = uuid4()
+    version_id = uuid4()
+    read_model = SimpleNamespace(
+        project_portrait=lambda actor, requested_project_id: {
+            "project_id": str(requested_project_id),
+            "product_version_id": str(version_id),
+            "version_label": "V1",
+            "version_number": 1,
+            "confirmed_at": "2026-08-16T00:00:00Z",
+            "confirmed_fields": {"stage": "只有想法", "target_user": "研究生"},
+        }
+    )
+    app = create_app(ControlPlane.create())
+    app.dependency_overrides[get_read_model] = lambda: read_model
+
+    response = TestClient(app).get(
+        f"/api/v1/projects/{project_id}/portrait",
+        headers={"X-Tenant-Id": str(uuid4()), "X-Actor-Id": "alice", "X-Correlation-Id": str(uuid4())},
+    )
+
+    assert response.status_code == 200, response.text
+    assert response.json()["product_version_id"] == str(version_id)
+    assert response.json()["confirmed_fields"]["stage"] == "只有想法"
 
 
 def test_cors_is_opt_in_and_allows_only_configured_local_workspace_origin(monkeypatch) -> None:
@@ -68,12 +100,13 @@ def test_upload_to_confirmed_profile_to_planned_api_chain() -> None:
     assert gap_payload["correlation_id"] == correlation_id
     assert gap_payload["profile_draft"]["source"] == "MODEL_INFERENCE"
     assert gap_payload["profile_draft"]["user_confirmed_fields"] == {}
-    assert 3 <= len(gap_payload["questions"]) <= 5
+    assert 3 <= len(gap_payload["questions"]) <= 6
     assert [question["priority"] for question in gap_payload["questions"]] == list(
         range(1, len(gap_payload["questions"]) + 1)
     )
 
     answers = {
+        "one_line_value_claim": "Help independent retailers find inventory risks before weekly ordering",
         "target_user": "Independent retailers",
         "payer": "Store owner",
         "stage": "Private beta",
@@ -95,6 +128,20 @@ def test_upload_to_confirmed_profile_to_planned_api_chain() -> None:
     )
     assert confirmation.status_code == 201, confirmation.text
     assert confirmation.json()["confirmed_fields"] == answers
+
+    resumed_gaps = client.post(f"/api/v1/product-versions/{version_id}/gap-questions", headers=request_headers)
+    assert resumed_gaps.status_code == 200, resumed_gaps.text
+    assert resumed_gaps.json()["questions"] == []
+    assert resumed_gaps.json()["profile_draft"]["status"] == "CONFIRMED"
+    assert resumed_gaps.json()["profile_draft"]["user_confirmed_fields"] == answers
+
+    repeated_confirmation = client.post(
+        f"/api/v1/product-versions/{version_id}/profile-confirmations",
+        headers=request_headers,
+        json={"acknowledge_model_inference": True},
+    )
+    assert repeated_confirmation.status_code == 201, repeated_confirmation.text
+    assert repeated_confirmation.json()["profile_id"] == confirmation.json()["profile_id"]
 
     planned = client.post(f"/api/v1/product-versions/{version_id}/plan", headers=request_headers)
     assert planned.status_code == 200, planned.text

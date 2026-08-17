@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/skills/evidence-grounding-audit/input.v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "project_id", "product_version", "generated_at", "agent_results"],
+  "properties": {
+    "task_id": { "type": "string", "minLength": 1 },
+    "project_id": { "type": "string", "minLength": 1 },
+    "product_version": { "type": "string", "minLength": 1 },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "expected_agents": { "type": "array", "items": { "enum": ["product", "user", "investment"] }, "uniqueItems": true },
+    "agent_results": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["source_agent", "status", "payload"],
+        "properties": {
+          "source_agent": { "enum": ["product", "user", "investment"] },
+          "status": { "enum": ["COMPLETED", "BLOCKED", "FAILED"] },
+          "project_id": { "type": ["string", "null"] },
+          "product_version": { "type": ["string", "null"] },
+          "report_ref": { "type": ["string", "null"] },
+          "payload": { "type": "object" }
+        }
+      }
+    },
+    "semantic_analysis": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["claim_id"],
+        "properties": {
+          "claim_id": { "type": "string" },
+          "support_strength": { "enum": ["direct", "indirect", "none"] },
+          "over_inference": { "type": "boolean" },
+          "hidden_assumptions": { "type": "array", "items": { "type": "string" } },
+          "duplicate_topic": { "type": ["string", "null"] },
+          "position": { "type": ["string", "number", "boolean", "null"] },
+          "reason_codes": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

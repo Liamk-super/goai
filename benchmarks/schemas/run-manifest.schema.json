@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/benchmark/run-manifest.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "suite_id",
+    "suite_version",
+    "case_ids",
+    "execution",
+    "runtime_identity",
+    "implementation",
+    "source_lock_sha256",
+    "started_at",
+    "repeat_index",
+    "outputs",
+    "usage"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "run_id": {"type": "string", "minLength": 1},
+    "suite_id": {"type": "string"},
+    "suite_version": {"const": "1.0.0"},
+    "case_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "lane", "provider", "network_allowed", "cache_allowed"],
+      "properties": {
+        "mode": {"enum": ["HARNESS_SELF_TEST", "RECORDED", "LIVE_AUTHORIZED"]},
+        "lane": {"enum": ["HARNESS_SELF_TEST", "MODEL_API", "SINGLE_AGENT", "AGENTTEAMS_E2E"]},
+        "provider": {"type": "string", "minLength": 1},
+        "network_allowed": {"type": "boolean"},
+        "cache_allowed": {"type": "boolean"}
+      }
+    },
+    "runtime_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "requested", "observed", "source", "details"],
+      "properties": {
+        "status": {"enum": ["VERIFIED", "MISMATCH", "UNVERIFIED"]},
+        "requested": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {"type": "string", "minLength": 1}
+        },
+        "observed": {
+          "type": "object",
+          "additionalProperties": {"type": "string", "minLength": 1}
+        },
+        "source": {
+          "enum": [
+            "HARNESS",
+            "PROVIDER_RESPONSE",
+            "AGENTTEAMS_WORKER_STATUS",
+            "PACKAGE_MANIFEST",
+            "RECORDED_METADATA",
+            "NONE"
+          ]
+        },
+        "details": {"type": "string"}
+      }
+    },
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["git_commit", "dirty", "prompt_sha256", "agent_sha256", "skill_sha256"],
+      "properties": {
+        "git_commit": {"type": "string"},
+        "dirty": {"type": "boolean"},
+        "prompt_sha256": {"type": ["string", "null"]},
+        "agent_sha256": {"type": ["string", "null"]},
+        "skill_sha256": {"type": ["string", "null"]}
+      }
+    },
+    "source_lock_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "started_at": {"type": "string", "format": "date-time"},
+    "finished_at": {"type": ["string", "null"], "format": "date-time"},
+    "repeat_index": {"type": "integer", "minimum": 1},
+    "outputs": {"type": "object", "additionalProperties": {"type": "object"}},
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_tokens", "output_tokens", "cost_amount", "currency", "usage_known", "latency_ms"],
+      "properties": {
+        "input_tokens": {"type": "integer", "minimum": 0},
+        "output_tokens": {"type": "integer", "minimum": 0},
+        "cost_amount": {"type": "number", "minimum": 0},
+        "currency": {"type": "string"},
+        "usage_known": {"type": "boolean"},
+        "latency_ms": {"type": "integer", "minimum": 0}
+      }
+    }
+  }
+}

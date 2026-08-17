@@ -1,16 +1,22 @@
-export const metadata = {
-  title: "LaunchScope workspace",
-  description: "Durable PostgreSQL-backed product validation workspace",
-};
+import { localizedMetadata, requestLocale } from "../../lib/locale-server";
 
-export default function RootLayout({
+export async function generateMetadata() {
+  const locale = await requestLocale();
+  return localizedMetadata(locale, {
+    en: { title: "Hit Predictor · Workspace", description: "Evidence-based product hit prediction" },
+    "zh-CN": { title: "爆款预测器 · 工作台", description: "用真实证据预测产品的爆款潜力" },
+  });
+}
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const locale = await requestLocale();
   return (
-    <html lang="en">
-      <body><LocaleProvider><DemoSessionGuard><AppShell>{children}</AppShell></DemoSessionGuard></LocaleProvider></body>
+    <html lang={locale}>
+      <body><LocaleProvider initialLocale={locale}><DemoSessionGuard><AppShell>{children}</AppShell></DemoSessionGuard></LocaleProvider></body>
     </html>
   )
 }

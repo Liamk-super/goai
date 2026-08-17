@@ -1,0 +1,45 @@
+openapi: 3.1.0
+info:
+  title: LaunchScope Supervisor Chat API
+  version: 1.0.0
+paths:
+  /api/v1/projects/{project_id}/versions/{version_id}/supervisor/messages:
+    post:
+      operationId: submitSupervisorMessage
+      parameters:
+      - {name: project_id, in: path, required: true, schema: {type: string, format: uuid}}
+      - {name: version_id, in: path, required: true, schema: {type: string, format: uuid}}
+      - {name: X-Tenant-Id, in: header, required: true, schema: {type: string, format: uuid}}
+      - {name: X-Actor-Id, in: header, required: true, schema: {type: string, minLength: 1}}
+      - {name: X-Correlation-Id, in: header, required: true, schema: {type: string, format: uuid}}
+      - {name: Idempotency-Key, in: header, required: true, schema: {type: string, minLength: 1, maxLength: 200}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [message, allow_external_processing]
+              properties:
+                message: {type: string, minLength: 1, maxLength: 30000}
+                allow_external_processing: {type: boolean}
+      responses:
+        '202':
+          description: Requirement normalized or awaiting only necessary clarification
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [message_id, brief_id, brief_revision, interaction_state, confirmation_required, questions, duplicate]
+                properties:
+                  message_id: {type: string, format: uuid}
+                  brief_id: {type: string, format: uuid}
+                  brief_revision: {type: integer, minimum: 1}
+                  interaction_state: {enum: [WAITING_FOR_USER, LEADER_PLANNING]}
+                  confirmation_required: {type: boolean}
+                  questions: {type: array, items: {type: string}}
+                  duplicate: {type: boolean}
+        '409': {description: Idempotency conflict}
+        '422': {description: Unsafe or ungrounded Intake Model output}

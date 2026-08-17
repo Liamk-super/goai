@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OfferPilot｜用户验证精简版</title>
+<style>
+:root{--bg:#f5f7fb;--ink:#152033;--muted:#6b7485;--line:#e5e9f0;--brand:#3157d5;--core:#0f8b70;--core-soft:#eaf8f3;--core-line:#bde8d9;--consider:#5264d9;--consider-soft:#eef0ff;--consider-line:#d3d8ff;--later:#bd781b;--later-soft:#fff7e8;--later-line:#f1d6a8;--danger:#c2413b;--danger-soft:#fff0ef;--success:#14855f;--warning:#b87316}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.65}.wrap{max-width:980px;margin:auto;padding:22px}.hero{background:linear-gradient(135deg,#17264a,#3157d5);color:#fff;border-radius:20px;padding:28px 30px;box-shadow:0 16px 40px #213a8224}.hero-top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.hero h1{font-size:26px;margin:0}.hero p{margin:12px 0 0;font-size:14px;max-width:760px;color:#eef2ff}.badges{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.badge{font-size:12px;padding:5px 10px;border:1px solid #ffffff3b;background:#ffffff17;border-radius:999px}.reading-path{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px;font-size:12px;color:#d9e1ff}.section{background:#fff;border:1px solid var(--line);border-radius:17px;padding:22px;margin-top:14px;box-shadow:0 2px 10px #17203308}.section h2{font-size:18px;margin:0 0 15px}.section-lead{font-size:12px;color:var(--muted);margin:-7px 0 14px}.audiences{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.audience-card{position:relative;padding:16px;border-radius:14px;border:1px solid;min-height:126px}.audience-card:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;border-radius:14px 14px 0 0}.audience-core{background:var(--core-soft);border-color:var(--core-line)}.audience-core:before{background:var(--core)}.audience-consider{background:var(--consider-soft);border-color:var(--consider-line)}.audience-consider:before{background:var(--consider)}.audience-later{background:var(--later-soft);border-color:var(--later-line)}.audience-later:before{background:var(--later)}.audience-kicker{font-size:12px;font-weight:800;margin:1px 0 7px}.audience-core .audience-kicker{color:var(--core)}.audience-consider .audience-kicker{color:var(--consider)}.audience-later .audience-kicker{color:var(--later)}.audience-card strong{display:block;font-size:14px}.audience-card p{font-size:12px;color:var(--muted);margin:7px 0 0}.best-fit{margin:12px 0 0;padding:10px 13px;border-radius:10px;background:#f8fafc;border:1px solid #edf0f4;font-size:13px;font-weight:650}.decision-strip{display:grid;grid-template-columns:1fr 1fr 1.15fr;margin-top:12px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:#fff}.decision-item{padding:11px 13px;min-height:72px}.decision-item+.decision-item{border-left:1px solid var(--line)}.decision-item b{display:block;font-size:12px;margin-bottom:4px}.decision-use b{color:var(--success)}.decision-no b{color:var(--warning)}.decision-risk{background:var(--danger-soft)}.decision-risk b{color:var(--danger)}.decision-item span{font-size:13px}.problem-card{display:flex;gap:13px;padding:12px 0;border-bottom:1px solid var(--line)}.problem-card:last-child{border-bottom:0}.problem-index{display:flex;align-items:center;justify-content:center;min-width:34px;height:28px;border-radius:8px;background:var(--danger-soft);color:var(--danger);font-weight:800;font-size:12px}.problem-card strong{font-size:14px}.problem-card p{margin:3px 0 0;color:var(--muted);font-size:13px}.priority{list-style:none;padding:0;margin:0}.priority li{display:flex;align-items:flex-start;gap:11px;padding:11px 0;border-bottom:1px solid var(--line)}.priority li:last-child{border-bottom:0}.priority-tag{min-width:36px;color:#fff;border-radius:7px;text-align:center;height:25px;line-height:25px;font-size:11px}.priority-p0{background:var(--danger)}.priority-p1{background:var(--brand)}.priority span{font-size:13px;padding-top:2px}.full-cta{display:flex;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(90deg,#f1f4ff,#f8faff);border:1px solid #dce3ff;border-radius:14px;padding:14px 16px;margin-top:14px}.full-cta strong{display:block;font-size:13px}.full-cta span{font-size:12px;color:var(--muted)}.full-cta b{white-space:nowrap;background:var(--brand);color:#fff;border-radius:9px;padding:8px 12px;font-size:12px}.muted{color:var(--muted);font-size:13px}.footer{text-align:center;color:#8790a4;font-size:11px;padding:14px}
+@media(max-width:760px){.wrap{padding:12px}.hero{padding:22px}.hero-top{display:block}.badges{justify-content:flex-start;margin-top:10px}.audiences{grid-template-columns:1fr}.decision-strip{grid-template-columns:1fr}.decision-item+.decision-item{border-left:0;border-top:1px solid var(--line)}.section{padding:17px}.full-cta{align-items:flex-start}.full-cta b{display:none}}
+</style></head><body><main class="wrap">
+<section class="hero"><div class="hero-top"><div><h1>OfferPilot｜用户验证精简版</h1></div><div class="badges"><span class="badge">用户需求：偏弱</span><span class="badge">证据可信度：中</span></div></div><p>需求存在，但当前切换或持续使用动力不够强，先解决最影响复用的问题。</p><div class="reading-path"><span>3–5 秒：先看客户与结论</span><span>→</span><span>30 秒：看关键问题与动作</span></div></section>
+<section class="section"><h2>1. 一眼看懂</h2><div class="audiences">
+      <article class="audience-card audience-core">
+        <div class="audience-kicker">核心用户</div>
+        <strong>收到或等待面试通知，只有几天准备时间，需要面试前快速做几轮针对性练习的人</strong>
+        <p>面试时间临近，希望低成本发现回答问题</p>
+      </article>
+      <article class="audience-card audience-consider">
+        <div class="audience-kicker">可争取用户</div>
+        <strong>已经在用ChatGPT + 免费面经，但仍想要更好结果的人</strong>
+        <p>希望比通用面经更针对自己的简历</p>
+      </article>
+      <article class="audience-card audience-later">
+        <div class="audience-kicker">暂不优先</div>
+        <strong>当前不够紧迫，且师兄模拟 + 网上面试题基本够用的人</strong>
+        <p>师兄可以免费帮忙，时间不紧时不会优先换工具</p>
+      </article></div><div class="best-fit">当前最值得争取的是收到或等待面试通知，只有几天准备时间，需要面试前快速做几轮针对性练习的人群，而不是所有目标用户。</div><div class="decision-strip"><div class="decision-item decision-use"><b>为什么会用</b><span>面试时间临近，希望低成本发现回答问题</span></div><div class="decision-item decision-no"><b>为什么不用</b><span>ChatGPT 和免费面经已经够用，产品差异不明显时不会切换</span></div><div class="decision-item decision-risk"><b>最大问题</b><span>产品还没有证明自己比现有替代方案明显更好</span></div></div></section>
+<section class="section"><h2>2. 当前最关键的问题</h2><p class="section-lead">只保留会改变下一版产品决策的 Top 问题。</p>
+      <article class="problem-card">
+        <span class="problem-index">01</span>
+        <div><strong>反馈过于通用</strong><p>用户看不到针对自己的价值，就很难形成再次使用理由。</p></div>
+      </article>
+      <article class="problem-card">
+        <span class="problem-index">02</span>
+        <div><strong>个性化追问还不够深</strong><p>如果和通用 AI 差别不明显，用户没有切换理由。</p></div>
+      </article>
+      <article class="problem-card">
+        <span class="problem-index">03</span>
+        <div><strong>等待过程缺少明确反馈</strong><p>关键路径的不确定感会直接制造中途流失。</p></div>
+      </article></section>
+<section class="section"><h2>3. 下一版先改什么</h2><p class="section-lead">优先处理最影响用户切换和复用的事项。</p><ul class="priority"><li><b class="priority-tag priority-p0">P0</b><span>让报告引用本次回答，指出问题、原因和改写示例；验证“建议太泛”的反馈是否下降。</span></li><li><b class="priority-tag priority-p0">P0</b><span>让每轮追问都引用具体经历或目标要求；验证用户是否明显觉得比通用 AI 更针对。</span></li><li><b class="priority-tag priority-p1">P1</b><span>补充明确进度和等待反馈；验证关键路径中途放弃是否下降。</span></li></ul><div class="full-cta"><div><strong>需要写策划书、比赛材料或核查证据？</strong><span>同次运行会同时生成《用户验证完备版》，包含用户画像、证据、评分依据与完整执行方案。</span></div><b>查看完备版</b></div></section>
+<div class="footer">精简版用于快速决策；完备版用于证据核查、执行与材料引用。</div></main></body></html>

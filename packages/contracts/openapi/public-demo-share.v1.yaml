@@ -1,0 +1,50 @@
+openapi: 3.1.0
+info:
+  title: LaunchScope Public Demo Share Publication API
+  version: 1.0.0
+paths:
+  /api/v1/experience/v2/reports/{report_id}/public-demo-share:
+    post:
+      operationId: publishPublicDemoShareV1
+      parameters:
+        - name: report_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: X-Tenant-Id
+          in: header
+          required: true
+          schema: { type: string, format: uuid }
+        - name: X-Actor-Id
+          in: header
+          required: true
+          schema: { type: string, minLength: 1 }
+        - name: X-Correlation-Id
+          in: header
+          required: true
+          schema: { type: string, format: uuid }
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 255 }
+      responses:
+        "201":
+          description: Active full public Demo share
+          content:
+            application/json:
+              schema: { $ref: "#/$defs/PublicDemoShareV1" }
+        "409": { description: Report, Run, or disclosure is not publishable }
+$defs:
+  PublicDemoShareV1:
+    type: object
+    additionalProperties: false
+    required: [share_id, run_id, report_id, token, status, include_agent_reports, include_evidence, created_at]
+    properties:
+      share_id: { type: string, format: uuid }
+      run_id: { type: string, format: uuid }
+      report_id: { type: string, format: uuid }
+      token: { type: string, minLength: 32, maxLength: 256 }
+      status: { const: ACTIVE }
+      include_agent_reports: { const: true }
+      include_evidence: { const: true }
+      created_at: { type: string, format: date-time }

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/skills/evidence-grounding-audit/output.v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "status", "result_summary", "structured_output", "evidence_refs", "confidence", "risks", "needs_human_review", "failure_reason", "retryable"],
+  "properties": {
+    "task_id": { "type": "string" },
+    "status": { "enum": ["completed", "blocked"] },
+    "result_summary": { "type": "string" },
+    "structured_output": {
+      "type": ["object", "null"],
+      "properties": {
+        "claims": { "type": "array" }, "evidence": { "type": "array" }, "support_links": { "type": "array" },
+        "calibration_decisions": { "type": "array" }, "canonical_claims": { "type": "array" },
+        "conflicts": { "type": "array" }, "decision_tensions": { "type": "array" },
+        "evidence_gaps": { "type": "array" }, "cross_agent_issues": { "type": "array" },
+        "supervisor_handoff": { "type": "object" }, "reports": { "type": "object" },
+        "structured_output_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      },
+      "required": ["claims", "evidence", "support_links", "calibration_decisions", "canonical_claims", "conflicts", "decision_tensions", "evidence_gaps", "cross_agent_issues", "supervisor_handoff", "reports", "structured_output_digest"]
+    },
+    "evidence_refs": { "type": "array", "items": { "type": "string" } },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "risks": { "type": "array", "items": { "type": "string" } },
+    "needs_human_review": { "type": "boolean" },
+    "failure_reason": { "type": ["string", "null"] },
+    "retryable": { "type": "boolean" }
+  }
+}

@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
-import { useI18n } from "../i18n/LocaleProvider";
-import { clearDemoSession, loadDemoSession } from "../../lib/demo-session";
+import type { ReactNode } from "react";
+import { LocaleSelect, useI18n } from "../i18n/LocaleProvider";
 
 /** 罗经玫瑰标记 —— 航海仪器的品牌符号，替代 "LS" 字母块 */
 function CompassRose() {
@@ -33,65 +32,48 @@ function CompassRose() {
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { locale, setLocale, t } = useI18n();
-  const [displayName, setDisplayName] = useState("Demo user");
-  useEffect(() => {
-    setDisplayName(loadDemoSession(window.localStorage)?.displayName ?? "Demo user");
-  }, []);
+  const { t } = useI18n();
 
   return (
     <div className="app-frame">
-      <div className="demo-banner">
-        <span>本地体验身份 · {displayName} · 非生产登录</span>
-        <button
-          className="quiet"
-          style={{ color: "inherit", textDecoration: "underline" }}
-          onClick={() => {
-            clearDemoSession(window.localStorage);
-            window.location.assign("/demo-login");
-          }}
-        >
-          退出体验
-        </button>
-      </div>
-
       <header className="topbar">
-        <a className="brand" href="/projects" aria-label={t("LaunchScope projects")}>
+        <a className="brand" href="/" aria-label={t("LaunchScope")}>
           <CompassRose />
           <span>
-            <span className="brand-name">势能引擎</span>
-            <span className="brand-sub">LaunchScope · evidence instrument</span>
+            <span className="brand-name">{t("LaunchScope")}</span>
+            <span className="brand-sub">{t("LaunchScope · evidence instrument")}</span>
           </span>
         </a>
         <nav className="topnav" aria-label={t("Primary navigation")}>
           <a href="/projects">{t("Projects")}</a>
-          <a href="/projects/new">{t("New signal")}</a>
-          <a href="/recorded-snapshot">{t("Recorded snapshot")}</a>
+          <a href="/?start=1">{t("New signal")}</a>
         </nav>
         <div className="topbar-right">
-          <label style={{ display: "flex", alignItems: "center", gap: 8, margin: 0 }}>
-            <span className="bearing">{t("Language")}</span>
-            <select
-              aria-label={t("Language")}
-              value={locale}
-              onChange={(event) => setLocale(event.target.value as "en" | "zh-CN")}
-            >
-              <option value="en">English</option>
-              <option value="zh-CN">简体中文</option>
-            </select>
-          </label>
-          <span className="status" data-state="completed">
-            {t("PostgreSQL truth")}
-          </span>
+          <LocaleSelect compact />
         </div>
       </header>
 
       {children}
 
       <footer className="app-footer">
+        <span>{t("Make every prediction evidence-based.")}</span>
+      </footer>
+    </div>
+  );
+}
+
+export function SnapshotShell({ children }: { children: ReactNode }) {
+  const { t } = useI18n();
+  return (
+    <div className="app-frame">
+      <div className="demo-banner">
+        <span>{t("Recorded acceptance snapshot · Read only · not live AgentTeams execution")}</span>
+        <a href="/">{t("Enter live Demo")}</a>
+      </div>
+      {children}
+      <footer className="app-footer">
         <span>{t("Evidence before assertion.")}</span>
-        <span>22.3193° N · 114.1694° E / V0.3</span>
-        <span>{t("Read-only by default · fail-closed always.")}</span>
+        <span>{t("No writes are available on this route.")}</span>
       </footer>
     </div>
   );

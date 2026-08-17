@@ -1,0 +1,50 @@
+{
+  "schema_version": "2.0",
+  "profile_id": "full-potential",
+  "version": "2.0",
+  "evaluation_mode": "FULL_POTENTIAL",
+  "weights": {
+    "user_value": 0.30,
+    "product_capability": 0.30,
+    "investment_potential": 0.30,
+    "evidence_quality": 0.10
+  },
+  "thresholds": {"PROCEED": 80, "VALIDATE_FURTHER": 60, "ADJUST": 40},
+  "required_agents": ["user-evidence", "product-engineering", "business-investment"],
+  "required_dimensions": ["user_value", "product_capability", "investment_potential", "evidence_quality"],
+  "coverage_rules": {
+    "proceed_minimum": 0.70,
+    "scoring_minimum": 0.50,
+    "rejected_findings_score_zero": true,
+    "requires_valid_evidence": true,
+    "expired_evidence_counts": false,
+    "required_dimension_weights": {
+      "user_value": 0.30,
+      "product_capability": 0.30,
+      "investment_potential": 0.30,
+      "evidence_quality": 0.10
+    }
+  },
+  "confidence_profile": {
+    "component_weights": {
+      "audited_evidence_quality": 0.35,
+      "evidence_coverage": 0.25,
+      "independent_source_support": 0.20,
+      "freshness": 0.10,
+      "cross_domain_agreement": 0.10
+    },
+    "band_thresholds": {"MEDIUM": 0.45, "HIGH": 0.75},
+    "unresolved_conflict_penalty": 0.20
+  },
+  "comparison_compatibility": {
+    "standard_version": "v2.2",
+    "score_profile_semantics": "full-potential@2.0",
+    "report_profile_semantics": "supervisor-report@2",
+    "required_dimension_set": "full-potential-v2"
+  },
+  "recommendation_caps": {
+    "missing_optional_agent": "VALIDATE_FURTHER",
+    "unresolved_conflict": "VALIDATE_FURTHER",
+    "low_coverage": "VALIDATE_FURTHER"
+  }
+}

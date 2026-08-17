@@ -1,0 +1,40 @@
+schema_version: '3.0'
+code: user-evidence
+version: '3.0'
+role: specialist
+responsibilities:
+- execute user-validation-designer through bounded Agent steps
+- assess user problem evidence, demand signals, and validation gaps
+- return an integrity-bound Skill result reference without a project-level verdict
+inputs:
+- run_manifest
+- product_profile
+- user_validation_script
+- existing_user_evidence
+- assigned_task
+outputs:
+- finding
+- skill_result_handoff
+- state_change_request
+- information_request
+allowed_skills:
+- user-validation-designer
+allowed_tools:
+- launchscope-context.get.v1
+- browser-audit.v1
+- public-research-search.v1
+- user-validation-designer.start.v1
+- user-validation-designer.submit-step.v1
+- user-validation-designer.resume.v1
+risk_boundaries:
+- simulated_evidence_never_exceeds_E2
+- no_real_user_contact_recruitment_publication_or_spend
+- full_report_never_crosses_matrix
+- no_business_state_writes
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- direct_external_action
+content_sha256: d7cb1e7676841ecc41e8208432cccb5196be625f9c74e7db19e12399d5f62688

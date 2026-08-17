@@ -1,0 +1,179 @@
+{
+  "task_id": "T-UVD-20260908-011",
+  "project_id": "PRJ-KAOYAN-NOTES",
+  "product_version": "V2.0",
+  "product_profile": {
+    "name": "考研资料速筛助手",
+    "one_line_value_claim": "帮二战考研生在 5 分钟内从海量资料里筛出本周该看的 3 份重点",
+    "description": "V2 修复导出功能，接入真实考纲数据。",
+    "url": "https://example-kaoyan.app",
+    "experience_report_ref": "EV-PTA-20260905-021",
+    "pricing_claim": "基础功能免费，进阶排序 19 元/月（V1 为 29 元/月）"
+  },
+  "target_users": {
+    "raw_description": "距考试 3 个月内的二战考研生，每月可支配预算 50 元以内",
+    "segments": ["距考试 3 个月内的二战考研生"],
+    "claimed_payer": "学生本人",
+    "claimed_first_user": "距考试 3 个月内的二战考研生"
+  },
+  "product_tasks": [
+    {
+      "task_key": "upload_and_rank",
+      "description": "上传 10 份资料并得到本周应看的 3 份排序结果",
+      "expected_observable_outcome": "页面显示 3 份资料的排序列表，每份带推荐理由",
+      "max_steps": 8
+    },
+    {
+      "task_key": "adjust_by_deadline",
+      "description": "把考试日期改为 45 天后，观察清单是否重新排序",
+      "expected_observable_outcome": "清单顺序发生变化且提示剩余天数",
+      "max_steps": 5
+    },
+    {
+      "task_key": "export_weekly_plan",
+      "description": "导出本周学习清单",
+      "expected_observable_outcome": "生成可保存的清单文件或分享链接",
+      "max_steps": 4
+    }
+  ],
+  "existing_user_evidence": [
+    {
+      "evidence_id": "EV-USR-EXT-0003",
+      "applies_to_product_version": "V2.0",
+      "kind": "interview",
+      "tier": "E3",
+      "source": "团队 2026-07 内测访谈记录（5 人）",
+      "timestamp": "2026-07-25",
+      "expiry": "2027-01-25",
+      "observation": "5 名受访者中 4 人确认每周花 2 小时以上筛资料；3 人表示不会为此付费",
+      "sample_size": 5,
+      "applies_to_segment": "距考试 3 个月内的二战考研生",
+      "supporting_claims": ["H1"],
+      "valid_for_dimensions": ["demand_strength", "pain_severity"]
+    },
+    {
+      "evidence_id": "EV-USR-EXT-0011",
+      "applies_to_product_version": "V2.0",
+      "kind": "usability_test",
+      "tier": "E3",
+      "source": "2026-08 可用性测试记录（5 人）",
+      "timestamp": "2026-08-28",
+      "expiry": "2027-02-28",
+      "observation": "5 人中 4 人独立完成上传与排序任务；导出任务 5 人全部完成（V1 时全部失败）",
+      "sample_size": 5,
+      "applies_to_segment": "距考试 3 个月内的二战考研生",
+      "supporting_claims": ["H3"],
+      "valid_for_dimensions": ["pain_severity"]
+    },
+    {
+      "evidence_id": "EV-USR-EXT-0012",
+      "applies_to_product_version": "V2.0",
+      "kind": "payment_record",
+      "tier": "E5",
+      "source": "预售页面后台记录",
+      "timestamp": "2026-09-05",
+      "expiry": "2027-03-05",
+      "observation": "预售页面 120 名访客中 14 人支付 19 元定金，转化率 11.7%",
+      "sample_size": 120,
+      "applies_to_segment": "距考试 3 个月内的二战考研生",
+      "supporting_claims": ["H2"],
+      "valid_for_dimensions": ["willingness_to_pay"]
+    }
+  ],
+  "validation_goal": {
+    "objective": "复验 V1 遗留的付费意愿与导出可用性假设，确认是否已升级证据等级",
+    "focus_questions": ["上一轮假设哪些已验证 / 被证伪 / 仍未知"],
+    "priority_dimension": "willingness_to_pay"
+  },
+  "product_stage": "productized",
+  "constraints": {
+    "time_budget_weeks": 4,
+    "money_budget_cny": 3000,
+    "recruitable_channels": ["考研微信群", "预售页面留资名单"],
+    "team_capacity_person_days": 12
+  },
+  "previous_validation_results": {
+    "task_id": "T-UVD-20260808-001",
+    "project_id": "PRJ-KAOYAN-NOTES",
+    "product_version": "V1.0",
+    "product_tasks_hash": "a3ca0315dff486cfcd48961cbd45a2915825332101e91678fed63e46256797af",
+    "scoring_schema_version": "0.1",
+    "hypotheses": [
+      {
+        "hypothesis_id": "H1",
+        "statement": "距考试 3 个月内的二战考研生每周花 2 小时以上筛选资料",
+        "status": "validated",
+        "evidence_level": "E3",
+        "success_threshold": "≥60% 受访者主动提及每周 2 小时以上耗时"
+      },
+      {
+        "hypothesis_id": "H2",
+        "statement": "该群体愿意为节省每周 2 小时支付 29 元/月",
+        "status": "falsified",
+        "evidence_level": "E3",
+        "success_threshold": "真实留资转化 ≥10%"
+      },
+      {
+        "hypothesis_id": "H3",
+        "statement": "用户能独立完成导出本周清单的任务",
+        "status": "open",
+        "evidence_level": "E2",
+        "success_threshold": "核心任务完成率 >=80%"
+      },
+      {
+        "hypothesis_id": "H4",
+        "statement": "在职社会考生与二战考生的筛选需求强度相近",
+        "status": "open",
+        "evidence_level": "E1",
+        "success_threshold": "两组访谈主动提及率差异 <20 个百分点"
+      }
+    ],
+    "personas_digest": [
+      {
+        "persona_id": "P1",
+        "label": "距考试 90 天的二战考研生，每天自习 10 小时",
+        "behavior_keys": {
+          "alternative_in_use": "自建 Excel 表 + B站视频",
+          "budget_constraint": "每月 50 元以内",
+          "skill_level": "intermediate",
+          "urgency": 5,
+          "risk_attitude": "averse"
+        }
+      },
+      {
+        "persona_id": "P2",
+        "label": "跨专业首战考生，资料来源杂但不着急",
+        "behavior_keys": {
+          "alternative_in_use": "学长给的资料包",
+          "budget_constraint": "每月 100 元以内",
+          "skill_level": "novice",
+          "urgency": 3,
+          "risk_attitude": "neutral"
+        }
+      },
+      {
+        "persona_id": "P3",
+        "label": "在职社会考生，每天可用时间不足 2 小时",
+        "behavior_keys": {
+          "alternative_in_use": "不解决，随缘看",
+          "budget_constraint": "每月 200 元以内",
+          "skill_level": "expert",
+          "urgency": 4,
+          "risk_attitude": "tolerant"
+        }
+      }
+    ],
+    "task_results": [
+      { "persona_id": "P1", "task_key": "upload_and_rank", "result": "completed_with_difficulty" },
+      { "persona_id": "P1", "task_key": "adjust_by_deadline", "result": "completed" },
+      { "persona_id": "P1", "task_key": "export_weekly_plan", "result": "failed" }
+    ]
+  },
+  "previous_validation_results_hash": "47f8d6d9b33a33c244fc10bc5926ef3831ccc1ba714c4fe926010a5a31c93a3a",
+  "evidence_refs": ["EV-PTA-20260905-021"],
+  "runtime": {
+    "allowed_tools": ["product_reader", "simulation_engine", "evidence_writer", "kb_retriever"],
+    "mode": "version_regression",
+    "product_tasks_hash": "a3ca0315dff486cfcd48961cbd45a2915825332101e91678fed63e46256797af"
+  }
+}

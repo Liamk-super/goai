@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/tools/user-validation-audit-context.get.v1.json",
+  "x-network-policy": { "allowed_domains": [], "max_redirects": 0, "max_response_bytes": 65536 },
+  "x-execution-policy": { "timeout_seconds": 15, "max_cost": 0 },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "tool_id", "permission", "network_level", "read_only", "input_schema", "output_schema"],
+  "properties": {
+    "contract_version": { "const": "1.0" },
+    "tool_id": { "const": "user-validation-audit-context.get.v1" },
+    "permission": { "const": "user_validation.audit.read" },
+    "network_level": { "const": "INTERNAL" },
+    "read_only": { "const": true },
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id", "task_id", "skill_result_ref", "context_token"],
+      "properties": {
+        "run_id": { "type": "string", "format": "uuid" },
+        "task_id": { "type": "string", "format": "uuid" },
+        "skill_result_ref": { "type": "string", "format": "uuid" },
+        "context_token": { "type": "string", "minLength": 1 },
+        "section": { "enum": ["summary", "claims", "evidence", "conflicts", "expiry"] },
+        "cursor": { "type": ["string", "null"] }
+      }
+    },
+    "output_schema": { "type": "object", "required": ["skill_result_ref", "skill_result_sha256", "section", "items", "knowledge_rules"] }
+  },
+  "examples": [{
+    "contract_version": "1.0",
+    "tool_id": "user-validation-audit-context.get.v1",
+    "permission": "user_validation.audit.read",
+    "network_level": "INTERNAL",
+    "read_only": true,
+    "input_schema": {
+      "run_id": "00000000-0000-0000-0000-000000000001",
+      "task_id": "00000000-0000-0000-0000-000000000002",
+      "skill_result_ref": "00000000-0000-0000-0000-000000000004",
+      "context_token": "signed-task-capability",
+      "section": "summary",
+      "cursor": null
+    },
+    "output_schema": {
+      "skill_result_ref": "00000000-0000-0000-0000-000000000004",
+      "skill_result_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "section": "summary",
+      "items": [],
+      "knowledge_rules": ["KB-EVD-D01"]
+    }
+  }]
+}

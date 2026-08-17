@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/benchmark/case.v1.schema.json",
+  "title": "LaunchScope Benchmark Case V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "suite", "benchmark_type", "partition", "input", "oracle", "rubric", "metadata"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "id": {"type": "string", "pattern": "^[A-Z][A-Z0-9-]{4,79}$"},
+    "suite": {"type": "string", "pattern": "^[a-z][a-z0-9-]{2,79}$"},
+    "benchmark_type": {"enum": ["MODEL", "AGENT", "SYSTEM_E2E"]},
+    "partition": {"enum": ["PUBLIC_ANCHOR", "DEVELOPMENT", "HOLDOUT"]},
+    "input": {"$ref": "#/$defs/input"},
+    "oracle": {"$ref": "#/$defs/oracle"},
+    "rubric": {"$ref": "#/$defs/rubric"},
+    "metadata": {"$ref": "#/$defs/metadata"}
+  },
+  "$defs": {
+    "input": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "payload"],
+          "properties": {
+            "kind": {"const": "INLINE"},
+            "payload": {"type": "object"}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "path", "sha256", "verbatim"],
+          "properties": {
+            "kind": {"const": "REFERENCE_FILE"},
+            "path": {"type": "string", "pattern": "^reference/"},
+            "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "verbatim": {"const": true}
+          }
+        }
+      ]
+    },
+    "oracle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "expected", "rule_refs", "notes"],
+      "properties": {
+        "mode": {"enum": ["RULE_DERIVED", "CONTRACT_DERIVED", "HUMAN_VERIFICATION_REQUIRED"]},
+        "expected": {"type": "object"},
+        "rule_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9-]{4,99}$"}},
+        "notes": {"type": "string", "minLength": 1}
+      }
+    },
+    "assertion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "path", "critical", "weight"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9_]{2,79}$"},
+        "type": {"enum": ["EQUALS", "CONTAINS_ALL", "NOT_CONTAINS_ANY", "COUNT_BETWEEN", "EXISTS", "JSON_SCHEMA"]},
+        "path": {"type": "string", "pattern": "^\\$($|\\.)"},
+        "expected": {},
+        "values": {"type": "array"},
+        "minimum": {"type": "integer", "minimum": 0},
+        "maximum": {"type": "integer", "minimum": 0},
+        "schema_path": {"type": "string"},
+        "critical": {"type": "boolean"},
+        "weight": {"type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "human_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "dimension", "required", "instructions"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9_]{2,79}$"},
+        "dimension": {"enum": ["FACTUAL_ACCURACY", "RANKING_VALIDITY", "REASONING_QUALITY", "ACTIONABILITY", "CONFLICT_HANDLING", "OVERALL_EFFECTIVENESS"]},
+        "required": {"type": "boolean"},
+        "instructions": {"type": "string", "minLength": 1}
+      }
+    },
+    "rubric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["automated", "human"],
+      "properties": {
+        "automated": {"type": "array", "items": {"$ref": "#/$defs/assertion"}},
+        "human": {"type": "array", "items": {"$ref": "#/$defs/human_item"}}
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "agent", "difficulty", "language", "tags", "contamination", "created_at"],
+      "properties": {
+        "title": {"type": "string", "minLength": 1},
+        "agent": {"type": ["string", "null"]},
+        "difficulty": {"enum": ["BASIC", "MEDIUM", "HARD", "ADVERSARIAL"]},
+        "language": {"enum": ["zh-CN", "en", "mixed"]},
+        "tags": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+        "contamination": {"enum": ["PUBLIC", "DEVELOPMENT_ONLY", "SEALED"]},
+        "created_at": {"type": "string", "format": "date"}
+      }
+    }
+  }
+}

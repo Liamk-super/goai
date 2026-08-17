@@ -1,0 +1,91 @@
+openapi: 3.1.0
+info:
+  title: LaunchScope Demo Canonical Event Recovery
+  version: 1.0.0
+paths:
+  /api/v1/runs/{run_id}/canonical-event-recoveries:
+    post:
+      operationId: recoverSettledCanonicalMatrixEvent
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CanonicalEventRecoveryRequest'
+      responses:
+        '202':
+          description: One already settled canonical Matrix event was authorized for exact replay
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CanonicalEventRecovery'
+        '404':
+          description: Demo recovery is disabled or the Run was not found
+        '409':
+          description: Stale epoch, ineligible state, active invocation, or idempotency conflict
+components:
+  parameters:
+    RunId:
+      name: run_id
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
+    TenantId:
+      name: X-Tenant-Id
+      in: header
+      required: true
+      schema: {type: string, format: uuid}
+    ActorId:
+      name: X-Actor-Id
+      in: header
+      required: true
+      schema: {type: string, minLength: 1, maxLength: 255}
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: {type: string, minLength: 1, maxLength: 200}
+    CorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: true
+      schema: {type: string, format: uuid}
+  schemas:
+    CanonicalEventRecoveryRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - task_id
+        - matrix_event_id
+        - expected_control_epoch
+        - expected_dispatch_epoch
+        - reason
+      properties:
+        task_id: {type: string, format: uuid}
+        matrix_event_id: {type: string, minLength: 1, maxLength: 255}
+        expected_control_epoch: {type: integer, minimum: 0}
+        expected_dispatch_epoch: {type: integer, minimum: 0}
+        reason: {type: string, minLength: 1, maxLength: 1000}
+    CanonicalEventRecovery:
+      type: object
+      additionalProperties: false
+      required:
+        - recovery_id
+        - run_id
+        - task_id
+        - control_epoch
+        - dispatch_epoch
+        - matrix_event_id
+      properties:
+        recovery_id: {type: string, format: uuid}
+        run_id: {type: string, format: uuid}
+        task_id: {type: string, format: uuid}
+        control_epoch: {type: integer, minimum: 0}
+        dispatch_epoch: {type: integer, minimum: 0}
+        matrix_event_id: {type: string, minLength: 1, maxLength: 255}

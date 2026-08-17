@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/benchmark/human-review.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "case_id", "reviewer_id", "reviewed_at", "status", "blinding", "ratings", "fact_sources", "notes"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "run_id": {"type": "string"},
+    "case_id": {"type": "string"},
+    "reviewer_id": {"type": "string", "minLength": 1},
+    "reviewed_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["PENDING", "VERIFIED", "REJECTED", "DISAGREEMENT"]},
+    "blinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assignment_id", "model_alias", "provider_hidden", "implementation_hidden", "unblinded_at"],
+      "properties": {
+        "assignment_id": {"type": "string", "minLength": 1},
+        "model_alias": {"type": "string", "pattern": "^MODEL-[A-Z][A-Z0-9-]*$"},
+        "provider_hidden": {"const": true},
+        "implementation_hidden": {"const": true},
+        "unblinded_at": {"type": ["string", "null"], "format": "date-time"}
+      }
+    },
+    "ratings": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 1, "maximum": 5}},
+    "fact_sources": {"type": "array", "items": {"type": "string"}},
+    "notes": {"type": "string"}
+  }
+}

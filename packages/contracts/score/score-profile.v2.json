@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/score/score-profile.v2.json",
+  "title": "ScoreProfileV2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "profile_id", "version", "evaluation_mode", "weights", "thresholds", "required_agents",
+    "required_dimensions", "coverage_rules", "confidence_profile", "comparison_compatibility", "recommendation_caps"
+  ],
+  "properties": {
+    "schema_version": {"const": "2.0"},
+    "profile_id": {"type": "string", "pattern": "^[a-z][a-z-]+$"},
+    "version": {"const": "2.0"},
+    "evaluation_mode": {"enum": ["FULL_POTENTIAL", "INVESTMENT_REVIEW", "LAUNCH_REVIEW", "USER_VALIDATION"]},
+    "weights": {
+      "type": "object", "minProperties": 1,
+      "additionalProperties": {"type": "number", "exclusiveMinimum": 0, "maximum": 1}
+    },
+    "thresholds": {
+      "type": "object", "additionalProperties": false,
+      "required": ["PROCEED", "VALIDATE_FURTHER", "ADJUST"],
+      "properties": {
+        "PROCEED": {"type": "number", "minimum": 0, "maximum": 100},
+        "VALIDATE_FURTHER": {"type": "number", "minimum": 0, "maximum": 100},
+        "ADJUST": {"type": "number", "minimum": 0, "maximum": 100}
+      }
+    },
+    "required_agents": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"enum": ["user-evidence", "product-engineering", "business-investment"]}
+    },
+    "required_dimensions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "coverage_rules": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "proceed_minimum", "scoring_minimum", "rejected_findings_score_zero", "requires_valid_evidence",
+        "expired_evidence_counts", "required_dimension_weights"
+      ],
+      "properties": {
+        "proceed_minimum": {"type": "number", "minimum": 0, "maximum": 1},
+        "scoring_minimum": {"type": "number", "minimum": 0, "maximum": 1},
+        "rejected_findings_score_zero": {"const": true},
+        "requires_valid_evidence": {"const": true},
+        "expired_evidence_counts": {"const": false},
+        "required_dimension_weights": {
+          "type": "object", "minProperties": 1,
+          "additionalProperties": {"type": "number", "exclusiveMinimum": 0}
+        }
+      }
+    },
+    "confidence_profile": {
+      "type": "object", "additionalProperties": false,
+      "required": ["component_weights", "band_thresholds", "unresolved_conflict_penalty"],
+      "properties": {
+        "component_weights": {
+          "type": "object", "additionalProperties": false,
+          "required": [
+            "audited_evidence_quality", "evidence_coverage", "independent_source_support", "freshness",
+            "cross_domain_agreement"
+          ],
+          "properties": {
+            "audited_evidence_quality": {"type": "number", "minimum": 0, "maximum": 1},
+            "evidence_coverage": {"type": "number", "minimum": 0, "maximum": 1},
+            "independent_source_support": {"type": "number", "minimum": 0, "maximum": 1},
+            "freshness": {"type": "number", "minimum": 0, "maximum": 1},
+            "cross_domain_agreement": {"type": "number", "minimum": 0, "maximum": 1}
+          }
+        },
+        "band_thresholds": {
+          "type": "object", "additionalProperties": false,
+          "required": ["MEDIUM", "HIGH"],
+          "properties": {
+            "MEDIUM": {"type": "number", "minimum": 0, "maximum": 1},
+            "HIGH": {"type": "number", "minimum": 0, "maximum": 1}
+          }
+        },
+        "unresolved_conflict_penalty": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "comparison_compatibility": {
+      "type": "object", "additionalProperties": false,
+      "required": ["standard_version", "score_profile_semantics", "report_profile_semantics", "required_dimension_set"],
+      "properties": {
+        "standard_version": {"type": "string", "minLength": 1},
+        "score_profile_semantics": {"type": "string", "minLength": 1},
+        "report_profile_semantics": {"type": "string", "minLength": 1},
+        "required_dimension_set": {"type": "string", "minLength": 1}
+      }
+    },
+    "recommendation_caps": {
+      "type": "object", "additionalProperties": false,
+      "required": ["missing_optional_agent", "unresolved_conflict", "low_coverage"],
+      "properties": {
+        "missing_optional_agent": {"$ref": "#/$defs/recommendation"},
+        "unresolved_conflict": {"enum": ["VALIDATE_FURTHER", "ADJUST", "PAUSE"]},
+        "low_coverage": {"enum": ["VALIDATE_FURTHER", "ADJUST", "PAUSE"]}
+      }
+    }
+  },
+  "$defs": {"recommendation": {"enum": ["PROCEED", "VALIDATE_FURTHER", "ADJUST", "PAUSE"]}}
+}

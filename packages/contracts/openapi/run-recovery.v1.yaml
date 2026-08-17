@@ -1,0 +1,95 @@
+openapi: 3.1.0
+info:
+  title: LaunchScope Demo Run Recovery
+  version: 1.0.0
+paths:
+  /api/v1/runs/{run_id}/recover:
+    post:
+      operationId: recoverDemoRun
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecoverRunRequest'
+      responses:
+        '202':
+          description: The same Run was returned to execution and unfinished Tasks were redispatched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunRecovery'
+        '404':
+          description: Demo recovery is disabled or the Run was not found
+        '409':
+          description: Stale epoch, ineligible Run, or idempotency conflict
+components:
+  parameters:
+    RunId:
+      name: run_id
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
+    TenantId:
+      name: X-Tenant-Id
+      in: header
+      required: true
+      schema: {type: string, format: uuid}
+    ActorId:
+      name: X-Actor-Id
+      in: header
+      required: true
+      schema: {type: string, minLength: 1, maxLength: 255}
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: {type: string, minLength: 1, maxLength: 200}
+    CorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: true
+      schema: {type: string, format: uuid}
+  schemas:
+    RecoverRunRequest:
+      type: object
+      additionalProperties: false
+      required: [expected_control_epoch, force]
+      properties:
+        expected_control_epoch: {type: integer, minimum: 0}
+        force: {const: true}
+    RunRecovery:
+      type: object
+      additionalProperties: false
+      required:
+        - run_id
+        - run_status
+        - execution_control
+        - recovered_task_ids
+        - preserved_task_ids
+        - dispatched_task_count
+      properties:
+        run_id: {type: string, format: uuid}
+        run_status: {const: RUNNING}
+        execution_control:
+          type: object
+          additionalProperties: true
+          required: [state, control_epoch, usage_settlement_status, in_flight_count]
+          properties:
+            state: {const: ACTIVE}
+            control_epoch: {type: integer, minimum: 1}
+            usage_settlement_status: {const: NONE}
+            in_flight_count: {const: 0}
+        recovered_task_ids:
+          type: array
+          items: {type: string, format: uuid}
+        preserved_task_ids:
+          type: array
+          items: {type: string, format: uuid}
+        dispatched_task_count: {type: integer, minimum: 1}

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from dataclasses import replace
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -34,9 +35,7 @@ def test_external_public_https_read_requires_an_explicit_authorized_case() -> No
     if not host:
         pytest.fail("LAUNCHSCOPE_REAL_READONLY_URL must be an absolute HTTPS URL")
     base = ToolContractRegistry().load("public-research.get.v1")
-    contract = base.__class__(
-        **{**base.__dict__, "allowed_domains": (host,)}
-    )
+    contract = replace(base, allowed_domains=(host,))
     result = PublicResearchClient().fetch({"url": url, "method": "GET"}, contract)
     assert result.evidence is not None
     assert result.evidence["source_url"] == url

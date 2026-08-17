@@ -25,14 +25,15 @@ try {
     if ([int]$running -gt 0 -or [int]$claimed -gt 0) {
         throw "Refusing reset: unsafe Run/claim state exists (runs=$running, claimed=$claimed)"
     }
-    $rendered = Join-Path $root 'infra/agentteams/generated/launchscope-team.rendered.yaml'
+    $renderedName = Get-AgentTeamsRenderedResourceName
+    $rendered = Join-Path $root "infra/agentteams/generated/$renderedName"
     if ((Test-AgentTeamsCliAvailable) -and (Test-Path -LiteralPath $rendered)) {
         Push-Location (Join-Path $root 'infra/agentteams')
-        try { & (Join-Path $PSScriptRoot 'invoke-agentteams-cli.ps1') @('delete','-f','generated/launchscope-team.rendered.yaml') }
+        try { & (Join-Path $PSScriptRoot 'invoke-agentteams-cli.ps1') @('delete','-f',"generated/$renderedName") }
         finally { Pop-Location }
     }
     & docker @compose down --volumes --remove-orphans
     if ($LASTEXITCODE -ne 0) { throw 'Scoped Compose volume removal failed' }
-    Write-Host 'Removed only LaunchScope Compose volumes and frozen 1+5 resources. AgentTeams installation/config remains.'
+    Write-Host "Removed only LaunchScope Compose volumes and selected $(Get-AgentTeamsGeneration) resources. AgentTeams installation/config remains."
     Write-Host 'Run demo-start.ps1 to recreate migrations and resources; cached browser sessions will fail validation.'
 } finally { Pop-Location }

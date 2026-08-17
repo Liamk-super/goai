@@ -79,7 +79,19 @@ from .services import (
     evaluate_rules,
     stage_status_is_terminal,
 )
-from .value_objects import ApprovalBinding, BudgetReservation, CorrelationContext, EvidenceRef, TenantScope, TimeScope
+from .value_objects import (
+    MAX_CLARIFICATION_ANSWER_CHARS,
+    MAX_CLARIFICATION_QUESTION_CHARS,
+    MAX_CLARIFICATION_REASON_CHARS,
+    MAX_IMPACT_DIMENSION_CHARS,
+    MAX_PROFILE_FIELD_CHARS,
+    ApprovalBinding,
+    BudgetReservation,
+    CorrelationContext,
+    EvidenceRef,
+    TenantScope,
+    TimeScope,
+)
 
 __version__ = "0.1.0"
 
@@ -119,6 +131,11 @@ __all__ = [
     "FindingGrade",
     "InvalidTransitionError",
     "InvariantViolation",
+    "MAX_CLARIFICATION_ANSWER_CHARS",
+    "MAX_CLARIFICATION_QUESTION_CHARS",
+    "MAX_CLARIFICATION_REASON_CHARS",
+    "MAX_IMPACT_DIMENSION_CHARS",
+    "MAX_PROFILE_FIELD_CHARS",
     "MaterialMetadata",
     "ProductProfile",
     "ProductVersion",

@@ -1,0 +1,162 @@
+openapi: 3.1.0
+info:
+  title: LaunchScope Report Export API
+  version: 1.0.0
+  description: Deterministic PDF and complete-package projections of immutable v2.2 reports.
+servers:
+  - url: /api/v1
+paths:
+  /experience/reports/{report_id}/exports:
+    post:
+      operationId: createReportExportV1
+      parameters:
+        - $ref: '#/components/parameters/ReportId'
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ExportRequest'}
+      responses:
+        '201': {$ref: '#/components/responses/ExportArtifact'}
+        '409': {description: Idempotency conflict or immutable artifact integrity failure}
+  /experience/report-exports/{export_id}:
+    get:
+      operationId: getReportExportV1
+      parameters:
+        - $ref: '#/components/parameters/ExportId'
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200': {$ref: '#/components/responses/ExportArtifact'}
+        '404': {description: Export not found in tenant scope}
+  /experience/report-exports/{export_id}/read-url:
+    get:
+      operationId: getReportExportReadUrlV1
+      parameters:
+        - $ref: '#/components/parameters/ExportId'
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200': {$ref: '#/components/responses/ExportReadUrl'}
+        '409': {description: Export is incomplete or failed integrity validation}
+  /public/demo/v2/reports/{report_id}/exports:
+    post:
+      operationId: createPublicDemoReportExportV1
+      parameters:
+        - $ref: '#/components/parameters/ReportId'
+        - $ref: '#/components/parameters/PublicToken'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ExportRequest'}
+      responses:
+        '201': {$ref: '#/components/responses/ExportArtifact'}
+        '404': {description: Shared Demo resource not found}
+        '429': {description: Public export rate limit exceeded}
+  /public/demo/v2/report-exports/{export_id}:
+    get:
+      operationId: getPublicDemoReportExportV1
+      parameters:
+        - $ref: '#/components/parameters/ExportId'
+        - $ref: '#/components/parameters/PublicToken'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200': {$ref: '#/components/responses/ExportArtifact'}
+        '404': {description: Shared Demo resource not found}
+        '429': {description: Public export rate limit exceeded}
+  /public/demo/v2/report-exports/{export_id}/read-url:
+    get:
+      operationId: getPublicDemoReportExportReadUrlV1
+      parameters:
+        - $ref: '#/components/parameters/ExportId'
+        - $ref: '#/components/parameters/PublicToken'
+        - $ref: '#/components/parameters/CorrelationId'
+      responses:
+        '200': {$ref: '#/components/responses/ExportReadUrl'}
+        '404': {description: Shared Demo resource not found}
+        '409': {description: Export is incomplete or failed integrity validation}
+        '429': {description: Public export rate limit exceeded}
+components:
+  parameters:
+    ReportId: {name: report_id, in: path, required: true, schema: {type: string, format: uuid}}
+    ExportId: {name: export_id, in: path, required: true, schema: {type: string, format: uuid}}
+    TenantId: {name: X-Tenant-Id, in: header, required: true, schema: {type: string, format: uuid}}
+    ActorId: {name: X-Actor-Id, in: header, required: true, schema: {type: string, minLength: 1, maxLength: 255}}
+    IdempotencyKey: {name: Idempotency-Key, in: header, required: true, schema: {type: string, minLength: 1, maxLength: 255}}
+    CorrelationId: {name: X-Correlation-Id, in: header, required: true, schema: {type: string, minLength: 1, maxLength: 255}}
+    PublicToken: {name: token, in: query, required: true, schema: {type: string, minLength: 32, maxLength: 256}}
+  schemas:
+    ExportRequest:
+      type: object
+      additionalProperties: false
+      required: [kind, view, locale, include_evidence]
+      properties:
+        kind: {type: string, enum: [SUPERVISOR, SPECIALIST, PACKAGE]}
+        agent_code:
+          type: [string, 'null']
+          enum: [user-evidence, product-engineering, business-investment, evidence-auditor, null]
+        view: {type: string, enum: [SUMMARY, FULL]}
+        locale: {type: string, minLength: 2, maxLength: 20}
+        include_evidence: {type: boolean}
+    ExportArtifact:
+      type: object
+      additionalProperties: false
+      required:
+        - export_id
+        - report_id
+        - run_id
+        - kind
+        - agent_code
+        - view
+        - locale
+        - include_evidence
+        - source_sha256
+        - status
+        - object_key
+        - sha256
+        - size_bytes
+        - error_code
+      properties:
+        export_id: {type: string, format: uuid}
+        report_id: {type: string, format: uuid}
+        run_id: {type: string, format: uuid}
+        kind: {type: string, enum: [SUPERVISOR, SPECIALIST, PACKAGE]}
+        agent_code: {type: [string, 'null']}
+        view: {type: string, enum: [SUMMARY, FULL]}
+        locale: {type: string}
+        include_evidence: {type: boolean}
+        source_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+        status: {type: string, enum: [PENDING, RENDERING, COMPLETED, FAILED]}
+        object_key: {type: [string, 'null']}
+        sha256: {type: [string, 'null'], pattern: '^[0-9a-f]{64}$'}
+        size_bytes: {type: [integer, 'null'], minimum: 0}
+        error_code: {type: [string, 'null']}
+    ExportReadUrl:
+      type: object
+      additionalProperties: false
+      required: [export_id, sha256, size_bytes, read_url]
+      properties:
+        export_id: {type: string, format: uuid}
+        sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+        size_bytes: {type: integer, minimum: 1}
+        read_url: {type: string, format: uri}
+  responses:
+    ExportArtifact:
+      description: Durable export state
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ExportArtifact'}
+    ExportReadUrl:
+      description: Short-lived private object read URL
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ExportReadUrl'}

@@ -1,0 +1,78 @@
+openapi: 3.1.0
+info:
+  title: LaunchScope Public Demo Report API
+  version: 2.0.0
+paths:
+  /api/v1/public/demo/v2/reports/{report_id}:
+    get:
+      operationId: getPublicSupervisorReport
+      parameters:
+      - {name: report_id, in: path, required: true, schema: {type: string, format: uuid}}
+      - {$ref: '#/components/parameters/Token'}
+      responses:
+        '200': {$ref: '#/components/responses/SupervisorReport'}
+        '404': {description: Token is wrong, revoked, or not bound to this report}
+        '409': {description: Immutable object integrity mismatch}
+  /api/v1/public/demo/v2/agent-reports/{agent_code}:
+    get:
+      operationId: getPublicSpecialistReport
+      parameters:
+      - {name: agent_code, in: path, required: true, schema: {enum: [user-evidence, product-engineering, business-investment, evidence-auditor]}}
+      - {$ref: '#/components/parameters/Token'}
+      responses:
+        '200': {$ref: '#/components/responses/SpecialistReport'}
+        '404': {description: Token does not authorize this Run or Agent report}
+        '409': {description: Immutable object integrity mismatch}
+  /api/v1/public/demo/v2/evidence/{evidence_id}/read-url:
+    get:
+      operationId: getPublicEvidenceReadUrl
+      parameters:
+      - {name: evidence_id, in: path, required: true, schema: {type: string, format: uuid}}
+      - {$ref: '#/components/parameters/Token'}
+      responses:
+        '200':
+          description: Short-lived read URL for evidence belonging to the shared Run
+        '404': {description: Token does not authorize this evidence}
+        '409': {description: Evidence object integrity mismatch}
+components:
+  parameters:
+    Token: {name: token, in: query, required: true, schema: {type: string, minLength: 32, maxLength: 256}}
+  responses:
+    SupervisorReport:
+      description: Public projection of the same canonical supervisor report
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [report_schema_version, document, integrity, projection]
+            properties:
+              report_schema_version: {const: '2.0'}
+              document: {$ref: '../reports/supervisor-report.v2.json'}
+              integrity: {$ref: '#/components/schemas/Integrity'}
+              projection: {$ref: '#/components/schemas/Projection'}
+    SpecialistReport:
+      description: Public projection of the same canonical specialist report
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [report_schema_version, document, integrity, projection]
+            properties:
+              report_schema_version: {const: '2.0'}
+              document: {$ref: '../reports/specialist-report.v2.json'}
+              integrity: {$ref: '#/components/schemas/Integrity'}
+              projection: {$ref: '#/components/schemas/Projection'}
+  schemas:
+    Integrity:
+      type: object
+      required: [canonical_sha256, source_sha256]
+      properties:
+        canonical_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+        source_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+    Projection:
+      type: object
+      required: [view, created_at]
+      properties:
+        view: {const: FULL}
+        created_at: {type: string, format: date-time}
+        supervisor_report_id: {type: string, format: uuid}

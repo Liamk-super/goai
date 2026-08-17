@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/reports/specialist-report.v2.json",
+  "title": "SpecialistReportDocumentV2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "report_id", "run_id", "project_id", "product_version_id", "product_title", "agent_code",
+    "source_sha256", "executive_summary", "metrics", "claims", "domain_payload", "risks", "actions", "citations",
+    "source_directory", "audit_summary", "raw_audit_refs"
+  ],
+  "properties": {
+    "schema_version": {"const": "2.0"},
+    "report_id": {"type": "string", "format": "uuid"},
+    "run_id": {"type": "string", "format": "uuid"},
+    "project_id": {"type": "string", "format": "uuid"},
+    "product_version_id": {"type": "string", "format": "uuid"},
+    "product_title": {"type": "string", "minLength": 1, "maxLength": 300},
+    "agent_code": {
+      "enum": ["user-evidence", "product-engineering", "business-investment", "evidence-auditor"]
+    },
+    "source_sha256": {"$ref": "#/$defs/sha256"},
+    "executive_summary": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/claimId"}},
+    "metrics": {
+      "type": "array", "maxItems": 40,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["key", "label", "value", "claim_ids"],
+        "properties": {
+          "key": {"type": "string", "minLength": 1},
+          "label": {"type": "string", "minLength": 1},
+          "value": {"type": ["string", "number", "boolean"]},
+          "claim_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/claimId"}}
+        }
+      }
+    },
+    "claims": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/claim"}},
+    "domain_payload": {"type": "object"},
+    "risks": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/claimId"}},
+    "actions": {"type": "array", "items": {"$ref": "#/$defs/action"}},
+    "citations": {"type": "array", "items": {"$ref": "#/$defs/citation"}},
+    "source_directory": {"type": "array", "items": {"$ref": "#/$defs/sourceLocator"}},
+    "audit_summary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["verified", "insufficient", "needs_more", "conflicted"],
+      "properties": {
+        "verified": {"type": "integer", "minimum": 0},
+        "insufficient": {"type": "integer", "minimum": 0},
+        "needs_more": {"type": "integer", "minimum": 0},
+        "conflicted": {"type": "integer", "minimum": 0}
+      }
+    },
+    "raw_audit_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "claimId": {"type": "string", "pattern": "^claim-[A-Za-z0-9._-]+$"},
+    "claim": {
+      "type": "object", "additionalProperties": false,
+      "required": ["claim_id", "section", "text", "status", "decision_relevance", "citation_ids", "score_bearing"],
+      "properties": {
+        "claim_id": {"$ref": "#/$defs/claimId"},
+        "section": {"type": "string", "minLength": 1},
+        "text": {"type": "string", "minLength": 1, "maxLength": 12000},
+        "status": {"enum": ["VERIFIED", "DOWNGRADED", "PENDING_VALIDATION", "CONFLICTED"]},
+        "decision_relevance": {"enum": ["CRITICAL", "IMPORTANT", "CONTEXT"]},
+        "citation_ids": {
+          "type": "array", "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^citation-[A-Za-z0-9._-]+$"}
+        },
+        "score_bearing": {"type": "boolean"}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {"status": {"const": "VERIFIED"}, "decision_relevance": {"const": "CRITICAL"}},
+            "required": ["status", "decision_relevance"]
+          },
+          "then": {"not": {"properties": {"citation_ids": {"maxItems": 0}}, "required": ["citation_ids"]}}
+        },
+        {
+          "if": {"properties": {"status": {"const": "PENDING_VALIDATION"}}, "required": ["status"]},
+          "then": {"properties": {"score_bearing": {"const": false}}}
+        }
+      ]
+    },
+    "action": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "action_id", "title", "owner", "deadline_days", "success_criteria", "failure_triggers",
+        "required_evidence", "related_claim_ids"
+      ],
+      "properties": {
+        "action_id": {"type": "string", "pattern": "^action-[A-Za-z0-9._-]+$"},
+        "title": {"type": "string", "minLength": 1},
+        "owner": {"type": "string", "minLength": 1},
+        "deadline_days": {"type": "integer", "minimum": 1, "maximum": 365},
+        "success_criteria": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "failure_triggers": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "required_evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "related_claim_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/claimId"}}
+      }
+    },
+    "citation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["citation_id", "claim_id", "evidence_id", "source_locator_id", "support_role", "audit_status", "label"],
+      "properties": {
+        "citation_id": {"type": "string", "pattern": "^citation-[A-Za-z0-9._-]+$"},
+        "claim_id": {"$ref": "#/$defs/claimId"},
+        "evidence_id": {"type": "string", "format": "uuid"},
+        "source_locator_id": {"type": ["string", "null"], "format": "uuid"},
+        "support_role": {"enum": ["SUPPORT", "COUNTER", "BACKGROUND"]},
+        "audit_status": {"enum": ["VERIFIED", "DOWNGRADED", "REJECTED", "NEEDS_MORE"]},
+        "label": {"type": "integer", "minimum": 1}
+      }
+    },
+    "sourceLocator": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "source_locator_id", "evidence_id", "source_kind", "title", "fetched_at", "locator",
+        "independence_group", "content_sha256"
+      ],
+      "properties": {
+        "source_locator_id": {"type": "string", "format": "uuid"},
+        "evidence_id": {"type": "string", "format": "uuid"},
+        "source_kind": {"enum": ["PUBLIC_URL", "SEARCH_RESULT", "INTERNAL_MATERIAL"]},
+        "canonical_url": {"type": "string", "format": "uri"},
+        "title": {"type": "string", "minLength": 1},
+        "publisher": {"type": ["string", "null"]},
+        "published_at": {"type": ["string", "null"], "format": "date-time"},
+        "fetched_at": {"type": "string", "format": "date-time"},
+        "locator": {"type": "object"},
+        "region": {"type": ["string", "null"]},
+        "independence_group": {"type": "string", "minLength": 1},
+        "content_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

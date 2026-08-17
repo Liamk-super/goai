@@ -1,4 +1,7 @@
-param([string]$EnvironmentFile = '.env.demo.local')
+param(
+    [string]$EnvironmentFile = '.env.demo.local',
+    [switch]$KeepInfrastructure
+)
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'demo-common.ps1')
@@ -35,16 +38,21 @@ if (Test-Path -LiteralPath $state) {
             continue
         }
         Stop-VerifiedDescendants $process.Id
-        Stop-Process -Id $process.Id -Force
+        Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
         Remove-Item -LiteralPath $recordPath.FullName -Force
         Write-Host "Stopped $($record.name) (PID $($process.Id))"
     }
+    Remove-Item -LiteralPath (Join-Path $state 'execution-readiness.json') -Force -ErrorAction SilentlyContinue
 }
-$labelled = @(docker ps --filter 'label=com.launchscope.demo=agentteams-v1.2.0' --format '{{.Names}}')
-foreach ($name in $labelled) { if ($name) { docker stop $name | Out-Null; Write-Host "Stopped labelled AgentTeams container $name" } }
-Push-Location $root
-try {
-    & docker compose --env-file (Join-Path $root $EnvironmentFile) -f infra/compose/docker-compose.yml stop `
-        postgres minio rocketmq-proxy rocketmq-broker rocketmq-namesrv
-} finally { Pop-Location }
-Write-Host 'Demo stopped. PostgreSQL, evidence, volumes and configuration were preserved.'
+if ($KeepInfrastructure) {
+    Write-Host 'Demo applications stopped. Local infrastructure remains running.'
+} else {
+    $labelled = @(docker ps --filter 'label=com.launchscope.demo=agentteams-v1.2.0' --format '{{.Names}}')
+    foreach ($name in $labelled) { if ($name) { docker stop $name | Out-Null; Write-Host "Stopped labelled AgentTeams container $name" } }
+    Push-Location $root
+    try {
+        & docker compose --env-file (Join-Path $root $EnvironmentFile) -f infra/compose/docker-compose.yml stop `
+            postgres minio rocketmq-proxy rocketmq-broker rocketmq-namesrv
+    } finally { Pop-Location }
+    Write-Host 'Demo stopped. PostgreSQL, evidence, volumes and configuration were preserved.'
+}

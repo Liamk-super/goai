@@ -1,5 +1,7 @@
 "use client";
 
+import { useI18n } from "../i18n/LocaleProvider";
+
 /**
  * Compass — 航海罗经 / 星盘
  *
@@ -115,14 +117,15 @@ export function Compass({
   onSelectNeedle,
   inscription = [],
 }: CompassProps) {
+  const { t, status } = useI18n();
   const notchAngle = notches > 0 ? 360 / notches : 9;
   // RETE 顺时针，MATER 逆时针半速 —— 反向视差，这是"转盘"的核心观感
   const reteAngle = notch * notchAngle;
   const materAngle = -reteAngle * 0.5;
 
   return (
-    <svg viewBox="-500 -500 1000 1000" role="img" aria-label="评估罗经">
-      <title>评估罗经：外环为方位刻度，中层为资料扇区，指针为 1+5 Agent 判断</title>
+    <svg viewBox="-500 -500 1000 1000" role="img" aria-label={t("Evaluation compass")}>
+      <title>{t("Evaluation compass: bearings outside, material sectors in the middle, and 1+5 Agent judgments on the needles")}</title>
 
       {/* ── 罗经边圈 ── */}
       <circle r={R.rim} className="plate-ring-strong" />
@@ -239,7 +242,7 @@ export function Compass({
               data-active={active}
               role="button"
               tabIndex={0}
-              aria-label={`${s.name}，已填 ${s.filled} / ${s.total}`}
+              aria-label={t("{name}, {filled} / {total} completed", { name: t(s.name), filled: s.filled, total: s.total })}
               aria-pressed={active}
               onClick={() => onSelectSector(i)}
               onKeyDown={(e) => {
@@ -279,7 +282,7 @@ export function Compass({
               data-state={state}
               role="button"
               tabIndex={0}
-              aria-label={`${n.name}：${n.status}，${n.evidence} 条证据`}
+              aria-label={t("{name}: {status}, {count} evidence items", { name: t(n.name), status: status(n.status), count: n.evidence })}
               onClick={() => onSelectNeedle?.(i)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
@@ -313,7 +316,7 @@ export function Compass({
                 className="needle-caption"
                 transform={`rotate(${-reteAngle} ${tx} ${ty + 15})`}
               >
-                {n.evidence} 证据
+                {t(n.evidence === 1 ? "1 evidence item" : "{count} evidence items", { count: n.evidence })}
               </text>
             </g>
           );

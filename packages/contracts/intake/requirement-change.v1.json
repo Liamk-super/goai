@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/intake/requirement-change.v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "change_id", "run_id", "brief_id", "classification", "affected_task_ids",
+    "scope_changed", "cost_changed", "permission_changed", "confirmation_required", "reason"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "change_id": { "type": "string", "format": "uuid" },
+    "run_id": { "type": "string", "format": "uuid" },
+    "brief_id": { "type": "string", "format": "uuid" },
+    "classification": { "enum": ["SUPPLEMENT", "REQUIREMENT_CHANGE"] },
+    "affected_task_ids": {
+      "type": "array", "uniqueItems": true,
+      "items": { "type": "string", "format": "uuid" }
+    },
+    "scope_changed": { "type": "boolean" },
+    "cost_changed": { "type": "boolean" },
+    "permission_changed": { "type": "boolean" },
+    "confirmation_required": { "type": "boolean" },
+    "reason": { "type": "string", "minLength": 1, "maxLength": 2000 }
+  }
+}

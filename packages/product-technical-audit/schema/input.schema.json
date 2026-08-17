@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/skills/product-technical-audit/input.v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["identity", "stage", "observations", "stage_gates", "core_flows", "delivery_risks", "bus_factor"],
+  "properties": {
+    "identity": {"type": "object", "required": ["report_id", "run_id", "project_id", "product_version_id", "product_title"]},
+    "stage": {"enum": ["CONCEPT", "MVP", "EARLY_COMMERCIAL", "GROWTH"]},
+    "observations": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["key", "section", "text"], "properties": {"key": {"type": "string"}, "section": {"type": "string"}, "text": {"type": "string"}, "decision_relevance": {"enum": ["CRITICAL", "IMPORTANT", "CONTEXT"]}, "sources": {"type": "array", "items": {"type": "object"}}}}},
+    "stage_gates": {"type": "array", "items": {"type": "object"}},
+    "core_flows": {"type": "array", "items": {"type": "object"}},
+    "delivery_risks": {"type": "array", "items": {"type": "string"}},
+    "bus_factor": {"type": ["integer", "null"], "minimum": 1},
+    "actions": {"type": "array", "items": {"type": "object"}}
+  }
+}

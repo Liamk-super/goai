@@ -36,7 +36,8 @@ src = [
   "packages/domain/src",
   "packages/contracts/src",
   "packages/skills/src",
-  "packages/observability/src"
+  "packages/observability/src",
+  "packages/benchmark/src"
 ]
 extend-exclude = [".git", ".venv", "node_modules", "dist", "build"]
 
@@ -57,7 +58,8 @@ pythonpath = [
   "packages/domain/src",
   "packages/contracts/src",
   "packages/skills/src",
-  "packages/observability/src"
+  "packages/observability/src",
+  "packages/benchmark/src"
 ]
 addopts = "-ra"
 
@@ -77,7 +79,8 @@ mypy_path = [
   "packages/domain/src",
   "packages/contracts/src",
   "packages/skills/src",
-  "packages/observability/src"
+  "packages/observability/src",
+  "packages/benchmark/src"
 ]
 exclude = [
   "(?x)(^|[\\\\/])(tests?|migrations)([\\\\/]|$)",

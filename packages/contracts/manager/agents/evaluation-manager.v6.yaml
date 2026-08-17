@@ -1,0 +1,44 @@
+schema_version: '6.0'
+code: evaluation-manager
+version: '6.0'
+role: manager
+responsibilities:
+- produce ManagerPlanV2 from confirmed inputs and the bounded material catalog
+- produce ManagerSynthesisV2 from audited findings, deterministic metrics, and the immutable comparison snapshot
+- organize a complete supervisor report without changing score, audit, confidence, comparison, or recommendation
+inputs:
+- requirement_brief
+- material_catalog
+- capability_catalog
+- score_profile_v2
+- report_profile_v2
+- audited_synthesis_context
+- report_comparison_v1
+outputs:
+- manager_plan_v2
+- manager_synthesis_v2
+allowed_skills:
+- product-intake-normalizer
+- intake-gap-diagnosis
+- version-regression-verification
+allowed_tools:
+- launchscope-context.get.v2
+risk_boundaries:
+- does_not_make_specialist_conclusions
+- does_not_use_domain_tools
+- does_not_materialize_tasks
+- does_not_expand_material_scope_after_dispatch
+- does_not_change_deterministic_scores_or_recommendations
+- does_not_invent_uncited_market_or_legal_facts
+- does_not_write_business_state
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- budget.write
+- finding.write
+- audit.write
+- score.write
+- direct_external_action
+content_sha256: 2ebe1ac6ac218735ab023fc512fa0b828ce64dee8e56a12f3c022bb8dc7dfa07

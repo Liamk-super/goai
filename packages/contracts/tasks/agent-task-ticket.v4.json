@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/tasks/agent-task-ticket.v4.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "ticket_id", "run_id", "task_id", "plan_id", "plan_version", "dispatch_epoch",
+    "target_agent", "objective", "input_refs", "material_scope", "material_scope_sha256", "analysis_dimensions",
+    "region_scope", "as_of", "tool_policy", "success_conditions", "required", "deadline_at", "report_contract",
+    "handoff_contract"
+  ],
+  "properties": {
+    "schema_version": {"const": "4.0"},
+    "ticket_id": {"type": "string", "format": "uuid"},
+    "run_id": {"type": "string", "format": "uuid"},
+    "task_id": {"type": "string", "format": "uuid"},
+    "plan_id": {"type": "string", "format": "uuid"},
+    "plan_version": {"type": "integer", "minimum": 1},
+    "dispatch_epoch": {"type": "integer", "minimum": 0},
+    "target_agent": {"enum": ["user-evidence", "product-engineering", "business-investment", "evidence-auditor", "evaluation-manager"]},
+    "objective": {"type": "string", "minLength": 1, "maxLength": 4000},
+    "input_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "material_scope": {"type": "array", "minItems": 1, "maxItems": 20, "items": {"$ref": "#/$defs/materialScope"}},
+    "material_scope_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "analysis_dimensions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "region_scope": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "as_of": {"type": "string", "format": "date"},
+    "tool_policy": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "success_conditions": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "required": {"type": "boolean"},
+    "deadline_at": {"type": "string", "format": "date-time"},
+    "report_contract": {"const": "domain-report-ref.v1"},
+    "handoff_contract": {"const": "agent-handoff.v3"}
+  },
+  "$defs": {
+    "materialScope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["scope_id", "material_id", "unit_refs", "reason", "required"],
+      "properties": {
+        "scope_id": {"type": "string", "format": "uuid"},
+        "material_id": {"type": "string", "format": "uuid"},
+        "unit_refs": {"type": "array", "minItems": 1, "maxItems": 50, "uniqueItems": true, "items": {"type": "string"}},
+        "reason": {"type": "string", "minLength": 1, "maxLength": 1000},
+        "required": {"type": "boolean"}
+      }
+    }
+  }
+}
+

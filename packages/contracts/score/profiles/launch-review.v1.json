@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "profile_id": "launch-review",
+  "version": "1.0",
+  "evaluation_mode": "LAUNCH_REVIEW",
+  "weights": { "user_value": 0.25, "product_capability": 0.40, "investment_potential": 0.25, "evidence_quality": 0.10 },
+  "thresholds": { "PROCEED": 85, "VALIDATE_FURTHER": 65, "ADJUST": 45 },
+  "required_agents": ["user-evidence", "product-engineering", "business-investment"],
+  "coverage_rules": { "proceed_minimum": 0.80, "scoring_minimum": 0.60, "rejected_findings_score_zero": true },
+  "recommendation_caps": { "missing_optional_agent": "VALIDATE_FURTHER", "unresolved_conflict": "VALIDATE_FURTHER", "low_coverage": "VALIDATE_FURTHER" }
+}

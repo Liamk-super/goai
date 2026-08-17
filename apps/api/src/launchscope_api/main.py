@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 from dataclasses import dataclass
 from uuid import UUID
@@ -16,7 +17,20 @@ from launchscope_domain.errors import DomainError
 
 from .infrastructure.db.session import DatabaseSettings, create_database_engine, session_factory
 from .infrastructure.object_store import S3QuarantineObjectStore
+from .modules.decision_report.export_application import ReportExportBusyError, ReportExportIntegrityError
+from .modules.evaluation.canonical_event_recovery import CanonicalEventRecoveryError
+from .modules.evaluation.execution_control import (
+    RunControlConflictError,
+    RunExecutionPausedError,
+    RunNotPausableError,
+    RunNotRecoverableError,
+    RunNotResumableError,
+)
 from .modules.evaluation.intake_application import IntakeValidationError
+from .modules.evaluation.limit_amendment_application import (
+    RunLimitAmendmentConflict,
+    RunLimitAmendmentError,
+)
 from .modules.identity_tenant.application import Actor, AuthorizationError, IdentityTenantApplication, NotFoundError
 from .modules.project_dossier.application import ProjectDossierApplication
 from .modules.project_dossier.material_ingestion import MaterialValidationError
@@ -24,6 +38,19 @@ from .modules.project_dossier.persistent_application import (
     PersistentIdentityTenantApplication,
     PersistentProjectDossierApplication,
 )
+from .modules.supervisor.audit_application import SupervisorAuditApplication
+from .modules.supervisor.completion_application import SupervisorCompletionApplication
+from .modules.supervisor.conversation_application import RunConversationApplication
+from .modules.supervisor.intake_application import SupervisorChatApplication
+from .modules.supervisor.planning_application import ManagerPlanningApplication
+from .modules.user_validation.application import (
+    ArtifactIntegrityError,
+    IdempotencyConflictError,
+    ReportTooLargeError,
+)
+from .modules.user_validation.runner import RunnerUnavailableError
+
+_LOGGER = logging.getLogger(__name__)
 
 
 @dataclass
@@ -45,15 +72,27 @@ class PersistentControlPlane:
 
     identity: PersistentIdentityTenantApplication
     dossier: PersistentProjectDossierApplication
+    supervisor: SupervisorChatApplication | None = None
+    run_conversations: RunConversationApplication | None = None
+    manager_planning: ManagerPlanningApplication | None = None
+    supervisor_audit: SupervisorAuditApplication | None = None
+    supervisor_completion: SupervisorCompletionApplication | None = None
 
     @classmethod
     def from_env(cls) -> PersistentControlPlane:
         settings = DatabaseSettings.from_env()
         sessions = session_factory(create_database_engine(settings.url, application_role="launchscope_runtime"))
         identity = PersistentIdentityTenantApplication(sessions)
+        objects = S3QuarantineObjectStore.from_env()
+        supervisor = SupervisorChatApplication(sessions, objects)
         return cls(
             identity=identity,
-            dossier=PersistentProjectDossierApplication(sessions, identity, S3QuarantineObjectStore.from_env()),
+            dossier=PersistentProjectDossierApplication(sessions, identity, objects),
+            supervisor=supervisor,
+            run_conversations=RunConversationApplication(sessions, objects, supervisor),
+            manager_planning=ManagerPlanningApplication(sessions),
+            supervisor_audit=SupervisorAuditApplication(sessions, objects),
+            supervisor_completion=SupervisorCompletionApplication(sessions, objects),
         )
 
 
@@ -93,7 +132,7 @@ def create_app(control_plane: ControlPlane | PersistentControlPlane | None = Non
             CORSMiddleware,
             allow_origins=list(cors_origins),
             allow_credentials=True,
-            allow_methods=["GET", "POST", "OPTIONS"],
+            allow_methods=["GET", "POST", "PUT", "OPTIONS"],
             allow_headers=[
                 "Content-Type",
                 "Idempotency-Key",
@@ -111,10 +150,14 @@ def create_app(control_plane: ControlPlane | PersistentControlPlane | None = Non
     from .modules.experience.api import router as experience_router
     from .modules.identity_tenant.api import router as identity_router
     from .modules.project_dossier.api import router as dossier_router
+    from .modules.supervisor.api import router as supervisor_router
+    from .modules.user_validation.api import router as user_validation_router
 
     app.include_router(identity_router, prefix="/api/v1")
     app.include_router(dossier_router, prefix="/api/v1")
     app.include_router(experience_router, prefix="/api/v1")
+    app.include_router(user_validation_router, prefix="/api/v1")
+    app.include_router(supervisor_router, prefix="/api/v1")
     if demo_mode:
         from .modules.identity_tenant.demo_api import build_demo_router
 
@@ -125,8 +168,10 @@ def create_app(control_plane: ControlPlane | PersistentControlPlane | None = Non
         app.include_router(agentteams_router, prefix="/api/v1")
 
     @app.exception_handler(SQLAlchemyError)
-    async def database_error(request: Request, _exc: SQLAlchemyError) -> JSONResponse:
+    async def database_error(request: Request, exc: SQLAlchemyError) -> JSONResponse:
         """Keep database/schema failures visible to browsers without leaking SQL details."""
+
+        _LOGGER.exception("database request failed for %s", request.url.path, exc_info=exc)
 
         return JSONResponse(
             status_code=503,
@@ -150,7 +195,12 @@ def create_app(control_plane: ControlPlane | PersistentControlPlane | None = Non
         elif isinstance(exc, NotFoundError):
             status, code = 404, "NOT_FOUND"
         elif isinstance(exc, (MaterialValidationError, IntakeValidationError, DomainError)):
-            status, code = 422, "PRECONDITION_FAILED"
+            if str(exc).startswith("SUPERVISOR_1P4_DISABLED:"):
+                status, code = 503, "SUPERVISOR_1P4_DISABLED"
+            elif str(exc).startswith("EXECUTION_RUNTIME_UNAVAILABLE:"):
+                status, code = 503, "EXECUTION_RUNTIME_UNAVAILABLE"
+            else:
+                status, code = 422, "PRECONDITION_FAILED"
         else:
             status, code = 400, "VALIDATION_ERROR"
         return JSONResponse(
@@ -160,6 +210,119 @@ def create_app(control_plane: ControlPlane | PersistentControlPlane | None = Non
                 "message": str(exc),
                 "correlation_id": correlation_id,
                 "retryable": False,
+                "details": {},
+            },
+        )
+
+    @app.exception_handler(IdempotencyConflictError)
+    async def idempotency_conflict(request: Request, exc: IdempotencyConflictError) -> JSONResponse:
+        return JSONResponse(
+            status_code=409,
+            content={
+                "error_code": "IDEMPOTENCY_CONFLICT",
+                "message": str(exc),
+                "correlation_id": request.headers.get("X-Correlation-Id", ""),
+                "retryable": False,
+                "details": {},
+            },
+        )
+
+    @app.exception_handler(ReportExportBusyError)
+    @app.exception_handler(ReportExportIntegrityError)
+    async def report_export_conflict(request: Request, exc: Exception) -> JSONResponse:
+        code = "REPORT_EXPORT_INTEGRITY" if isinstance(exc, ReportExportIntegrityError) else "REPORT_EXPORT_NOT_READY"
+        return JSONResponse(
+            status_code=409,
+            content={
+                "error_code": code,
+                "message": str(exc),
+                "correlation_id": request.headers.get("X-Correlation-Id", ""),
+                "retryable": False,
+                "details": {},
+            },
+        )
+
+    @app.exception_handler(RunControlConflictError)
+    @app.exception_handler(CanonicalEventRecoveryError)
+    @app.exception_handler(RunLimitAmendmentConflict)
+    @app.exception_handler(RunLimitAmendmentError)
+    @app.exception_handler(RunNotPausableError)
+    @app.exception_handler(RunNotRecoverableError)
+    @app.exception_handler(RunNotResumableError)
+    async def run_control_conflict(request: Request, exc: Exception) -> JSONResponse:
+        if isinstance(exc, CanonicalEventRecoveryError):
+            code = "CANONICAL_EVENT_RECOVERY_NOT_ALLOWED"
+        elif isinstance(exc, RunLimitAmendmentConflict):
+            code = "RUN_LIMIT_AMENDMENT_CONFLICT"
+        elif isinstance(exc, RunLimitAmendmentError):
+            code = "RUN_LIMIT_AMENDMENT_NOT_ALLOWED"
+        elif isinstance(exc, RunNotPausableError):
+            code = "RUN_NOT_PAUSABLE"
+        elif isinstance(exc, RunNotRecoverableError):
+            code = "RUN_NOT_RECOVERABLE"
+        elif isinstance(exc, RunNotResumableError):
+            code = "RUN_NOT_RESUMABLE"
+        else:
+            code = "RUN_CONTROL_CONFLICT"
+        return JSONResponse(
+            status_code=409,
+            content={
+                "error_code": code,
+                "message": str(exc),
+                "correlation_id": request.headers.get("X-Correlation-Id", ""),
+                "retryable": False,
+                "details": {},
+            },
+        )
+
+    @app.exception_handler(RunExecutionPausedError)
+    async def run_execution_paused(request: Request, exc: RunExecutionPausedError) -> JSONResponse:
+        return JSONResponse(
+            status_code=423,
+            content={
+                "error_code": "RUN_PAUSED",
+                "message": str(exc),
+                "correlation_id": request.headers.get("X-Correlation-Id", ""),
+                "retryable": False,
+                "details": {},
+            },
+        )
+
+    @app.exception_handler(ArtifactIntegrityError)
+    async def artifact_integrity_error(request: Request, exc: ArtifactIntegrityError) -> JSONResponse:
+        return JSONResponse(
+            status_code=409,
+            content={
+                "error_code": "ARTIFACT_INTEGRITY_MISMATCH",
+                "message": str(exc),
+                "correlation_id": request.headers.get("X-Correlation-Id", ""),
+                "retryable": False,
+                "details": {},
+            },
+        )
+
+    @app.exception_handler(ReportTooLargeError)
+    async def report_too_large(request: Request, exc: ReportTooLargeError) -> JSONResponse:
+        return JSONResponse(
+            status_code=413,
+            content={
+                "error_code": "REPORT_TOO_LARGE",
+                "message": str(exc),
+                "correlation_id": request.headers.get("X-Correlation-Id", ""),
+                "retryable": False,
+                "details": {},
+            },
+        )
+
+    @app.exception_handler(RunnerUnavailableError)
+    async def runner_unavailable(request: Request, exc: RunnerUnavailableError) -> JSONResponse:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error_code": "DEPENDENCY_UNAVAILABLE",
+                "message": str(exc),
+                "correlation_id": request.headers.get("X-Correlation-Id", ""),
+                "retryable": True,
                 "details": {},
             },
         )

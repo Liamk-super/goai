@@ -1,0 +1,287 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "launchscope://skills/user-validation-designer/0.1/validation-plan",
+  "title": "Validation Plan v0.1 (KB-USR-V01 five elements + V02 method matrix + V03 sampling + V04 upgrade)",
+  "description": "A DESIGN for a real-user experiment. This skill never executes one: execution_owner and needs_human_review are pinned to human / true via enum:[...] so the contract itself forbids a self-executing plan. A plan that upgrades no evidence level is deleted rather than kept (KB-USR-V04).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "plan_id",
+    "hypothesis_id",
+    "hypothesis",
+    "validation_target",
+    "target_participants",
+    "recruitment_criteria",
+    "method",
+    "method_rationale",
+    "sample_size",
+    "tasks_or_questions",
+    "success_metrics",
+    "success_threshold",
+    "duration",
+    "estimated_cost",
+    "current_evidence_level",
+    "target_evidence_level",
+    "evidence_upgrade",
+    "priority_rank",
+    "execution_owner",
+    "needs_human_review"
+  ],
+  "properties": {
+    "plan_id": { "type": "string", "pattern": "^VP[0-9]+$" },
+    "hypothesis_id": { "type": "string", "pattern": "^H[0-9]+$" },
+    "hypothesis": { "type": "string", "minLength": 1 },
+
+    "validation_target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["falsifiable_statement", "proves_or_disproves"],
+      "properties": {
+        "falsifiable_statement": {
+          "type": "string",
+          "minLength": 1,
+          "description": "One sentence that a real result can contradict. 'Users like it' is not falsifiable and fails review."
+        },
+        "proves_or_disproves": { "type": "string", "enum": ["prove", "disprove", "both"] }
+      }
+    },
+
+    "target_participants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["persona_ids", "segment_label", "must_be_real_user"],
+      "properties": {
+        "persona_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "pattern": "^P[0-9]+$" },
+          "description": "Which simulated personas this plan intends to test against reality."
+        },
+        "segment_label": { "type": "string", "minLength": 1 },
+        "must_be_real_user": {
+          "type": "boolean",
+          "enum": [true],
+          "description": "Pinned true. A validation plan whose participants are simulated personas would upgrade nothing; that is the whole point of S6."
+        }
+      }
+    },
+
+    "recruitment_criteria": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inclusion", "exclusion", "screening_questions", "channels"],
+      "properties": {
+        "inclusion": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "exclusion": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "screening_questions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "description": "Behaviour-based screeners only. 'Would you buy this?' style leading questions are forbidden (KB-USR-F07 / P02); ask about the last time they hit the problem and what it cost them."
+        },
+        "channels": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "pii_handling_note": {
+          "type": ["string", "null"],
+          "description": "Data-minimisation plan for whoever executes this. This skill collects nothing."
+        }
+      }
+    },
+
+    "method": {
+      "type": "string",
+      "enum": [
+        "problem_interview",
+        "usability_test",
+        "pricing_experiment",
+        "presale_or_deposit",
+        "survey",
+        "trial_cohort_retention",
+        "landing_page_test"
+      ],
+      "description": "Closed set from the KB-USR-V02 validation method matrix. Desk research reuse is supplementary/deferred research, not a validation plan that creates a new evidence tier."
+    },
+    "method_rationale": { "type": "string", "minLength": 1 },
+
+    "sample_size": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit", "basis"],
+      "properties": {
+        "value": { "type": "integer", "minimum": 1 },
+        "unit": {
+          "type": "string",
+          "enum": ["persons_per_persona", "persons_total", "responses", "sessions"]
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Cite KB-USR-V03: 5-8 per persona for interviews, 5 per round for usability, >=100 responses for directional survey."
+        },
+        "saturation_rule": { "type": ["string", "null"] },
+        "underpowered": {
+          "type": ["boolean", "null"],
+          "description": "Program-set true when below the V03 floor (e.g. survey with <100 responses), which also constrains the claimable target_evidence_level."
+        }
+      }
+    },
+
+    "tasks_or_questions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["item_id", "content", "kind", "question_type"],
+        "properties": {
+          "item_id": { "type": "string", "minLength": 1 },
+          "content": { "type": "string", "minLength": 1 },
+          "kind": {
+            "type": "string",
+            "enum": ["past_behavior_question", "cost_question", "task", "observation_point"],
+            "description": "Mom Test shape: past behaviour and cost, not opinion or prediction."
+          },
+          "question_type": {
+            "type": ["string", "null"],
+            "enum": [null, "last_occurrence", "current_workaround", "past_time_cost", "past_money_cost", "past_failure", "recent_alternative"],
+            "description": "Program-authoritative question family. Required for question kinds; null for tasks/observation points."
+          },
+          "reused_from_previous_round": { "type": ["boolean", "null"] }
+        }
+      }
+    },
+
+    "success_metrics": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["metric", "metric_type", "measurable", "metric_id", "measurement_type", "observable_event", "commitment_type"],
+        "properties": {
+          "metric_id": { "type": "string", "pattern": "^M[0-9]+$" },
+          "metric": { "type": "string", "minLength": 1 },
+          "measurement_type": {
+            "type": "string",
+            "enum": ["count", "rate", "duration", "money", "behavior", "commitment"]
+          },
+          "observable_event": { "type": "string", "minLength": 1 },
+          "commitment_type": {
+            "type": ["string", "null"],
+            "enum": [null, "lead_submitted", "reservation_created", "time_committed", "deposit_paid", "payment_completed", "contract_signed"]
+          },
+          "metric_type": {
+            "type": "string",
+            "enum": ["behavioral", "attitudinal", "commitment", "monetary"],
+            "description": "willingness_to_pay hypotheses require at least one of commitment or monetary; attitudinal alone is a weak signal (KB-USR-F07)."
+          },
+          "measurable": { "type": "boolean", "enum": [true] }
+        }
+      }
+    },
+
+    "success_threshold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expression", "basis", "reused_from_previous_round", "metric_id", "operator", "value", "unit"],
+      "properties": {
+        "metric_id": { "type": "string", "pattern": "^M[0-9]+$" },
+        "operator": { "type": "string", "enum": [">", ">=", "<", "<=", "=", "between"] },
+        "value": { "type": "number" },
+        "unit": { "type": "string", "minLength": 1 },
+        "expression": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Quantified, e.g. 'core task completion rate >= 80%' (KB-USR-V03). Adverbs are not thresholds."
+        },
+        "basis": { "type": "string", "minLength": 1 },
+        "reused_from_previous_round": {
+          "type": "boolean",
+          "description": "In version_regression this defaults to true. Setting it false REQUIRES change_reason, so a round cannot quietly lower the bar to look like progress."
+        },
+        "change_reason": { "type": ["string", "null"] }
+      }
+    },
+
+    "duration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["weeks", "fits_constraints"],
+      "properties": {
+        "weeks": { "type": "number", "minimum": 0 },
+        "fits_constraints": {
+          "type": ["boolean", "null"],
+          "description": "null when constraints.time_budget_weeks was not supplied; the plan is then tagged feasibility_unchecked."
+        },
+        "note": { "type": ["string", "null"] }
+      }
+    },
+
+    "estimated_cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["money_cny", "person_days", "confidence"],
+      "properties": {
+        "money_cny": { "type": ["number", "null"], "minimum": 0 },
+        "person_days": { "type": ["number", "null"], "minimum": 0 },
+        "confidence": { "type": "string", "enum": ["high", "medium", "low"] }
+      }
+    },
+
+    "current_evidence_level": { "type": "string", "enum": ["E0", "E1", "E2"] },
+    "target_evidence_level": {
+      "type": "string",
+      "enum": ["E3", "E4", "E5"],
+      "description": "Must exceed current_evidence_level and must be reachable by the chosen method: interview/survey/usability -> E3; landing page/trial retention/real task completion -> E4; pricing/presale/contract -> E5."
+    },
+
+    "evidence_upgrade": {
+      "type": "array",
+      "minItems": 1,
+      "description": "KB-USR-V04. Which conclusions move from which tier to which tier. An empty list means the plan changes nothing and is deleted.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claim_id", "claim", "from_tier", "to_tier", "upgrade_condition"],
+        "properties": {
+          "claim_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Must exist in evidence_level_summary.per_claim with current_tier == from_tier."
+          },
+          "claim": { "type": "string", "minLength": 1 },
+          "from_tier": { "type": "string", "enum": ["E0", "E1", "E2"] },
+          "to_tier": { "type": "string", "enum": ["E3", "E4", "E5"] },
+          "upgrade_condition": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What outcome counts as an upgrade. Must align with success_threshold.expression."
+          }
+        }
+      }
+    },
+
+    "priority_rank": { "type": "integer", "minimum": 1, "maximum": 3 },
+
+    "execution_owner": {
+      "type": "string",
+      "enum": ["human"],
+      "description": "Pinned. This skill designs; a human executes. KB-USR-P03 / spec rule A-23."
+    },
+    "needs_human_review": {
+      "type": "boolean",
+      "enum": [true],
+      "description": "Pinned true. Every plan touches real users, so every plan needs approval before execution. The model cannot set this to false."
+    },
+
+    "external_actions_required": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "string",
+        "enum": ["recruit_participants", "publish_landing_page", "distribute_survey", "collect_personal_data", "charge_or_collect_deposit", "contact_users"]
+      },
+      "description": "Declares which forbidden-for-agent actions a human must perform. Purely informational for the approver."
+    },
+    "risks_and_limits": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "carried_from_previous": { "type": ["boolean", "null"] }
+  }
+}

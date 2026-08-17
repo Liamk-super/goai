@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/tools/user-validation-designer.submit-step.v1.json",
+  "x-network-policy": { "allowed_domains": [], "max_redirects": 0, "max_response_bytes": 65536 },
+  "x-execution-policy": { "timeout_seconds": 30, "max_cost": 0 },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "tool_id", "permission", "network_level", "read_only", "input_schema", "output_schema"],
+  "properties": {
+    "contract_version": { "const": "1.0" },
+    "tool_id": { "const": "user-validation-designer.submit-step.v1" },
+    "permission": { "const": "user_validation.checkpoint.write" },
+    "network_level": { "const": "INTERNAL" },
+    "read_only": { "const": false },
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id", "task_id", "execution_id", "expected_revision", "checkpoint_sha256",
+        "step_id", "attempt", "output", "idempotency_key", "correlation_id", "context_token"
+      ],
+      "properties": {
+        "run_id": { "type": "string", "format": "uuid" },
+        "task_id": { "type": "string", "format": "uuid" },
+        "execution_id": { "type": "string", "format": "uuid" },
+        "expected_revision": { "type": "integer", "minimum": 0 },
+        "checkpoint_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "step_id": { "enum": ["s2", "s3", "s4a", "s4b", "s5", "s6"] },
+        "attempt": { "type": "integer", "minimum": 0, "maximum": 2 },
+        "output": { "type": "object" },
+        "idempotency_key": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "correlation_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "context_token": { "type": "string", "minLength": 1 }
+      }
+    },
+    "output_schema": { "type": "object", "required": ["execution_id", "revision", "checkpoint_sha256", "status"] }
+  },
+  "examples": [{
+    "contract_version": "1.0",
+    "tool_id": "user-validation-designer.submit-step.v1",
+    "permission": "user_validation.checkpoint.write",
+    "network_level": "INTERNAL",
+    "read_only": false,
+    "input_schema": {
+      "run_id": "00000000-0000-0000-0000-000000000001",
+      "task_id": "00000000-0000-0000-0000-000000000002",
+      "execution_id": "00000000-0000-0000-0000-000000000004",
+      "expected_revision": 0,
+      "checkpoint_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "step_id": "s2",
+      "attempt": 0,
+      "output": {},
+      "idempotency_key": "uvd-step-s2-0",
+      "correlation_id": "00000000-0000-0000-0000-000000000003",
+      "context_token": "signed-task-capability"
+    },
+    "output_schema": {
+      "execution_id": "00000000-0000-0000-0000-000000000004",
+      "revision": 1,
+      "checkpoint_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "status": "awaiting_step"
+    }
+  }]
+}

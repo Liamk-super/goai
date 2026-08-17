@@ -1,0 +1,211 @@
+openapi: 3.1.0
+info:
+  title: LaunchScope User Validation API
+  version: 3.0.0
+  description: Additive UVD 1.0.5 dual-report interfaces. Existing V1 and V2 contracts remain unchanged.
+paths:
+  /product-versions/{versionId}/user-validation-script:
+    put:
+      summary: Freeze one validated 1-5 task Product Validation Script
+      parameters:
+      - {$ref: '#/components/parameters/VersionId'}
+      - {$ref: '#/components/parameters/IdempotencyKey'}
+      - {$ref: '#/components/parameters/CorrelationId'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ProductValidationScript'}
+      responses:
+        '200': {description: Idempotent replay or newly frozen script}
+        '409': {description: IDEMPOTENCY_CONFLICT or immutable version conflict}
+  /product-versions/{versionId}/user-evidence:
+    post:
+      summary: Register aggregate, PII-free user evidence metadata against an immutable object
+      parameters:
+      - {$ref: '#/components/parameters/VersionId'}
+      - {$ref: '#/components/parameters/IdempotencyKey'}
+      - {$ref: '#/components/parameters/CorrelationId'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/UserEvidenceRegistration'}
+      responses:
+        '201': {description: Evidence registered without upgrading its claimed tier}
+        '422': {description: PII or evidence metadata validation failed}
+  /runs/{baselineRunId}/user-evidence-rechecks:
+    post:
+      summary: Create an append-only evidence_recheck child Run
+      parameters:
+      - {name: baselineRunId, in: path, required: true, schema: {type: string, format: uuid}}
+      - {$ref: '#/components/parameters/IdempotencyKey'}
+      - {$ref: '#/components/parameters/CorrelationId'}
+      responses:
+        '201': {description: Child Run created with baseline_run_id}
+        '409': {description: Selected baseline is incomplete or incompatible}
+  /runs/{runId}/user-validation-result:
+    get:
+      summary: Read an authorized summary and a short-lived private artifact URL
+      parameters:
+      - {name: runId, in: path, required: true, schema: {type: string, format: uuid}}
+      responses:
+        '200':
+          description: Integrity-bound result summary with optional Presentation metadata
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/UserValidationResult'}
+        '404': {description: Result absent or outside tenant scope}
+  /runs/{runId}/user-validation-reports/{variant}:
+    get:
+      summary: Read one integrity-verified deterministic report presentation
+      parameters:
+      - {name: runId, in: path, required: true, schema: {type: string, format: uuid}}
+      - name: variant
+        in: path
+        required: true
+        schema: {type: string, enum: [summary, full]}
+      - name: format
+        in: query
+        required: true
+        schema: {type: string, enum: [html, markdown]}
+      responses:
+        '200':
+          description: Report content with artifact and content integrity hashes
+          headers:
+            Cache-Control:
+              schema: {type: string, const: no-store}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/UserValidationReport'}
+        '404': {description: Result or selected presentation is absent or outside tenant scope}
+        '409': {description: Stored artifact or content integrity check failed}
+        '413': {description: Selected report content exceeds one MiB}
+components:
+  schemas:
+    PresentationFormat:
+      type: object
+      additionalProperties: false
+      required: [available, content_sha256]
+      properties:
+        available: {type: boolean}
+        content_sha256: {type: [string, 'null'], pattern: '^[a-f0-9]{64}$'}
+    PresentationVariant:
+      type: object
+      additionalProperties: false
+      required: [markdown, html]
+      properties:
+        markdown: {$ref: '#/components/schemas/PresentationFormat'}
+        html: {$ref: '#/components/schemas/PresentationFormat'}
+    PresentationMetadata:
+      type: object
+      additionalProperties: false
+      required: [version, summary, full]
+      properties:
+        version: {type: string, const: '0.4'}
+        summary: {$ref: '#/components/schemas/PresentationVariant'}
+        full: {$ref: '#/components/schemas/PresentationVariant'}
+    UserValidationResult:
+      type: object
+      additionalProperties: false
+      required:
+      - run_id
+      - skill_result_ref
+      - schema_version
+      - status
+      - mode
+      - summary
+      - skill_result_sha256
+      - report_url
+      - expires_in_seconds
+      - presentation
+      properties:
+        run_id: {type: string, format: uuid}
+        skill_result_ref: {type: string, format: uuid}
+        schema_version: {type: string, minLength: 1}
+        status: {type: string, enum: [COMPLETED, PARTIAL, BLOCKED, FAILED]}
+        mode: {type: string, enum: [first_validation, version_regression, evidence_recheck]}
+        summary: {type: object}
+        skill_result_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        report_url: {type: string, minLength: 1}
+        expires_in_seconds: {type: integer, minimum: 1}
+        presentation:
+          oneOf:
+          - {type: 'null'}
+          - {$ref: '#/components/schemas/PresentationMetadata'}
+    UserValidationReport:
+      type: object
+      additionalProperties: false
+      required: [run_id, skill_result_ref, variant, format, content, content_sha256, skill_result_sha256]
+      properties:
+        run_id: {type: string, format: uuid}
+        skill_result_ref: {type: string, format: uuid}
+        variant: {type: string, enum: [summary, full]}
+        format: {type: string, enum: [html, markdown]}
+        content: {type: string, minLength: 1, maxLength: 1048576}
+        content_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        skill_result_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+    ProductValidationScript:
+      type: object
+      additionalProperties: false
+      required: [tasks]
+      properties:
+        tasks:
+          type: array
+          minItems: 1
+          maxItems: 5
+          items:
+            type: object
+            additionalProperties: false
+            required: [task_key, description, expected_observable_outcome]
+            properties:
+              task_key: {type: string, minLength: 1, maxLength: 120}
+              description: {type: string, minLength: 1, maxLength: 2000}
+              expected_observable_outcome: {type: string, minLength: 1, maxLength: 2000}
+              max_steps: {type: [integer, 'null'], minimum: 1, maximum: 100}
+    UserEvidenceRegistration:
+      type: object
+      additionalProperties: false
+      required:
+      - object_key
+      - sha256
+      - kind
+      - claimed_tier
+      - source
+      - observed_at
+      - aggregate_observation
+      - applicability
+      - supporting_claim_refs
+      - contradicting_claim_refs
+      properties:
+        object_key: {type: string, minLength: 1, maxLength: 1024}
+        sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        kind:
+          enum: [interview, survey, usability_test, review, public_comment, usage_data, retention_data, payment_record, contract, team_statement]
+        claimed_tier: {enum: [E0, E1, E2, E3, E4, E5]}
+        source_tier: {type: [string, 'null'], enum: [tier_1, tier_2, tier_3, untraceable, null]}
+        source: {type: string, minLength: 1, maxLength: 1000}
+        observed_at: {type: string, format: date-time}
+        expires_at: {type: [string, 'null'], format: date-time}
+        sample_size: {type: [integer, 'null'], minimum: 1}
+        segment: {type: [string, 'null'], maxLength: 500}
+        aggregate_observation: {type: string, minLength: 1, maxLength: 4000}
+        applicability: {type: object}
+        supporting_claim_refs: {type: array, maxItems: 100, items: {type: string}}
+        contradicting_claim_refs: {type: array, maxItems: 100, items: {type: string}}
+  parameters:
+    VersionId:
+      name: versionId
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: {type: string, minLength: 1, maxLength: 200}
+    CorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: true
+      schema: {type: string, format: uuid}

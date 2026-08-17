@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from contextlib import AbstractContextManager
 from dataclasses import dataclass
+from datetime import UTC, datetime
+from typing import cast
 from uuid import UUID, uuid4
 
 from sqlalchemy import func, select, update
@@ -19,12 +21,16 @@ from launchscope_api.infrastructure.db.schema import (
     evaluation_run,
     intake_gap_question,
     material,
+    material_selection,
+    material_selection_item,
     product_profile,
     product_profile_draft,
     product_version,
     project,
+    public_demo_disclosure_acceptance,
     run_status_history,
     tenant,
+    user_validation_script,
     workspace,
     workspace_member,
 )
@@ -40,6 +46,11 @@ from launchscope_api.modules.identity_tenant.application import (
     WorkspaceRole,
 )
 from launchscope_api.modules.project_dossier.application import ProductVersion, Project
+from launchscope_api.modules.project_dossier.material_analysis import (
+    MaterialAnalysisApplication,
+    MaterialObjectStore,
+    material_routing_enabled,
+)
 from launchscope_api.modules.project_dossier.material_ingestion import (
     MaterialRecord,
     PersistentMaterialIngestionApplication,
@@ -51,12 +62,24 @@ from launchscope_api.modules.project_dossier.profile_confirmation import (
     ProductProfileDraft,
     ProfileStatus,
 )
+from launchscope_api.modules.supervisor.baseline_application import (
+    REPORT_STANDARD_VERSION,
+    content_fingerprint_sha256,
+    input_snapshot_sha256,
+    report_profile_ref,
+    report_v2_enabled,
+    report_v3_enabled,
+    select_baseline,
+)
+from launchscope_api.modules.supervisor.stage_admission import StageAdmissionError, evaluation_mode_for_stage
 from launchscope_domain.enums import EventType, RunStatus
 from launchscope_domain.events import EventEnvelope
 from launchscope_domain.value_objects import CorrelationContext, TenantScope
 
-_REQUIRED_FIELDS = ("target_user", "payer", "stage", "region", "validation_goal")
+_REQUIRED_FIELDS = ("one_line_value_claim", "target_user", "payer", "stage", "region", "validation_goal")
+PUBLIC_DEMO_DISCLOSURE_POLICY_VERSION = "public-demo-evidence-v1"
 _QUESTION_TEXT = {
+    "one_line_value_claim": "What is the product's one-sentence value proposition?",
     "target_user": "Who is the primary target user?",
     "payer": "Who pays for the product or service?",
     "stage": "What is the current product stage?",
@@ -190,6 +213,7 @@ class PersistentProjectDossierApplication:
         self._sessions = sessions
         self.identity = identity
         self.materials = PersistentMaterialIngestionApplication(sessions, store)
+        self.material_analysis = MaterialAnalysisApplication(sessions, cast(MaterialObjectStore, store))
 
     def create_project(self, actor: Actor, workspace_id: UUID, name: str) -> Project:
         normalized_name = _required(name, "project name", 200)
@@ -254,6 +278,82 @@ class PersistentProjectDossierApplication:
     def complete_material(self, actor: Actor, material_id: UUID) -> MaterialRecord:
         return self.materials.complete(actor, material_id)
 
+    def public_demo_disclosure(self, actor: Actor, version_id: UUID) -> dict[str, object]:
+        with self._transaction(actor) as session:
+            version = self._version(session, actor, version_id)
+            self.identity.require_workspace_role_in_session(session, actor, version.workspace_id)
+            row = (
+                session.execute(
+                    select(public_demo_disclosure_acceptance).where(
+                        public_demo_disclosure_acceptance.c.tenant_id == actor.tenant_id,
+                        public_demo_disclosure_acceptance.c.product_version_id == version_id,
+                        public_demo_disclosure_acceptance.c.policy_version == PUBLIC_DEMO_DISCLOSURE_POLICY_VERSION,
+                    )
+                )
+                .mappings()
+                .first()
+            )
+            return {
+                "product_version_id": str(version_id),
+                "policy_version": PUBLIC_DEMO_DISCLOSURE_POLICY_VERSION,
+                "accepted": row is not None,
+                "acceptance_id": str(row["id"]) if row is not None else None,
+                "accepted_at": row["accepted_at"].isoformat() if row is not None else None,
+            }
+
+    def accept_public_demo_disclosure(
+        self,
+        actor: Actor,
+        version_id: UUID,
+        *,
+        idempotency_key: str,
+        correlation_id: UUID,
+    ) -> dict[str, object]:
+        if not idempotency_key.strip():
+            raise ValueError("Idempotency-Key is required")
+        now = datetime.now(UTC)
+        with self._transaction(actor) as session:
+            version = self._version(session, actor, version_id)
+            self.identity.require_workspace_role_in_session(session, actor, version.workspace_id)
+            existing = (
+                session.execute(
+                    select(public_demo_disclosure_acceptance).where(
+                        public_demo_disclosure_acceptance.c.tenant_id == actor.tenant_id,
+                        public_demo_disclosure_acceptance.c.product_version_id == version_id,
+                        public_demo_disclosure_acceptance.c.policy_version == PUBLIC_DEMO_DISCLOSURE_POLICY_VERSION,
+                    )
+                )
+                .mappings()
+                .first()
+            )
+            if existing is None:
+                acceptance_id = uuid4()
+                accepted_at = now
+                session.execute(
+                    public_demo_disclosure_acceptance.insert().values(
+                        id=acceptance_id,
+                        tenant_id=actor.tenant_id,
+                        project_id=version.project_id,
+                        product_version_id=version_id,
+                        run_id=None,
+                        actor_id=actor.actor_id,
+                        policy_version=PUBLIC_DEMO_DISCLOSURE_POLICY_VERSION,
+                        accepted_at=accepted_at,
+                        created_at=now,
+                    )
+                )
+            else:
+                acceptance_id = existing["id"]
+                accepted_at = existing["accepted_at"]
+        return {
+            "product_version_id": str(version_id),
+            "policy_version": PUBLIC_DEMO_DISCLOSURE_POLICY_VERSION,
+            "accepted": True,
+            "acceptance_id": str(acceptance_id),
+            "accepted_at": accepted_at.isoformat(),
+            "correlation_id": str(correlation_id),
+        }
+
     def diagnose_gaps(
         self, actor: Actor, version_id: UUID, correlation_id: UUID
     ) -> tuple[ProductProfileDraft, tuple[GapQuestion, ...]]:
@@ -284,7 +384,17 @@ class PersistentProjectDossierApplication:
                 .first()
             )
             if draft_row is not None and draft_row["status"] == ProfileStatus.CONFIRMED.value:
-                raise IntakeValidationError("ProductProfile has already been confirmed for this product version")
+                return (
+                    ProductProfileDraft(
+                        draft_row["id"],
+                        version_id,
+                        dict(draft_row["inferred_fields"]),
+                        source=draft_row["source"],
+                        status=ProfileStatus.CONFIRMED,
+                        answers=dict(draft_row["answered_fields"]),
+                    ),
+                    (),
+                )
             draft_id = draft_row["id"] if draft_row is not None else uuid4()
             inferred: dict[str, str | None] = {field: None for field in _REQUIRED_FIELDS}
             if draft_row is None:
@@ -431,22 +541,60 @@ class PersistentProjectDossierApplication:
             )
         return ConfirmedProductProfile(profile_id, version_id, actor.actor_id, answers)
 
-    def plan(self, actor: Actor, version_id: UUID, correlation_id: UUID) -> PersistentRun:
+    def plan(
+        self,
+        actor: Actor,
+        version_id: UUID,
+        correlation_id: UUID,
+        *,
+        locale: str = "zh-CN",
+        evaluation_mode: str | None = None,
+    ) -> PersistentRun:
         key = f"plan:{version_id}:{correlation_id}"
         with self._transaction(actor) as session:
             version = self._version(session, actor, version_id)
             self.identity.require_workspace_role_in_session(session, actor, version.workspace_id)
-            confirmed = session.execute(
-                select(product_profile.c.id)
-                .where(
-                    product_profile.c.tenant_id == actor.tenant_id,
-                    product_profile.c.product_version_id == version_id,
-                    product_profile.c.confirmation_status == "CONFIRMED",
+            confirmed = (
+                session.execute(
+                    select(product_profile)
+                    .where(
+                        product_profile.c.tenant_id == actor.tenant_id,
+                        product_profile.c.product_version_id == version_id,
+                        product_profile.c.confirmation_status == "CONFIRMED",
+                    )
+                    .order_by(product_profile.c.confirmed_at.desc(), product_profile.c.id.desc())
+                    .limit(1)
                 )
-                .limit(1)
-            ).first()
+                .mappings()
+                .first()
+            )
             if confirmed is None:
                 raise IntakeValidationError("ProductProfile must be user-confirmed before a run may enter PLANNED")
+            stage = str((confirmed["confirmed_fields"] or {}).get("stage") or "")
+            try:
+                mode = evaluation_mode_for_stage(stage, requested_mode=evaluation_mode)
+            except StageAdmissionError as exc:
+                raise IntakeValidationError(str(exc)) from exc
+            material_v2 = material_routing_enabled()
+            selection = None
+            if material_v2:
+                selection = (
+                    session.execute(
+                        select(material_selection)
+                        .where(
+                            material_selection.c.tenant_id == actor.tenant_id,
+                            material_selection.c.product_version_id == version_id,
+                        )
+                        .order_by(material_selection.c.revision.desc())
+                        .limit(1)
+                    )
+                    .mappings()
+                    .first()
+                )
+                if selection is None:
+                    raise IntakeValidationError(
+                        "MaterialSelectionSnapshot must be confirmed before a material-routing Run may enter PLANNED"
+                    )
             existing = (
                 session.execute(
                     select(evaluation_run.c.id, evaluation_run.c.status).where(
@@ -459,6 +607,100 @@ class PersistentProjectDossierApplication:
             )
             if existing is not None:
                 return PersistentRun(existing["id"], RunStatus(existing["status"]))
+            if material_v2 and selection is not None:
+                material_rows = (
+                    session.execute(
+                        select(material.c.id, material.c.sha256)
+                        .join(
+                            material_selection_item,
+                            (material_selection_item.c.tenant_id == material.c.tenant_id)
+                            & (material_selection_item.c.material_id == material.c.id),
+                        )
+                        .where(
+                            material_selection_item.c.tenant_id == actor.tenant_id,
+                            material_selection_item.c.selection_id == selection["id"],
+                            material_selection_item.c.decision.in_(("INCLUDE", "INCLUDE_PARTIAL")),
+                        )
+                        .order_by(material.c.sha256, material.c.id)
+                    )
+                    .mappings()
+                    .all()
+                )
+            else:
+                material_rows = (
+                    session.execute(
+                        select(material.c.id, material.c.sha256)
+                        .where(
+                            material.c.tenant_id == actor.tenant_id,
+                            material.c.product_version_id == version_id,
+                            material.c.ingest_status == "VALIDATED",
+                        )
+                        .order_by(material.c.sha256, material.c.id)
+                    )
+                    .mappings()
+                    .all()
+                )
+            script = (
+                session.execute(
+                    select(
+                        user_validation_script.c.id,
+                        user_validation_script.c.revision,
+                        user_validation_script.c.sha256,
+                    )
+                    .where(
+                        user_validation_script.c.tenant_id == actor.tenant_id,
+                        user_validation_script.c.product_version_id == version_id,
+                    )
+                    .order_by(user_validation_script.c.revision.desc(), user_validation_script.c.id.desc())
+                    .limit(1)
+                )
+                .mappings()
+                .first()
+            )
+            snapshot = {
+                "project_id": str(version.project_id),
+                "product_version_id": str(version_id),
+                "confirmed_product_profile": dict(confirmed["confirmed_fields"]),
+                "material_selection": (
+                    {
+                        "selection_id": str(selection["id"]),
+                        "revision": int(selection["revision"]),
+                        "sha256": str(selection["sha256"]),
+                    }
+                    if selection is not None
+                    else None
+                ),
+                "included_materials": [
+                    {"material_id": str(row["id"]), "sha256": str(row["sha256"])} for row in material_rows
+                ],
+                "user_validation_script": (
+                    {
+                        "script_id": str(script["id"]),
+                        "revision": int(script["revision"]),
+                        "sha256": str(script["sha256"]),
+                    }
+                    if script is not None
+                    else None
+                ),
+                "evaluation_mode": mode,
+            }
+            report_v2 = report_v2_enabled()
+            active_report_profile = report_profile_ref()
+            snapshot_sha = input_snapshot_sha256(snapshot) if report_v2 else None
+            fingerprint_sha = content_fingerprint_sha256(snapshot) if report_v2 else None
+            standard_version = REPORT_STANDARD_VERSION if report_v2 else "1.0"
+            binding = (
+                select_baseline(
+                    session,
+                    tenant_id=actor.tenant_id,
+                    project_id=version.project_id,
+                    candidate_content_fingerprint_sha256=fingerprint_sha,
+                    candidate_standard_version=standard_version,
+                    candidate_report_profile_ref=active_report_profile,
+                )
+                if report_v2 and fingerprint_sha is not None
+                else None
+            )
             run_id = uuid4()
             scope = TenantScope(
                 actor.tenant_id,
@@ -475,11 +717,42 @@ class PersistentProjectDossierApplication:
                     product_version_id=version_id,
                     status=RunStatus.PLANNED.value,
                     current_stage=None,
-                    state_flags={"gap_identified": True, "profile_confirmed": True},
-                    standard_version="1.0",
+                    state_flags={
+                        "gap_identified": True,
+                        "profile_confirmed": True,
+                        "architecture_generation": (
+                            "supervisor-1p4-report-v3"
+                            if report_v3_enabled()
+                            else "supervisor-1p4-report-v22"
+                            if report_v2
+                            else "supervisor-1p4-material-routing-v2"
+                            if material_v2
+                            else "supervisor-1p4-v1"
+                        ),
+                        "locale": "en" if locale == "en" else "zh-CN",
+                        "audience": "student",
+                        "tone": "clear_concise_practical",
+                        "evaluation_mode": mode,
+                        "report_comparison_status": binding.status if binding is not None else None,
+                    },
+                    standard_version=standard_version,
                     correlation_id=correlation_id,
                     idempotency_key=key,
+                    baseline_run_id=binding.baseline_run_id if binding is not None else None,
+                    input_snapshot_sha256=snapshot_sha,
+                    content_fingerprint_sha256=fingerprint_sha,
+                    report_profile_ref=active_report_profile if report_v2 else None,
                 )
+            )
+            session.execute(
+                update(public_demo_disclosure_acceptance)
+                .where(
+                    public_demo_disclosure_acceptance.c.tenant_id == actor.tenant_id,
+                    public_demo_disclosure_acceptance.c.product_version_id == version_id,
+                    public_demo_disclosure_acceptance.c.policy_version == PUBLIC_DEMO_DISCLOSURE_POLICY_VERSION,
+                    public_demo_disclosure_acceptance.c.run_id.is_(None),
+                )
+                .values(run_id=run_id)
             )
             for from_status, to_status, reason in (
                 (RunStatus.DRAFT.value, RunStatus.INTAKE.value, "authorized intake"),
@@ -565,6 +838,7 @@ class PersistentProjectDossierApplication:
 
 
 __all__ = [
+    "PUBLIC_DEMO_DISCLOSURE_POLICY_VERSION",
     "PersistentIdentityTenantApplication",
     "PersistentProjectDossierApplication",
     "PersistentRun",

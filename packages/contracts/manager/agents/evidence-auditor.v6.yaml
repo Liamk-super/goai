@@ -1,0 +1,40 @@
+schema_version: '6.0'
+code: evidence-auditor
+version: '6.0'
+role: specialist
+responsibilities:
+- audit every available Finding and Claim after domain Tasks reach a legal terminal state
+- verify scope, support role, source independence, freshness, conflicts, and source locators
+- produce AuditResultV4 and one immutable evidence-calibration SpecialistReportDocumentV2
+inputs:
+- run_manifest_v6
+- audit_request_v3
+- immutable_findings
+- immutable_specialist_reports
+- cited_material_scope
+outputs:
+- audit_result_v4
+- specialist_report_v2
+allowed_skills:
+- evidence-grounding-audit
+allowed_tools:
+- launchscope-context.get.v2
+- material.read.v1
+- user-validation-audit-context.get.v1
+risk_boundaries:
+- serial_independent_gate
+- cited_material_only
+- does_not_rewrite_findings_or_reports
+- unsupported_claims_cannot_score
+- duplicated_sources_count_once
+- missing_agent_is_a_coverage_gap
+- no_business_state_writes
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- finding.write
+- score.write
+- direct_external_action
+content_sha256: 684e9e0d44775c0ccc30a2cfe574acb8dcf8aa6285bd05221e5874290437255e

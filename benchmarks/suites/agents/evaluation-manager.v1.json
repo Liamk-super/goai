@@ -1,0 +1,1105 @@
+{
+  "schema_version": "1.0",
+  "id": "agent-evaluation-manager-v1",
+  "version": "1.0.0",
+  "benchmark_type": "AGENT",
+  "expected_case_count": 16,
+  "cases": [
+    {
+      "schema_version": "1.0",
+      "id": "AG-SUP-01",
+      "suite": "agent-evaluation-manager-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "开始评审，但本轮验证目标缺失。",
+          "facts": {
+            "validation_goal": null
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REQUEST_CLARIFICATION",
+          "status": "NEEDS_INPUT"
+        },
+        "rule_refs": [
+          "SUP-GOAL-MISSING"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REQUEST_CLARIFICATION",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_status_2",
+            "type": "EQUALS",
+            "path": "$.status",
+            "expected": "NEEDS_INPUT",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-GOAL-MISSING"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Missing validation goal",
+        "agent": "evaluation-manager",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evaluation-manager"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-SUP-02",
+      "suite": "agent-evaluation-manager-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "目标用户是所有人。",
+          "facts": {
+            "target_users": "所有人"
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "BLOCK",
+          "status": "NEEDS_INPUT"
+        },
+        "rule_refs": [
+          "SUP-ALL-USERS-BLOCK"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "BLOCK",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_status_2",
+            "type": "EQUALS",
+            "path": "$.status",
+            "expected": "NEEDS_INPUT",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-ALL-USERS-BLOCK"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "All-users audience",
+        "agent": "evaluation-manager",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evaluation-manager"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-SUP-03",
+      "suite": "agent-evaluation-manager-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "缺少谁用、谁付和核心功能。",
+          "facts": {
+            "core_fields_complete": false
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "BLOCK",
+          "status": "NEEDS_INPUT"
+        },
+        "rule_refs": [
+          "SUP-CORE-MISSING-BLOCK"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "BLOCK",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_status_2",
+            "type": "EQUALS",
+            "path": "$.status",
+            "expected": "NEEDS_INPUT",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-CORE-MISSING-BLOCK"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Core intake missing",
+        "agent": "evaluation-manager",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evaluation-manager"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-SUP-04",
+      "suite": "agent-evaluation-manager-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "用户明确回答留存率不知道。",
+          "facts": {
+            "answer": "unknown"
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "MARK_UNKNOWN",
+          "status": "SUCCEEDED"
+        },
+        "rule_refs": [
+          "SUP-UNKNOWN-VALID"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "MARK_UNKNOWN",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_status_2",
+            "type": "EQUALS",
+            "path": "$.status",
+            "expected": "SUCCEEDED",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-UNKNOWN-VALID"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Unknown answer accepted",
+        "agent": "evaluation-manager",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evaluation-manager"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-SUP-05",
+      "suite": "agent-evaluation-manager-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "发现十二个缺口，生成最少关键追问。",
+          "facts": {
+            "gap_count": 12
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REQUEST_CLARIFICATION",
+          "question_count": 5
+        },
+        "rule_refs": [
+          "SUP-QUESTIONS-MAX5"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REQUEST_CLARIFICATION",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_question_count_2",
+            "type": "EQUALS",
+            "path": "$.question_count",
+            "expected": 5,
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-QUESTIONS-MAX5"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Question limit",
+        "agent": "evaluation-manager",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evaluation-manager"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-SUP-06",
+      "suite": "agent-evaluation-manager-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "四个专业分析完成，准备综合。",
+          "facts": {
+            "specialists_complete": true,
+            "audit_complete": false
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "ROUTE_EVIDENCE_AUDITOR"
+        },
+        "rule_refs": [
+          "SUP-AUDIT-BEFORE-SYNTHESIS"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "ROUTE_EVIDENCE_AUDITOR",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-AUDIT-BEFORE-SYNTHESIS"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Audit ordering",
+        "agent": "evaluation-manager",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evaluation-manager"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-SUP-07",
+      "suite": "agent-evaluation-manager-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "预算消耗到 80%，仍有低优先级任务。",
+          "facts": {
+            "budget_used_percent": 80
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "FREEZE_LOW_PRIORITY"
+        },
+        "rule_refs": [
+          "SUP-BUDGET80-FREEZE"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "FREEZE_LOW_PRIORITY",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-BUDGET80-FREEZE"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Budget freeze",
+        "agent": "evaluation-manager",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evaluation-manager"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-SUP-08",
+      "suite": "agent-evaluation-manager-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "投资与地域结论相反且未解决。",
+          "facts": {
+            "conflict": true,
+            "resolved": false
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "PRESERVE_CONFLICT"
+        },
+        "rule_refs": [
+          "SUP-CONFLICT-NO-AVERAGE"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "PRESERVE_CONFLICT",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-CONFLICT-NO-AVERAGE"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Unresolved conflict",
+        "agent": "evaluation-manager",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evaluation-manager"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-SUP-09",
+      "suite": "agent-evaluation-manager-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "有效证据覆盖率为 42%。",
+          "facts": {
+            "coverage_percent": 42
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "VALIDATE_FURTHER"
+        },
+        "rule_refs": [
+          "SUP-COVERAGE50-CAP"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "VALIDATE_FURTHER",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-COVERAGE50-CAP"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Low coverage cap",
+        "agent": "evaluation-manager",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evaluation-manager"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-SUP-10",
+      "suite": "agent-evaluation-manager-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "形成最终建议。",
+          "facts": {
+            "ready_for_recommendation": true
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "LIMIT_ACTIONS",
+          "next_action_count": 3
+        },
+        "rule_refs": [
+          "SUP-NEXT-ACTIONS-1-3"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "LIMIT_ACTIONS",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_next_action_count_2",
+            "type": "EQUALS",
+            "path": "$.next_action_count",
+            "expected": 3,
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-NEXT-ACTIONS-1-3"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Action count",
+        "agent": "evaluation-manager",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evaluation-manager"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-SUP-11",
+      "suite": "agent-evaluation-manager-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "用户只说帮我看看这个产品。",
+          "facts": {
+            "validation_goal": "看看产品"
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REQUEST_CLARIFICATION"
+        },
+        "rule_refs": [
+          "SUP-GOAL-MISSING"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REQUEST_CLARIFICATION",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-GOAL-MISSING"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Ambiguous goal paraphrase",
+        "agent": "evaluation-manager",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evaluation-manager"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-SUP-12",
+      "suite": "agent-evaluation-manager-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "The product is for everyone; proceed to full review.",
+          "facts": {
+            "target_users": "everyone"
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "BLOCK"
+        },
+        "rule_refs": [
+          "SUP-ALL-USERS-BLOCK"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "BLOCK",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-ALL-USERS-BLOCK"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "English universal audience",
+        "agent": "evaluation-manager",
+        "difficulty": "HARD",
+        "language": "en",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evaluation-manager"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-SUP-13",
+      "suite": "agent-evaluation-manager-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "用户第二次确认不知道付费转化。",
+          "facts": {
+            "answer": "unknown",
+            "asked_before": true
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "MARK_UNKNOWN"
+        },
+        "rule_refs": [
+          "SUP-UNKNOWN-VALID"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "MARK_UNKNOWN",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-UNKNOWN-VALID"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "No repeat on unknown",
+        "agent": "evaluation-manager",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evaluation-manager"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-SUP-14",
+      "suite": "agent-evaluation-manager-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "总分高但关键冲突未解决。",
+          "facts": {
+            "score": 88,
+            "conflict": true,
+            "resolved": false
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "PRESERVE_CONFLICT",
+          "recommendation_cap": "VALIDATE_FURTHER"
+        },
+        "rule_refs": [
+          "SUP-CONFLICT-NO-AVERAGE",
+          "SUP-COVERAGE50-CAP"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "PRESERVE_CONFLICT",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_recommendation_cap_2",
+            "type": "EQUALS",
+            "path": "$.recommendation_cap",
+            "expected": "VALIDATE_FURTHER",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-CONFLICT-NO-AVERAGE",
+              "SUP-COVERAGE50-CAP"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Conflict with high score",
+        "agent": "evaluation-manager",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evaluation-manager"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-SUP-15",
+      "suite": "agent-evaluation-manager-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "证据包为空导致审计 blocked。",
+          "facts": {
+            "auditor_status": "BLOCKED"
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REQUEST_MORE_EVIDENCE"
+        },
+        "rule_refs": [
+          "SUP-AUDIT-BEFORE-SYNTHESIS",
+          "EVD-EMPTY-PACKAGE-BLOCK"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REQUEST_MORE_EVIDENCE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-AUDIT-BEFORE-SYNTHESIS",
+              "EVD-EMPTY-PACKAGE-BLOCK"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Auditor blocked",
+        "agent": "evaluation-manager",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evaluation-manager"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-SUP-16",
+      "suite": "agent-evaluation-manager-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "所有维度 Agent 都 blocked。",
+          "facts": {
+            "blocked_agent_count": 4
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "BLOCK",
+          "status": "BLOCKED"
+        },
+        "rule_refs": [
+          "SUP-CORE-MISSING-BLOCK"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "BLOCK",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_status_2",
+            "type": "EQUALS",
+            "path": "$.status",
+            "expected": "BLOCKED",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "SUP-CORE-MISSING-BLOCK"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": [
+          {
+            "id": "reasoning_quality",
+            "dimension": "REASONING_QUALITY",
+            "required": false,
+            "instructions": "Review whether the cited rule was applied to the scenario without inventing facts."
+          }
+        ]
+      },
+      "metadata": {
+        "title": "All dimensions blocked",
+        "agent": "evaluation-manager",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "evaluation-manager"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+schema_version: '2.0'
+code: business-investment
+version: '2.0'
+role: specialist
+responsibilities:
+- assess market
+- business model
+- investment readiness
+- and commercial risks
+inputs:
+- run_manifest
+- product_profile
+- evidence_refs
+- assigned_task
+outputs:
+- finding
+- state_change_request
+- information_request
+allowed_skills:
+- business-investment-assessment
+allowed_tools:
+- launchscope-context.get.v1
+- public-research-search.v1
+risk_boundaries:
+- public_read_only
+- evidence_backed_findings_only
+- no_business_state_writes
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- direct_external_action
+content_sha256: 3a67b2466cf5be97b725f6c4b339eb64168d449980f59c02e0b9531d2766bc5b

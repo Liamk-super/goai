@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/reports/report-comparison.v1.json",
+  "title": "ReportComparisonV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "status", "candidate_run_id", "candidate_input_snapshot_sha256",
+    "candidate_score_profile_ref", "candidate_report_profile_ref", "resolved_issues", "unchanged_issues",
+    "new_risks", "evidence_upgrades", "evidence_downgrades", "change_reason_claim_ids"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "status": {"enum": ["FIRST_EVALUATION", "COMPARABLE", "STANDARD_CHANGED", "SAME_INPUT_RERUN"]},
+    "prior_run_id": {"type": "string", "format": "uuid"},
+    "prior_report_id": {"type": "string", "format": "uuid"},
+    "candidate_run_id": {"type": "string", "format": "uuid"},
+    "candidate_report_id": {"type": "string", "format": "uuid"},
+    "prior_input_snapshot_sha256": {"$ref": "#/$defs/sha256"},
+    "candidate_input_snapshot_sha256": {"$ref": "#/$defs/sha256"},
+    "prior_score_profile_ref": {"type": "string", "minLength": 1, "maxLength": 160},
+    "candidate_score_profile_ref": {"type": "string", "minLength": 1, "maxLength": 160},
+    "prior_report_profile_ref": {"type": "string", "minLength": 1, "maxLength": 160},
+    "candidate_report_profile_ref": {"type": "string", "minLength": 1, "maxLength": 160},
+    "index_before": {"type": "number", "minimum": 0, "maximum": 100},
+    "index_after": {"type": "number", "minimum": 0, "maximum": 100},
+    "index_delta": {"type": "number", "minimum": -100, "maximum": 100},
+    "dimension_deltas": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dimension", "before", "after", "delta"],
+        "properties": {
+          "dimension": {"type": "string", "minLength": 1},
+          "before": {"type": "number", "minimum": 0, "maximum": 100},
+          "after": {"type": "number", "minimum": 0, "maximum": 100},
+          "delta": {"type": "number", "minimum": -100, "maximum": 100}
+        }
+      }
+    },
+    "resolved_issues": {"$ref": "#/$defs/claimIds"},
+    "unchanged_issues": {"$ref": "#/$defs/claimIds"},
+    "new_risks": {"$ref": "#/$defs/claimIds"},
+    "evidence_upgrades": {"$ref": "#/$defs/claimIds"},
+    "evidence_downgrades": {"$ref": "#/$defs/claimIds"},
+    "change_reason_claim_ids": {"$ref": "#/$defs/claimIds"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "COMPARABLE"}}, "required": ["status"]},
+      "then": {
+        "required": [
+          "prior_run_id", "prior_input_snapshot_sha256", "prior_score_profile_ref", "prior_report_profile_ref",
+          "index_before", "index_after", "index_delta", "dimension_deltas"
+        ]
+      },
+      "else": {
+        "not": {
+          "anyOf": [
+            {"required": ["index_before"]},
+            {"required": ["index_after"]},
+            {"required": ["index_delta"]},
+            {"required": ["dimension_deltas"]}
+          ]
+        }
+      }
+    },
+    {
+      "if": {"properties": {"status": {"enum": ["STANDARD_CHANGED", "SAME_INPUT_RERUN"]}}, "required": ["status"]},
+      "then": {
+        "required": [
+          "prior_run_id", "prior_input_snapshot_sha256", "prior_score_profile_ref", "prior_report_profile_ref"
+        ]
+      }
+    },
+    {
+      "if": {"properties": {"status": {"const": "FIRST_EVALUATION"}}, "required": ["status"]},
+      "then": {
+        "not": {
+          "anyOf": [
+            {"required": ["prior_run_id"]},
+            {"required": ["prior_report_id"]},
+            {"required": ["prior_input_snapshot_sha256"]},
+            {"required": ["prior_score_profile_ref"]},
+            {"required": ["prior_report_profile_ref"]}
+          ]
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "claimIds": {
+      "type": "array", "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^claim-[A-Za-z0-9._-]+$"}
+    }
+  }
+}

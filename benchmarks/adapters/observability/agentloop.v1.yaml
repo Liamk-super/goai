@@ -1,0 +1,23 @@
+apiVersion: launchscope.io/v1alpha1
+kind: BenchmarkContinuousEvaluationAdapter
+metadata:
+  name: alibaba-cloud-agentloop
+spec:
+  enabled: false
+  endpointEnv: LAUNCHSCOPE_AGENTLOOP_OTLP_ENDPOINT
+  authorizationEnv: LAUNCHSCOPE_AGENTLOOP_AUTHORIZATION
+  datasetExport:
+    format: jsonl
+    localCommand: ".venv/Scripts/python.exe -m launchscope_benchmark export-agentloop-dataset"
+    uploadEnabled: false
+  otlp:
+    uploadEnabled: false
+    requiredProcessors: [memory_limiter, attributes/body_guard, batch]
+    allowedSignalFields: [run_id, stage_code, task_id, agent_code, skill_code, tool_code, outcome, duration_ms, payload_sha256]
+  safeguards:
+    requiresExplicitAuthorization: true
+    mayUploadPromptOrBusinessBodies: false
+    mayCreateCloudResources: false
+    mayIncurCost: false
+  acceptanceBoundary: "Local JSONL export is not AgentLoop cloud ingestion or experiment evidence."
+

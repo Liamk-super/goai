@@ -1,0 +1,4 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "https://launchscope.local/contracts/reports/specialist-report.v2.json"
+}

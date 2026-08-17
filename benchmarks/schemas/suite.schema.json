@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/benchmark/suite.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "version", "benchmark_type", "expected_case_count", "cases"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{2,79}$"},
+    "version": {"const": "1.0.0"},
+    "benchmark_type": {"enum": ["MODEL", "AGENT", "SYSTEM_E2E"]},
+    "expected_case_count": {"type": "integer", "minimum": 1},
+    "cases": {"type": "array", "minItems": 1, "items": {"$ref": "https://launchscope.local/benchmark/case.v1.schema.json"}}
+  }
+}

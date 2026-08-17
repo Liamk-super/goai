@@ -1,0 +1,167 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "launchscope://skills/user-validation-designer/0.1/persona",
+  "title": "Persona v0.1 (KB-USR-G01 six elements + G03 thresholds)",
+  "description": "A behavioural persona. Clustering is by goal x behaviour x constraint, never by demographics: background is carried for colour only and is excluded from the differentiation check. All six G01 elements are required; a persona missing any of them, or remaining low-confidence without explicitly scoped E3+ calibration, gets eligible_for_scoring=false and its simulated evidence cannot support a score.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "persona_id",
+    "label",
+    "archetype",
+    "goal_statement",
+    "motivation",
+    "pains",
+    "barriers",
+    "behavior_keys",
+    "value_threshold",
+    "rejection_threshold",
+    "rejection_reasons",
+    "confidence",
+    "field_provenance",
+    "eligible_for_scoring",
+    "calibrated_by_real_evidence"
+  ],
+  "properties": {
+    "persona_id": { "type": "string", "pattern": "^P[0-9]+$" },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "description": "One line: identity + the key behavioural trait (KB-USR-G01)."
+    },
+    "archetype": {
+      "type": "string",
+      "enum": ["high_need", "skeptic", "edge_case", "other"],
+      "description": "KB-USR-G02 requires the set to cover high_need, skeptic and edge_case at minimum."
+    },
+    "background": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "description": "Context only. Explicitly NOT a clustering basis and NOT part of the differentiation check.",
+      "properties": {
+        "identity": { "type": ["string", "null"] },
+        "occupation": { "type": ["string", "null"] },
+        "environment": { "type": ["string", "null"] }
+      }
+    },
+    "goal_statement": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Job statement: when [situation], I want to [job], so I can [outcome]."
+    },
+    "motivation": { "type": "string", "minLength": 1, "description": "Why now." },
+    "pains": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description", "pain_class", "frequency", "severity", "workaround_cost", "priority_score", "fact_type"],
+        "properties": {
+          "description": { "type": "string", "minLength": 1 },
+          "pain_class": {
+            "type": "string",
+            "enum": ["functional", "economic", "emotional", "social"],
+            "description": "KB-USR-F04 four-way classification."
+          },
+          "frequency": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "severity": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "workaround_cost": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "description": ">=4 forces switching_forces.push >= 4 (KB-USR-F02) and marks a strong pain (F04)."
+          },
+          "priority_score": {
+            "type": ["number", "null"],
+            "description": "frequency x severity x workaround_cost, computed by program."
+          },
+          "fact_type": { "type": "string", "enum": ["fact", "inference", "assumption"] },
+          "evidence_refs": { "type": ["array", "null"], "items": { "type": "string" } }
+        }
+      }
+    },
+    "barriers": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Why this persona might not adopt: learning cost, price, trust, incumbent, permissions."
+    },
+    "behavior_keys": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["alternative_in_use", "budget_constraint", "skill_level", "urgency", "risk_attitude"],
+      "description": "The only fields read by the differentiation check. NEW-DECISION-U01: two personas sharing >=4 of these five keys are judged homogeneous.",
+      "properties": {
+        "alternative_in_use": { "type": "string", "minLength": 1 },
+        "budget_constraint": { "type": "string", "minLength": 1 },
+        "skill_level": { "type": "string", "enum": ["novice", "intermediate", "expert"] },
+        "urgency": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "risk_attitude": { "type": "string", "enum": ["averse", "neutral", "tolerant"] }
+      }
+    },
+    "value_threshold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "quantified", "fact_type"],
+      "description": "KB-USR-G03. What must be true for this persona to consider the product worth it.",
+      "properties": {
+        "statement": { "type": "string", "minLength": 1 },
+        "quantified": { "type": "boolean" },
+        "fact_type": { "type": "string", "enum": ["fact", "inference", "assumption"] },
+        "evidence_refs": { "type": ["array", "null"], "items": { "type": "string" } }
+      }
+    },
+    "rejection_threshold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "quantified", "fact_type"],
+      "description": "KB-USR-G03. The point at which this persona walks away.",
+      "properties": {
+        "statement": { "type": "string", "minLength": 1 },
+        "quantified": { "type": "boolean" },
+        "fact_type": { "type": "string", "enum": ["fact", "inference", "assumption"] },
+        "evidence_refs": { "type": ["array", "null"], "items": { "type": "string" } }
+      }
+    },
+    "rejection_reasons": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "KB-USR-P01 item 2: at least one CONCRETE reason to refuse. Vague filler such as 'might not be interested' fails review; name the price, the data question, the permission, the learning cost."
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low"],
+      "description": "low when goal / pains / alternative are all assumptions; such a persona cannot solely support a score (KB-USR-F01)."
+    },
+    "field_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["goal", "pains", "alternative", "value_threshold"],
+      "description": "Per-field evidence-vs-assumption labelling (KB-USR-F01 step 4).",
+      "properties": {
+        "goal": { "type": "string", "enum": ["fact", "inference", "assumption"] },
+        "pains": { "type": "string", "enum": ["fact", "inference", "assumption"] },
+        "alternative": { "type": "string", "enum": ["fact", "inference", "assumption"] },
+        "value_threshold": { "type": "string", "enum": ["fact", "inference", "assumption"] },
+        "rejection_threshold": { "type": ["string", "null"], "enum": [null, "fact", "inference", "assumption"] }
+      }
+    },
+    "eligible_for_scoring": {
+      "type": "boolean",
+      "description": "Program-set. false when any G01 element is missing or confidence is low."
+    },
+    "calibrated_by_real_evidence": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "E3+ evidence ids that calibrated this persona. Empty array means pure simulation (E2 ceiling)."
+    },
+    "carried_from_previous": {
+      "type": ["boolean", "null"],
+      "description": "True when the persona_id is inherited from previous_validation_results.personas_digest (spec R-07)."
+    },
+    "evidence_refs": { "type": ["array", "null"], "items": { "type": "string" } }
+  }
+}

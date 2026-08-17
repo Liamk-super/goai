@@ -1,0 +1,56 @@
+{
+  "task_id": "evidence-calibration-demo-v1",
+  "project_id": "launchscope-demo",
+  "product_version": "V1",
+  "generated_at": "2026-08-11T08:00:00Z",
+  "expected_agents": ["product", "user", "investment"],
+  "agent_results": [
+    {
+      "source_agent": "product", "status": "COMPLETED", "project_id": "launchscope-demo", "product_version": "V1", "report_ref": "product-agent-result.json",
+      "payload": {
+        "claims": [
+          {"claim_id":"CL-P-TRUST","statement":"平台存在虚假内容侵蚀信任风险。","dimension":"trust","classification":"inference","criticality":"critical","evidence_refs":["EV-SHARED-TRUST"]},
+          {"claim_id":"CL-P-STAGE","statement":"产品阶段 = early_product","dimension":"product_stage","value":"early_product","evidence_refs":["EV-P-STAGE"]},
+          {"claim_id":"CL-P-TASK","statement":"核心分析任务已在当前版本完成自动操作验证。","dimension":"product_capability","evidence_refs":["EV-P-TASK"]}
+        ],
+        "evidence_cards": [
+          {"evidence_id":"EV-SHARED-TRUST","source":"https://example.test/original-trust-study","publisher":"Research Lab","source_tier":"tier_2","reliability_level":"E1","timestamp":"2026-07-01T00:00:00Z","expiry":"2027-01-01T00:00:00Z","product_version":"V1","observation":"Commercial and false content can reduce platform trust.","content_fingerprint":"trust-study-2026"},
+          {"evidence_id":"EV-P-STAGE","source":"tool://repository/run-1","source_tier":"tier_1","reliability_level":"E2","timestamp":"2026-08-10T00:00:00Z","expiry":"2026-11-10T00:00:00Z","product_version":"V1","observation":"Repository and demo indicate an early product stage."},
+          {"evidence_id":"EV-P-TASK","source":"tool://browser/run-9","source_tier":"tier_1","reliability_level":"E4","timestamp":"2026-08-10T00:00:00Z","expiry":"2026-11-10T00:00:00Z","product_version":"V1","observation":"Authorized task-completion ledger for the current version."}
+        ]
+      }
+    },
+    {
+      "source_agent": "user", "status": "COMPLETED", "project_id": "launchscope-demo", "product_version": "V1", "report_ref": "user-agent-result.json",
+      "payload": {
+        "user_hypotheses": [
+          {"hypothesis_id":"CL-U-TRUST","statement":"真实经验与商业内容界限模糊导致用户难以建立信任。","claim_type":"trust","fact_type":"inference","decision_impact":"high","supporting_refs":["EV-U-TRUST-REPRINT"]},
+          {"hypothesis_id":"CL-U-DEMAND","statement":"用户非常需要该产品。","claim_type":"demand","fact_type":"fact","decision_impact":"critical","supporting_refs":["EV-U-SIM"]}
+        ],
+        "evidence_cards": [
+          {"evidence_id":"EV-U-TRUST-REPRINT","source":"https://mirror.test/trust-study","publisher":"Mirror Site","source_tier":"tier_3","reliability_level":"E1","timestamp":"2026-07-02T00:00:00Z","expiry":"2027-01-01T00:00:00Z","product_version":"V1","observation":"Commercial and false content can reduce platform trust.","content_fingerprint":"trust-study-2026","original_source":"https://example.test/original-trust-study"},
+          {"evidence_id":"EV-U-SIM","source":"simulation://persona/P1","source_tier":"tier_3","reliability_level":"E2","timestamp":"2026-08-10T00:00:00Z","expiry":"2026-11-10T00:00:00Z","product_version":"V1","observation":"AI persona reported strong demand.","simulated":true}
+        ]
+      }
+    },
+    {
+      "source_agent": "investment", "status": "COMPLETED", "project_id": "launchscope-demo", "product_version": "V1", "report_ref": "investment-agent-result.json",
+      "payload": {
+        "claims": [
+          {"claim_id":"CL-I-TRUST","text":"虚假种草与商业化可能损伤社区长期价值。","claim_type":"trust","decision_impact":"critical","evidence_refs":["EV-I-TRUST-REPRINT"]},
+          {"claim_id":"CL-I-POTENTIAL","text":"项目整体仍有中等投资潜力。","claim_type":"investment_potential","decision_impact":"critical","evidence_refs":["EV-I-POTENTIAL"]},
+          {"claim_id":"CL-I-STAGE","text":"产品阶段 = mature_operation","claim_type":"product_stage","value":"mature_operation","evidence_refs":["EV-I-STAGE"]},
+          {"claim_id":"CL-I-GROWTH","text":"行业市场增长，因此该产品一定成功。","claim_type":"market","decision_impact":"critical","evidence_refs":["EV-I-MARKET"]},
+          {"claim_id":"CL-I-REVENUE","text":"第三方估算收入就是官方审计收入。","claim_type":"financial","decision_impact":"critical","evidence_refs":["EV-I-ESTIMATE"]}
+        ],
+        "evidence_cards": [
+          {"evidence_id":"EV-I-TRUST-REPRINT","source":"https://news.test/trust-study","publisher":"News Syndication","source_tier":"tier_2","reliability_level":"E1","timestamp":"2026-07-03T00:00:00Z","expiry":"2027-01-01T00:00:00Z","product_version":"V1","observation":"Commercial and false content can reduce platform trust.","content_fingerprint":"trust-study-2026","original_source":"https://example.test/original-trust-study"},
+          {"evidence_id":"EV-I-POTENTIAL","source":"file://investment-review/1","source_tier":"tier_2","reliability_level":"E2","timestamp":"2026-08-10T00:00:00Z","expiry":"2026-11-10T00:00:00Z","product_version":"V1","observation":"Stage-aware resource option review."},
+          {"evidence_id":"EV-I-STAGE","source":"file://team-deck/1","source_tier":"tier_3","reliability_level":"E0","timestamp":"2026-08-10T00:00:00Z","expiry":"2026-11-10T00:00:00Z","product_version":"V1","observation":"Team deck calls the product mature."},
+          {"evidence_id":"EV-I-MARKET","source":"https://official.test/market-growth","source_tier":"tier_1","reliability_level":"E1","timestamp":"2026-07-01T00:00:00Z","expiry":"2027-01-01T00:00:00Z","product_version":"V1","observation":"The external market grew."},
+          {"evidence_id":"EV-I-ESTIMATE","source":"https://analyst.test/revenue-estimate","source_tier":"tier_2","reliability_level":"E1","timestamp":"2026-07-01T00:00:00Z","expiry":"2026-10-01T00:00:00Z","product_version":"V1","observation":"A third party estimated revenue without access to audited accounts."}
+        ]
+      }
+    }
+  ]
+}

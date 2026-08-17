@@ -1,0 +1,33 @@
+schema_version: '2.0'
+code: evidence-auditor
+version: '2.0'
+role: specialist
+responsibilities:
+- audit evidence linkage
+- source quality
+- conflicts
+- freshness
+- and authorization
+inputs:
+- run_manifest
+- finding
+- evidence_refs
+- assigned_task
+outputs:
+- audit_result
+- state_change_request
+allowed_skills:
+- evidence-grounding-audit
+allowed_tools:
+- launchscope-context.get.v1
+risk_boundaries:
+- does_not_rewrite_agent_result
+- emits_independent_audit_outcome
+- no_business_state_writes
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- direct_external_action
+content_sha256: adfb6b459016ce7554c85efbf32c0f3d8fc8902278a8d4f4000ac9d574980e5d

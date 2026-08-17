@@ -14,6 +14,16 @@ from fastapi import APIRouter, Header, HTTPException, Request
 from launchscope_api.infrastructure.db.session import DatabaseSettings, create_database_engine, session_factory
 from launchscope_api.infrastructure.object_store import S3QuarantineObjectStore
 from launchscope_api.modules.identity_tenant.application import Actor
+from launchscope_api.modules.supervisor.audit_application import SupervisorAuditApplication
+from launchscope_api.modules.supervisor.completion_application import SupervisorCompletionApplication
+from launchscope_api.modules.supervisor.matrix_adapter import (
+    GenerationAwareMatrixIngress,
+    PostgresMatrixReceiptStore,
+    PostgresV4DeliverySettlement,
+    SupervisorMatrixAdapter,
+)
+from launchscope_api.modules.supervisor.planning_application import ManagerPlanningApplication
+from launchscope_orchestrator.agentteams_bridge import SupersededHandoffError
 
 from .handoff_application import HandoffApplication
 
@@ -34,15 +44,24 @@ class _ConfiguredDirectory:
 
 
 @lru_cache(maxsize=1)
-def _from_env() -> HandoffApplication:
+def _from_env() -> GenerationAwareMatrixIngress:
     settings = DatabaseSettings.from_env()
     engine = create_database_engine(
         settings.url, application_role=os.getenv("LAUNCHSCOPE_DB_ROLE", "launchscope_runtime")
     )
-    return HandoffApplication(
-        session_factory(engine), S3QuarantineObjectStore.from_env(),
-        _ConfiguredDirectory(os.getenv("LAUNCHSCOPE_MATRIX_AGENT_DIRECTORY_JSON", "{}")),
+    sessions = session_factory(engine)
+    objects = S3QuarantineObjectStore.from_env()
+    directory = _ConfiguredDirectory(os.getenv("LAUNCHSCOPE_MATRIX_AGENT_DIRECTORY_JSON", "{}"))
+    legacy = HandoffApplication(sessions, objects, directory)
+    supervisor = SupervisorMatrixAdapter(
+        ManagerPlanningApplication(sessions),
+        SupervisorAuditApplication(sessions, objects),
+        SupervisorCompletionApplication(sessions, objects),
+        directory,
+        PostgresMatrixReceiptStore(sessions),
+        PostgresV4DeliverySettlement(sessions),
     )
+    return GenerationAwareMatrixIngress(supervisor, legacy)
 
 
 def _authorize(value: str | None) -> None:
@@ -63,7 +82,23 @@ def matrix_event(
 ) -> dict[str, object]:
     _authorize(authorization)
     application = getattr(request.app.state, "handoff_application", None) or _from_env()
-    result = application.consume(Actor(tenant_id, "agentteams-matrix-bridge"), body, run_id=run_id, task_id=task_id)
+    try:
+        result = application.consume(
+            Actor(tenant_id, "agentteams-matrix-bridge"), body, run_id=run_id, task_id=task_id
+        )
+    except SupersededHandoffError as exc:
+        # A benign race, not an Agent contract violation: a re-dispatch left the
+        # previous round's reply in the room.  Acknowledge it as discarded so the
+        # listener advances its cursor instead of retrying forever and blocking
+        # the legitimate current-epoch reply behind it.
+        return {
+            "matrix_event_id": str(body.get("event_id", "")),
+            "task_status": "SUPERSEDED",
+            "run_status": "UNCHANGED",
+            "duplicate": True,
+            "report_id": None,
+            "discarded_reason": str(exc),
+        }
     return {
         "matrix_event_id": result.matrix_event_id, "task_status": result.task_status,
         "run_status": result.run_status, "duplicate": result.duplicate,

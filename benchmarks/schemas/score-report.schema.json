@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/benchmark/score-report.v1.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "suite_id", "execution_lane", "runtime_identity", "summary", "cases"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "run_id": {"type": "string"},
+    "suite_id": {"type": "string"},
+    "execution_lane": {"enum": ["HARNESS_SELF_TEST", "MODEL_API", "SINGLE_AGENT", "AGENTTEAMS_E2E"]},
+    "runtime_identity": {
+      "type": "object",
+      "required": ["status", "requested", "observed", "source", "details"]
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_count",
+        "automated_pass_rate",
+        "critical_violations",
+        "runtime_identity_violations",
+        "human_reviews_pending"
+      ],
+      "properties": {
+        "case_count": {"type": "integer", "minimum": 0},
+        "automated_pass_rate": {"type": "number", "minimum": 0, "maximum": 1},
+        "critical_violations": {"type": "integer", "minimum": 0},
+        "runtime_identity_violations": {"type": "integer", "minimum": 0},
+        "human_reviews_pending": {"type": "integer", "minimum": 0}
+      }
+    },
+    "cases": {"type": "array", "items": {"type": "object"}}
+  }
+}

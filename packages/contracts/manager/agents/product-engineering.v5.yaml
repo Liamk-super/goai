@@ -1,0 +1,36 @@
+schema_version: '5.0'
+code: product-engineering
+version: '5.0'
+role: specialist
+responsibilities:
+- assess implementation, localization, regional availability, platform rules, data security, and evidence freshness
+- read only material units assigned to the current Task
+- produce an immutable readable report and structured findings
+inputs:
+- run_manifest_v5
+- requirement_brief
+- assigned_task_ticket_v4
+- assigned_material_scope
+outputs:
+- agent_handoff_v3
+- domain_report_ref
+allowed_skills:
+- browser-product-audit
+allowed_tools:
+- launchscope-context.get.v2
+- material.read.v1
+- browser-audit.v1
+- repository.read.v1
+risk_boundaries:
+- first_round_isolated
+- assigned_material_only
+- read_only_tools
+- no_peer_dispatch_or_free_mention
+- no_business_state_writes
+prohibited_actions:
+- run.write
+- task.write
+- memory.write
+- report.write
+- direct_external_action
+content_sha256: 5bca20eff4a594879d4c34a53832b82d38b6e3c28c94dd37c393f5ee15349818

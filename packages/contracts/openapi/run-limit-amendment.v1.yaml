@@ -1,0 +1,111 @@
+openapi: 3.1.0
+info:
+  title: LaunchScope Demo Run Limit Amendment
+  version: 1.0.0
+paths:
+  /api/v1/runs/{run_id}/limit-amendments:
+    post:
+      operationId: amendDemoRunModelLimits
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunLimitAmendmentRequest'
+      responses:
+        '202':
+          description: Higher bounded model limits were authorized for one exact persisted result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunLimitAmendment'
+        '404':
+          description: Demo amendment is disabled or the Run was not found
+        '409':
+          description: Stale version, ineligible Run, active invocation, or idempotency conflict
+components:
+  parameters:
+    RunId:
+      name: run_id
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
+    TenantId:
+      name: X-Tenant-Id
+      in: header
+      required: true
+      schema: {type: string, format: uuid}
+    ActorId:
+      name: X-Actor-Id
+      in: header
+      required: true
+      schema: {type: string, minLength: 1, maxLength: 255}
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: {type: string, minLength: 1, maxLength: 200}
+    CorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: true
+      schema: {type: string, format: uuid}
+  schemas:
+    RunLimitAmendmentRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - task_id
+        - matrix_event_id
+        - expected_control_epoch
+        - expected_dispatch_epoch
+        - expected_amendment_version
+        - model_calls
+        - input_tokens
+        - output_tokens
+        - reason
+      properties:
+        task_id: {type: string, format: uuid}
+        matrix_event_id: {type: string, minLength: 1, maxLength: 255}
+        expected_control_epoch: {type: integer, minimum: 0}
+        expected_dispatch_epoch: {type: integer, minimum: 0}
+        expected_amendment_version: {type: integer, minimum: 0}
+        model_calls: {type: integer, minimum: 1, maximum: 4096}
+        input_tokens: {type: integer, minimum: 1, maximum: 200000000}
+        output_tokens: {type: integer, minimum: 1, maximum: 20000000}
+        reason: {type: string, minLength: 1, maxLength: 1000}
+    EffectiveModelLimits:
+      type: object
+      additionalProperties: false
+      required: [model_calls, input_tokens, output_tokens]
+      properties:
+        model_calls: {type: integer, minimum: 1, maximum: 4096}
+        input_tokens: {type: integer, minimum: 1, maximum: 200000000}
+        output_tokens: {type: integer, minimum: 1, maximum: 20000000}
+    RunLimitAmendment:
+      type: object
+      additionalProperties: false
+      required:
+        - amendment_id
+        - run_id
+        - task_id
+        - amendment_version
+        - control_epoch
+        - dispatch_epoch
+        - matrix_event_id
+        - effective_limits
+      properties:
+        amendment_id: {type: string, format: uuid}
+        run_id: {type: string, format: uuid}
+        task_id: {type: string, format: uuid}
+        amendment_version: {type: integer, minimum: 1}
+        control_epoch: {type: integer, minimum: 0}
+        dispatch_epoch: {type: integer, minimum: 0}
+        matrix_event_id: {type: string, minLength: 1, maxLength: 255}
+        effective_limits: {$ref: '#/components/schemas/EffectiveModelLimits'}

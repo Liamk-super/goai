@@ -99,6 +99,7 @@ def _create_planned_run(
     assert client.post(f"/api/v1/materials/{initiated['material_id']}/complete", headers=headers).status_code == 200
     gaps = client.post(f"/api/v1/product-versions/{version_id}/gap-questions", headers=headers).json()
     answers = {
+        "one_line_value_claim": "Validate evidence-backed product decisions before committing more resources",
         "target_user": "Small product teams",
         "payer": "Team owner",
         "stage": "Local demo",

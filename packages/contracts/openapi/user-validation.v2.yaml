@@ -1,0 +1,120 @@
+openapi: 3.1.0
+info:
+  title: LaunchScope User Validation API
+  version: 2.0.0
+  description: Additive UVD script, evidence, recheck, and report interfaces. Existing V1 contracts remain unchanged.
+paths:
+  /product-versions/{versionId}/user-validation-script:
+    put:
+      summary: Freeze one validated 1-5 task Product Validation Script
+      parameters:
+      - {$ref: '#/components/parameters/VersionId'}
+      - {$ref: '#/components/parameters/IdempotencyKey'}
+      - {$ref: '#/components/parameters/CorrelationId'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ProductValidationScript'}
+      responses:
+        '200': {description: Idempotent replay or newly frozen script}
+        '409': {description: IDEMPOTENCY_CONFLICT or immutable version conflict}
+  /product-versions/{versionId}/user-evidence:
+    post:
+      summary: Register aggregate, PII-free user evidence metadata against an immutable object
+      parameters:
+      - {$ref: '#/components/parameters/VersionId'}
+      - {$ref: '#/components/parameters/IdempotencyKey'}
+      - {$ref: '#/components/parameters/CorrelationId'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/UserEvidenceRegistration'}
+      responses:
+        '201': {description: Evidence registered without upgrading its claimed tier}
+        '422': {description: PII or evidence metadata validation failed}
+  /runs/{baselineRunId}/user-evidence-rechecks:
+    post:
+      summary: Create an append-only evidence_recheck child Run
+      parameters:
+      - {name: baselineRunId, in: path, required: true, schema: {type: string, format: uuid}}
+      - {$ref: '#/components/parameters/IdempotencyKey'}
+      - {$ref: '#/components/parameters/CorrelationId'}
+      responses:
+        '201': {description: Child Run created with baseline_run_id}
+        '409': {description: Selected baseline is incomplete or incompatible}
+  /runs/{runId}/user-validation-result:
+    get:
+      summary: Read an authorized summary and a short-lived private artifact URL
+      parameters:
+      - {name: runId, in: path, required: true, schema: {type: string, format: uuid}}
+      responses:
+        '200': {description: Integrity-bound result summary}
+        '404': {description: Result absent or outside tenant scope}
+components:
+  schemas:
+    ProductValidationScript:
+      type: object
+      additionalProperties: false
+      required: [tasks]
+      properties:
+        tasks:
+          type: array
+          minItems: 1
+          maxItems: 5
+          items:
+            type: object
+            additionalProperties: false
+            required: [task_key, description, expected_observable_outcome]
+            properties:
+              task_key: {type: string, minLength: 1, maxLength: 120}
+              description: {type: string, minLength: 1, maxLength: 2000}
+              expected_observable_outcome: {type: string, minLength: 1, maxLength: 2000}
+              max_steps: {type: [integer, 'null'], minimum: 1, maximum: 100}
+    UserEvidenceRegistration:
+      type: object
+      additionalProperties: false
+      required:
+      - object_key
+      - sha256
+      - kind
+      - claimed_tier
+      - source
+      - observed_at
+      - aggregate_observation
+      - applicability
+      - supporting_claim_refs
+      - contradicting_claim_refs
+      properties:
+        object_key: {type: string, minLength: 1, maxLength: 1024}
+        sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+        kind:
+          enum: [interview, survey, usability_test, review, public_comment, usage_data, retention_data, payment_record, contract, team_statement]
+        claimed_tier: {enum: [E0, E1, E2, E3, E4, E5]}
+        source_tier: {type: [string, 'null'], enum: [tier_1, tier_2, tier_3, untraceable, null]}
+        source: {type: string, minLength: 1, maxLength: 1000}
+        observed_at: {type: string, format: date-time}
+        expires_at: {type: [string, 'null'], format: date-time}
+        sample_size: {type: [integer, 'null'], minimum: 1}
+        segment: {type: [string, 'null'], maxLength: 500}
+        aggregate_observation: {type: string, minLength: 1, maxLength: 4000}
+        applicability: {type: object}
+        supporting_claim_refs: {type: array, maxItems: 100, items: {type: string}}
+        contradicting_claim_refs: {type: array, maxItems: 100, items: {type: string}}
+  parameters:
+    VersionId:
+      name: versionId
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: {type: string, minLength: 1, maxLength: 200}
+    CorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: true
+      schema: {type: string, format: uuid}

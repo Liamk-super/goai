@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "skill_code",
+    "version",
+    "content_sha256",
+    "package_sha256",
+    "runner_sha256",
+    "prompt_sha256",
+    "knowledge_package_sha256",
+    "input_schema_ref",
+    "input_schema_sha256",
+    "output_schema_ref",
+    "output_schema_sha256",
+    "preconditions",
+    "permissions",
+    "failure_classes",
+    "budget",
+    "evidence_requirements",
+    "lifecycle",
+    "may_write_business_state"
+  ],
+  "properties": {
+    "schema_version": { "const": "2.0" },
+    "skill_code": { "enum": ["user-validation-designer", "evidence-grounding-audit"] },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+(?:\\.[0-9]+)?$" },
+    "content_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "package_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "runner_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "prompt_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "knowledge_package_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "input_schema_ref": { "type": "string", "minLength": 1 },
+    "input_schema_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "output_schema_ref": { "type": "string", "minLength": 1 },
+    "output_schema_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "preconditions": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "permissions": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "failure_classes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": ["TRANSIENT", "VALIDATION", "AUTHORIZATION", "DEPENDENCY", "BUDGET", "POLICY", "SUBMISSION_UNKNOWN", "BUSINESS"]
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_cost", "currency", "max_model_turns", "max_agent_iterations", "task_timeout_seconds"],
+      "properties": {
+        "max_cost": { "type": "number", "minimum": 0 },
+        "currency": { "type": "string", "minLength": 1 },
+        "max_model_turns": { "type": "integer", "minimum": 1, "maximum": 32 },
+        "max_agent_iterations": { "type": "integer", "minimum": 1, "maximum": 32 },
+        "task_timeout_seconds": { "type": "integer", "minimum": 1, "maximum": 1200 }
+      }
+    },
+    "evidence_requirements": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "feature_flag", "rollback"],
+      "properties": {
+        "status": { "enum": ["APPROVED", "APPROVED_DISABLED"] },
+        "feature_flag": { "type": "string", "minLength": 1 },
+        "rollback": { "type": "string", "minLength": 1 }
+      }
+    },
+    "may_write_business_state": { "const": false }
+  }
+}

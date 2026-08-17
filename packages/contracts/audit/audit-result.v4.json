@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/audit/audit-result.v4.json",
+  "title": "AuditResultV4",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "audit_id", "run_id", "finding_id", "source_finding_sha256", "decision", "reason",
+    "rule_ids", "conflict_group_ids", "freshness_status", "freshness_score", "support_strength",
+    "independent_source_count", "evidence_ids", "source_locator_ids", "citation_status", "score_bearing",
+    "audit_round", "remediation_target"
+  ],
+  "properties": {
+    "schema_version": {"const": "4.0"},
+    "audit_id": {"type": "string", "format": "uuid"},
+    "run_id": {"type": "string", "format": "uuid"},
+    "finding_id": {"type": "string", "format": "uuid"},
+    "source_finding_sha256": {"$ref": "#/$defs/sha256"},
+    "decision": {"enum": ["ACCEPTED", "DOWNGRADED", "REJECTED", "NEEDS_MORE"]},
+    "reason": {"type": "string", "minLength": 1, "maxLength": 4000},
+    "rule_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^KB-EVD-"}},
+    "conflict_group_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "format": "uuid"}},
+    "freshness_status": {"enum": ["VALID", "NEAR_EXPIRY", "EXPIRED", "SUPERSEDED"]},
+    "freshness_score": {"type": "number", "minimum": 0, "maximum": 1},
+    "support_strength": {"enum": ["STRONG", "MODERATE", "WEAK", "NONE"]},
+    "independent_source_count": {"type": "integer", "minimum": 0},
+    "evidence_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "format": "uuid"}},
+    "source_locator_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "format": "uuid"}},
+    "citation_status": {"enum": ["VERIFIED", "DOWNGRADED", "PENDING_VALIDATION", "REJECTED"]},
+    "score_bearing": {"type": "boolean"},
+    "audit_round": {"type": "integer", "minimum": 1, "maximum": 2},
+    "remediation_target": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["agent_code", "finding_id", "question", "required_evidence"],
+          "properties": {
+            "agent_code": {"enum": ["user-evidence", "product-engineering", "business-investment"]},
+            "finding_id": {"type": "string", "format": "uuid"},
+            "question": {"type": "string", "minLength": 1, "maxLength": 2000},
+            "required_evidence": {"type": "string", "minLength": 1, "maxLength": 2000}
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"decision": {"enum": ["REJECTED", "NEEDS_MORE"]}}, "required": ["decision"]},
+      "then": {"properties": {"score_bearing": {"const": false}}}
+    },
+    {
+      "if": {"properties": {"citation_status": {"enum": ["PENDING_VALIDATION", "REJECTED"]}}, "required": ["citation_status"]},
+      "then": {"properties": {"score_bearing": {"const": false}}}
+    }
+  ],
+  "$defs": {"sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}
+}

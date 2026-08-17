@@ -1,0 +1,18 @@
+{
+  "name": "launchscope-benchmark-promptfoo-adapter",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=24.0.0 <25"
+  },
+  "packageManager": "pnpm@11.9.0",
+  "scripts": {
+    "validate": "promptfoo validate -c promptfooconfig.yaml",
+    "validate:matrix": "promptfoo validate -c model-matrix.yaml",
+    "dry-run": "promptfoo eval -c promptfooconfig.yaml --no-share --no-cache --no-progress-bar --no-table -o ../../../artifacts/benchmarks/promptfoo-offline-dry-run.json",
+    "run:matrix": "promptfoo eval -c model-matrix.yaml --no-share --no-cache --no-progress-bar --no-table"
+  },
+  "devDependencies": {
+    "promptfoo": "0.121.19"
+  }
+}

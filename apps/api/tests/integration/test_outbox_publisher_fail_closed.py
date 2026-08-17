@@ -22,7 +22,7 @@ def test_publisher_role_can_claim_and_unknown_ack_freezes_without_retry(
     with database.begin() as connection:
         connection.execute(text("UPDATE evaluation_run SET status='PLANNED' WHERE id=:id"), {"id": run_id})
     runtime_sessions = session_factory(runtime_engine)
-    DispatchApplication(runtime_sessions).dispatch(
+    DispatchApplication(runtime_sessions)._dispatch_legacy_for_historical_tests_only(
         Actor(tenant_id, "local-demo:test"), run_id, idempotency_key="publisher-unknown"
     )
     publisher_engine = create_database_engine(

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">LaunchScope AgentTeams v6 architecture</title>
+  <desc id="desc">A supervisor plus four specialists work through the control plane, bounded MCP tools, and durable PostgreSQL evidence.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F7FBFF"/><stop offset="1" stop-color="#EDF5F8"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#12324A" flood-opacity=".12"/></filter>
+    <style>
+      .h{font:700 32px 'Microsoft YaHei','Segoe UI',sans-serif;fill:#112B3C}.t{font:500 20px 'Microsoft YaHei','Segoe UI',sans-serif;fill:#214152}.s{font:500 16px 'Microsoft YaHei','Segoe UI',sans-serif;fill:#4C6573}.w{font:700 20px 'Microsoft YaHei','Segoe UI',sans-serif;fill:#fff}.a{stroke:#486D80;stroke-width:3;fill:none;marker-end:url(#arrow)}
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#486D80"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <text x="800" y="58" text-anchor="middle" class="h">LaunchScope AgentTeams v6 · 主管 + 4 专家</text>
+  <text x="800" y="92" text-anchor="middle" class="s">任务、回执与引用有界流动；PostgreSQL 是唯一业务事实来源</text>
+  <g filter="url(#shadow)"><rect x="595" y="125" width="410" height="92" rx="18" fill="#173F5F"/><text x="800" y="166" text-anchor="middle" class="w">Human Coordinator</text><text x="800" y="195" text-anchor="middle" style="font:500 16px 'Microsoft YaHei','Segoe UI',sans-serif;fill:#D9EDF8">授权、输入、审批</text></g>
+  <path class="a" d="M800 218V267"/>
+  <g filter="url(#shadow)"><rect x="445" y="270" width="710" height="125" rx="20" fill="#2D6A78"/><text x="800" y="317" text-anchor="middle" class="w">LaunchScope Control Plane</text><text x="800" y="349" text-anchor="middle" style="font:500 17px 'Microsoft YaHei','Segoe UI',sans-serif;fill:#E4F5F7">计划校验 · 幂等 · 预算 · 审计 · Run 状态提交</text><text x="800" y="377" text-anchor="middle" style="font:500 15px 'Microsoft YaHei','Segoe UI',sans-serif;fill:#CFE8EA">PostgreSQL business truth · SHA-256 evidence/report binding</text></g>
+  <path class="a" d="M800 396V445"/>
+  <text x="800" y="437" text-anchor="middle" class="s">AgentTeams / Matrix：有界任务、MCP 读取、回执与结构化 handoff</text>
+  <g filter="url(#shadow)"><rect x="620" y="465" width="360" height="100" rx="18" fill="#DA7B33"/><text x="800" y="508" text-anchor="middle" class="w">evaluation-manager</text><text x="800" y="537" text-anchor="middle" style="font:500 16px 'Microsoft YaHei','Segoe UI',sans-serif;fill:#FFF4E8">主管：计划与综合（不改评分）</text></g>
+  <path class="a" d="M800 566V615"/><path class="a" d="M800 614H255V663"/><path class="a" d="M800 614H615V663"/><path class="a" d="M800 614H985V663"/><path class="a" d="M800 614H1345V663"/>
+  <g filter="url(#shadow)"><rect x="90" y="665" width="330" height="130" rx="18" fill="#4C7D59"/><text x="255" y="713" text-anchor="middle" class="w">user-evidence</text><text x="255" y="743" text-anchor="middle" style="font:500 16px 'Microsoft YaHei','Segoe UI',sans-serif;fill:#EAF7ED">用户证据与验证报告</text><text x="255" y="770" text-anchor="middle" style="font:500 14px 'Microsoft YaHei','Segoe UI',sans-serif;fill:#EAF7ED">独立第一轮</text></g>
+  <g filter="url(#shadow)"><rect x="450" y="665" width="330" height="130" rx="18" fill="#496E9E"/><text x="615" y="713" text-anchor="middle" class="w">product-engineering</text><text x="615" y="743" text-anchor="middle" style="font:500 16px 'Microsoft YaHei','Segoe UI',sans-serif;fill:#EAF2FF">产品/工程可行性</text><text x="615" y="770" text-anchor="middle" style="font:500 14px 'Microsoft YaHei','Segoe UI',sans-serif;fill:#EAF2FF">独立第一轮</text></g>
+  <g filter="url(#shadow)"><rect x="820" y="665" width="330" height="130" rx="18" fill="#76558C"/><text x="985" y="713" text-anchor="middle" class="w">business-investment</text><text x="985" y="743" text-anchor="middle" style="font:500 16px 'Microsoft YaHei','Segoe UI',sans-serif;fill:#F4EAF9">商业、市场与投资</text><text x="985" y="770" text-anchor="middle" style="font:500 14px 'Microsoft YaHei','Segoe UI',sans-serif;fill:#F4EAF9">事实 / 假设分离</text></g>
+  <g filter="url(#shadow)"><rect x="1180" y="665" width="330" height="130" rx="18" fill="#8B4F45"/><text x="1345" y="713" text-anchor="middle" class="w">evidence-auditor</text><text x="1345" y="743" text-anchor="middle" style="font:500 16px 'Microsoft YaHei','Segoe UI',sans-serif;fill:#FDECEA">证据与引用校准</text><text x="1345" y="770" text-anchor="middle" style="font:500 14px 'Microsoft YaHei','Segoe UI',sans-serif;fill:#FDECEA">不改写原始发现</text></g>
+  <rect x="272" y="830" width="1056" height="42" rx="21" fill="#E7EEF2"/><text x="800" y="858" text-anchor="middle" class="t">未知提交 / 用量 / 账单 → NEEDS_ATTENTION，禁止自动重试</text>
+</svg>

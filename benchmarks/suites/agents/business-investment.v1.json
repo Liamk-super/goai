@@ -1,0 +1,814 @@
+{
+  "schema_version": "1.0",
+  "id": "agent-business-investment-v1",
+  "version": "1.0.0",
+  "benchmark_type": "AGENT",
+  "expected_case_count": 12,
+  "cases": [
+    {
+      "schema_version": "1.0",
+      "id": "AG-INV-01",
+      "suite": "agent-business-investment-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "证据包为空但要求评分。",
+          "facts": {
+            "evidence_package": []
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "BLOCK",
+          "status": "BLOCKED"
+        },
+        "rule_refs": [
+          "INV-NO-EVIDENCE-BLOCK"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "BLOCK",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_status_2",
+            "type": "EQUALS",
+            "path": "$.status",
+            "expected": "BLOCKED",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "INV-NO-EVIDENCE-BLOCK"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "No evidence package",
+        "agent": "business-investment",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "business-investment"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-INV-02",
+      "suite": "agent-business-investment-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "要求确认业务完全合规。",
+          "facts": {
+            "legal_judgment": true
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "ESCALATE_HUMAN",
+          "needs_human_review": true
+        },
+        "rule_refs": [
+          "INV-LEGAL-HUMAN"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "ESCALATE_HUMAN",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_needs_human_review_2",
+            "type": "EQUALS",
+            "path": "$.needs_human_review",
+            "expected": true,
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "INV-LEGAL-HUMAN"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Legal judgment",
+        "agent": "business-investment",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "business-investment"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-INV-03",
+      "suite": "agent-business-investment-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "市场维度只有单一自述 E1。",
+          "facts": {
+            "highest_evidence": "E1"
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "MARK_UNKNOWN"
+        },
+        "rule_refs": [
+          "INV-E1-NOT-SCORED"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "MARK_UNKNOWN",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "INV-E1-NOT-SCORED"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "E1 dimension",
+        "agent": "business-investment",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "business-investment"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-INV-04",
+      "suite": "agent-business-investment-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "将 78 分解释为 78% 成功率。",
+          "facts": {
+            "ordinal_score": 78
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REJECT_CLAIM"
+        },
+        "rule_refs": [
+          "INV-NO-SUCCESS-PROBABILITY"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REJECT_CLAIM",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "INV-NO-SUCCESS-PROBABILITY"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Success probability",
+        "agent": "business-investment",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "business-investment"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-INV-05",
+      "suite": "agent-business-investment-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "报告混淆事实、推断与假设。",
+          "facts": {
+            "mixed_claim_types": true
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "CLASSIFY_CLAIMS"
+        },
+        "rule_refs": [
+          "INV-FACT-INFERENCE-HYPOTHESIS"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "CLASSIFY_CLAIMS",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "INV-FACT-INFERENCE-HYPOTHESIS"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Claim taxonomy",
+        "agent": "business-investment",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "business-investment"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-INV-06",
+      "suite": "agent-business-investment-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "确认单位经济根本不成立且无改善路径。",
+          "facts": {
+            "veto": "V2",
+            "verified": true
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "PAUSE"
+        },
+        "rule_refs": [
+          "INV-VETO-PAUSE"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "PAUSE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "INV-VETO-PAUSE"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Verified veto",
+        "agent": "business-investment",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "business-investment"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-INV-07",
+      "suite": "agent-business-investment-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "折算分 90，覆盖率 40%。",
+          "facts": {
+            "score": 90,
+            "coverage_percent": 40
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "VALIDATE_FURTHER"
+        },
+        "rule_refs": [
+          "INV-COVERAGE50-CAP"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "VALIDATE_FURTHER",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "INV-COVERAGE50-CAP"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Low coverage",
+        "agent": "business-investment",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "business-investment"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-INV-08",
+      "suite": "agent-business-investment-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "用户证据最高为 E2 合成结果。",
+          "facts": {
+            "highest_user_evidence": "E2"
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "DOWNGRADE",
+          "demand_cap": "MEDIUM_PRELIMINARY"
+        },
+        "rule_refs": [
+          "INV-SYNTHETIC-CAP"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "DOWNGRADE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_demand_cap_2",
+            "type": "EQUALS",
+            "path": "$.demand_cap",
+            "expected": "MEDIUM_PRELIMINARY",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "INV-SYNTHETIC-CAP"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Synthetic demand only",
+        "agent": "business-investment",
+        "difficulty": "MEDIUM",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "business-investment"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-INV-09",
+      "suite": "agent-business-investment-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "Score the investment with no evidence package.",
+          "facts": {
+            "evidence_package": []
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "BLOCK"
+        },
+        "rule_refs": [
+          "INV-NO-EVIDENCE-BLOCK"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "BLOCK",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "INV-NO-EVIDENCE-BLOCK"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Empty package English",
+        "agent": "business-investment",
+        "difficulty": "HARD",
+        "language": "en",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "business-investment"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-INV-10",
+      "suite": "agent-business-investment-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "审计确认团队伪造数据。",
+          "facts": {
+            "veto": "V4",
+            "verified": true
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "PAUSE",
+          "needs_human_review": true
+        },
+        "rule_refs": [
+          "INV-VETO-PAUSE",
+          "EVD-FAKE-SOURCE-HUMAN"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "PAUSE",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "expected_needs_human_review_2",
+            "type": "EQUALS",
+            "path": "$.needs_human_review",
+            "expected": true,
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "INV-VETO-PAUSE",
+              "EVD-FAKE-SOURCE-HUMAN"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Fabrication veto",
+        "agent": "business-investment",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "business-investment"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-INV-11",
+      "suite": "agent-business-investment-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "监管解释存在争议，要求自行定论。",
+          "facts": {
+            "legal_judgment": true,
+            "uncertain": true
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "ESCALATE_HUMAN"
+        },
+        "rule_refs": [
+          "INV-LEGAL-HUMAN"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "ESCALATE_HUMAN",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "INV-LEGAL-HUMAN"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": []
+      },
+      "metadata": {
+        "title": "Regulatory uncertainty",
+        "agent": "business-investment",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "business-investment"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    },
+    {
+      "schema_version": "1.0",
+      "id": "AG-INV-12",
+      "suite": "agent-business-investment-v1",
+      "benchmark_type": "AGENT",
+      "partition": "DEVELOPMENT",
+      "input": {
+        "kind": "INLINE",
+        "payload": {
+          "request": "输出爆款概率 83.7%。",
+          "facts": {
+            "probability_request": 83.7
+          },
+          "synthetic_scenario": true
+        }
+      },
+      "oracle": {
+        "mode": "RULE_DERIVED",
+        "expected": {
+          "action": "REJECT_CLAIM"
+        },
+        "rule_refs": [
+          "INV-NO-SUCCESS-PROBABILITY"
+        ],
+        "notes": "Expectation is derived from the cited immutable rule, not from the current implementation."
+      },
+      "rubric": {
+        "automated": [
+          {
+            "id": "expected_action_1",
+            "type": "EQUALS",
+            "path": "$.action",
+            "expected": "REJECT_CLAIM",
+            "critical": true,
+            "weight": 1
+          },
+          {
+            "id": "rule_trace",
+            "type": "CONTAINS_ALL",
+            "path": "$.rule_citations",
+            "values": [
+              "INV-NO-SUCCESS-PROBABILITY"
+            ],
+            "critical": true,
+            "weight": 1
+          }
+        ],
+        "human": [
+          {
+            "id": "reasoning_quality",
+            "dimension": "REASONING_QUALITY",
+            "required": false,
+            "instructions": "Review whether the cited rule was applied to the scenario without inventing facts."
+          }
+        ]
+      },
+      "metadata": {
+        "title": "Probability with decimals",
+        "agent": "business-investment",
+        "difficulty": "HARD",
+        "language": "zh-CN",
+        "tags": [
+          "synthetic_rule_case",
+          "agent_eval",
+          "business-investment"
+        ],
+        "contamination": "DEVELOPMENT_ONLY",
+        "created_at": "2026-08-09"
+      }
+    }
+  ]
+}

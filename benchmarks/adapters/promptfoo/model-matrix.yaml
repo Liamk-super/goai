@@ -1,0 +1,32 @@
+description: LaunchScope formal two-Case API matrix; this is not AgentTeams E2E
+sharing: false
+writeLatestResults: false
+commandLineOptions:
+  cache: false
+  share: false
+  repeat: 3
+
+prompts:
+  - "{{prompt}}"
+
+providers:
+  - id: file://provider.py
+    label: kimi-k3
+    config:
+      mode: live
+      authorized: true
+      model: kimi-k3
+  - id: file://provider.py
+    label: glm-5.2
+    config:
+      mode: live
+      authorized: true
+      model: glm-5.2
+  - id: file://provider.py
+    label: qwen3.8-max
+    config:
+      mode: live
+      authorized: true
+      model: qwen3.8-max
+
+tests: file://../../../artifacts/benchmarks/model-matrix-promptfoo-cases.json

@@ -1,0 +1,166 @@
+openapi: 3.1.0
+info:
+  title: LaunchScope Run Execution Control
+  version: 1.0.0
+paths:
+  /api/v1/runs/{run_id}/execution-control:
+    get:
+      operationId: getRunExecutionControl
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+      responses:
+        '200':
+          description: Durable Run execution-control projection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunExecutionControl'
+  /api/v1/runs/{run_id}/pause:
+    post:
+      operationId: pauseRun
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PauseRunRequest'
+      responses:
+        '202':
+          description: Pause accepted or completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunExecutionControl'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /api/v1/runs/{run_id}/resume:
+    post:
+      operationId: resumeRun
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+        - $ref: '#/components/parameters/TenantId'
+        - $ref: '#/components/parameters/ActorId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+        - $ref: '#/components/parameters/CorrelationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResumeRunRequest'
+      responses:
+        '202':
+          description: Resume accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunExecutionControl'
+        '409':
+          $ref: '#/components/responses/Conflict'
+components:
+  parameters:
+    RunId:
+      name: run_id
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
+    TenantId:
+      name: X-Tenant-Id
+      in: header
+      required: true
+      schema: {type: string, format: uuid}
+    ActorId:
+      name: X-Actor-Id
+      in: header
+      required: true
+      schema: {type: string, minLength: 1, maxLength: 255}
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: {type: string, minLength: 1, maxLength: 200}
+    CorrelationId:
+      name: X-Correlation-Id
+      in: header
+      required: true
+      schema: {type: string, format: uuid}
+  schemas:
+    PauseRunRequest:
+      type: object
+      additionalProperties: false
+      required: [expected_control_epoch, reason]
+      properties:
+        expected_control_epoch: {type: integer, minimum: 0}
+        reason: {const: USER_EXIT}
+    ResumeRunRequest:
+      type: object
+      additionalProperties: false
+      required: [expected_control_epoch]
+      properties:
+        expected_control_epoch: {type: integer, minimum: 0}
+    RunExecutionControl:
+      type: object
+      additionalProperties: false
+      required:
+        - run_id
+        - state
+        - control_epoch
+        - usage_settlement_status
+        - in_flight_count
+        - resumable
+      properties:
+        run_id: {type: string, format: uuid}
+        state: {enum: [ACTIVE, PAUSE_REQUESTED, PAUSED, PAUSE_BLOCKED, CLOSED]}
+        control_epoch: {type: integer, minimum: 0}
+        usage_settlement_status: {enum: [NONE, PENDING, SETTLED, UNKNOWN]}
+        in_flight_count: {type: integer, minimum: 0}
+        resumable: {type: boolean}
+        pause_requested_at: {type: [string, 'null'], format: date-time}
+        paused_at: {type: [string, 'null'], format: date-time}
+        resumed_at: {type: [string, 'null'], format: date-time}
+        last_error: {type: [string, 'null'], maxLength: 1000}
+        checkpoint:
+          type: [object, 'null']
+          additionalProperties: false
+          properties:
+            interrupted_task_ids: {type: array, items: {type: string, format: uuid}}
+            completed_task_ids: {type: array, items: {type: string, format: uuid}}
+            evidence_ids: {type: array, items: {type: string, format: uuid}}
+            usage_summary: {type: object}
+        remaining_budget:
+          type: [object, 'null']
+          additionalProperties: false
+          properties:
+            currency: {type: string}
+            limit: {type: string}
+            reserved: {type: string}
+            consumed: {type: string}
+            remaining: {type: string}
+            status: {type: string}
+        usage_after_pause:
+          type: object
+          additionalProperties: false
+          required: [tokens, cost]
+          properties:
+            tokens: {type: integer, minimum: 0}
+            cost: {type: string}
+  responses:
+    Conflict:
+      description: Stale epoch, invalid transition, or idempotency conflict
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [error_code, message, retryable]
+            properties:
+              error_code: {enum: [RUN_CONTROL_CONFLICT, RUN_NOT_PAUSABLE, RUN_NOT_RESUMABLE, IDEMPOTENCY_CONFLICT]}
+              message: {type: string}
+              retryable: {const: false}

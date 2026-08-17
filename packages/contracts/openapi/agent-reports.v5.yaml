@@ -1,0 +1,84 @@
+openapi: 3.1.0
+info:
+  title: LaunchScope Canonical Specialist Reports API
+  version: 5.0.0
+paths:
+  /api/v1/experience/v2/runs/{run_id}/agent-reports:
+    get:
+      operationId: listCanonicalSpecialistReports
+      parameters:
+      - {$ref: '#/components/parameters/RunId'}
+      - {$ref: '#/components/parameters/TenantId'}
+      - {$ref: '#/components/parameters/ActorId'}
+      responses:
+        '200':
+          description: Four bounded report summaries without report bodies
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [run_id, reports]
+                properties:
+                  run_id: {type: string, format: uuid}
+                  reports:
+                    type: array
+                    minItems: 4
+                    maxItems: 4
+                    items: {$ref: '#/components/schemas/Summary'}
+        '404': {description: Report v2 Run not found}
+  /api/v1/experience/v2/runs/{run_id}/agent-reports/{agent_code}:
+    get:
+      operationId: getCanonicalSpecialistReport
+      parameters:
+      - {$ref: '#/components/parameters/RunId'}
+      - {name: agent_code, in: path, required: true, schema: {$ref: '#/components/schemas/AgentCode'}}
+      - {$ref: '#/components/parameters/TenantId'}
+      - {$ref: '#/components/parameters/ActorId'}
+      responses:
+        '200':
+          description: Hash-verified canonical specialist report document
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SpecialistProjection'}
+        '404': {description: Canonical specialist report not found}
+        '409': {description: Immutable object integrity mismatch}
+components:
+  parameters:
+    RunId: {name: run_id, in: path, required: true, schema: {type: string, format: uuid}}
+    TenantId: {name: X-Tenant-Id, in: header, required: true, schema: {type: string, format: uuid}}
+    ActorId: {name: X-Actor-Id, in: header, required: true, schema: {type: string, minLength: 1}}
+  schemas:
+    AgentCode:
+      enum: [user-evidence, product-engineering, business-investment, evidence-auditor]
+    Summary:
+      type: object
+      required: [agent_code, title, kind, status, report_id, source_sha256, created_at, revision]
+      properties:
+        agent_code: {$ref: '#/components/schemas/AgentCode'}
+        title: {type: string}
+        kind: {enum: [DOMAIN, AUDIT]}
+        status: {enum: [PENDING, AVAILABLE, FAILED, UNAVAILABLE]}
+        report_id: {type: [string, 'null'], format: uuid}
+        source_sha256: {type: [string, 'null'], pattern: '^[0-9a-f]{64}$'}
+        created_at: {type: [string, 'null'], format: date-time}
+        revision: {type: [integer, 'null'], minimum: 0}
+    SpecialistProjection:
+      type: object
+      additionalProperties: false
+      required: [report_schema_version, document, integrity, projection]
+      properties:
+        report_schema_version: {const: '2.0'}
+        document: {$ref: '../reports/specialist-report.v2.json'}
+        integrity:
+          type: object
+          required: [canonical_sha256, source_sha256]
+          properties:
+            canonical_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+            source_sha256: {type: string, pattern: '^[0-9a-f]{64}$'}
+        projection:
+          type: object
+          required: [view, created_at, supervisor_report_id]
+          properties:
+            view: {const: FULL}
+            created_at: {type: string, format: date-time}
+            supervisor_report_id: {type: string, format: uuid}

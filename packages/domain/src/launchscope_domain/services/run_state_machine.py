@@ -27,8 +27,12 @@ class RunTransitionContext:
     response_deadline_passed: bool = False
     known_terminal_failure: bool = False
     failure_class: FailureClass | None = None
+    unanswered_information_request: bool = False
+    information_requests_answered: bool = False
+    clarification_impact_assessed: bool = False
     human_resume: bool = False
     reconciliation_complete: bool = False
+    demo_force_resume: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -54,11 +58,14 @@ class TransitionCheck:
 _RUN_TRANSITIONS: Mapping[RunStatus, frozenset[RunStatus]] = {
     RunStatus.DRAFT: frozenset({RunStatus.INTAKE, RunStatus.CANCELLED}),
     RunStatus.INTAKE: frozenset({RunStatus.WAITING_FOR_USER, RunStatus.PLANNED, RunStatus.FAILED}),
-    RunStatus.WAITING_FOR_USER: frozenset({RunStatus.PLANNED, RunStatus.EXPIRED, RunStatus.CANCELLED}),
+    RunStatus.WAITING_FOR_USER: frozenset(
+        {RunStatus.PLANNED, RunStatus.RUNNING, RunStatus.EXPIRED, RunStatus.CANCELLED}
+    ),
     RunStatus.PLANNED: frozenset({RunStatus.WAITING_FOR_BUDGET, RunStatus.RUNNING, RunStatus.CANCELLED}),
     RunStatus.RUNNING: frozenset(
         {
             RunStatus.EVIDENCE_REVIEW,
+            RunStatus.WAITING_FOR_USER,
             RunStatus.NEEDS_ATTENTION,
             RunStatus.FAILED,
             RunStatus.CANCELLED,
@@ -149,6 +156,16 @@ class RunStateMachine:
                 return "budget must be reserved before execution"
         if current is RunStatus.RUNNING and target is RunStatus.EVIDENCE_REVIEW and not ctx.required_tasks_terminal:
             return "all required tasks must be terminal before evidence review"
+        if current is RunStatus.RUNNING and target is RunStatus.WAITING_FOR_USER:
+            if not ctx.unanswered_information_request:
+                return "clarification requires at least one durable unanswered InformationRequest"
+            if ctx.failure_class is not None:
+                return "an Agent clarification is not a failure and carries no failure class"
+        if current is RunStatus.WAITING_FOR_USER and target is RunStatus.RUNNING:
+            if not ctx.information_requests_answered:
+                return "every InformationRequest must be answered before the Run resumes"
+            if not ctx.clarification_impact_assessed:
+                return "the Manager must assess which Tasks the answers affect before resume"
         if current is RunStatus.RUNNING and target is RunStatus.NEEDS_ATTENTION and ctx.failure_class is None:
             return "fail-closed transition requires a failure class"
         if (
@@ -181,7 +198,7 @@ class RunStateMachine:
             current is RunStatus.NEEDS_ATTENTION
             and target is RunStatus.RUNNING
             and ctx.failure_class is FailureClass.SUBMISSION_UNKNOWN
-            and not ctx.reconciliation_complete
+            and not (ctx.reconciliation_complete or ctx.demo_force_resume)
         ):
             return "SUBMISSION_UNKNOWN requires versioned reconciliation before resume"
         return ""

@@ -153,6 +153,27 @@ class S3QuarantineObjectStore(QuarantineObjectStore):
         self.ensure_private_bucket()
         return self._presign("GET", object_key, {})
 
+    def get_private(self, object_key: str, *, max_bytes: int = 2_000_000) -> bytes:
+        """Read one exact private object with a strict size and digest check."""
+
+        if max_bytes <= 0 or max_bytes > 20 * 1024 * 1024:
+            raise ObjectStoreIntegrityError("private object read limit must be between one byte and twenty MiB")
+        metadata = self.head(object_key)
+        if metadata is None:
+            raise ObjectStoreIntegrityError("private object was not found")
+        if metadata.size_bytes > max_bytes:
+            raise ObjectStoreIntegrityError("private object exceeds the bounded read limit")
+        try:
+            with urlopen(Request(self.signed_read_url(object_key), method="GET"), timeout=10) as response:
+                payload = response.read(max_bytes + 1)
+        except HTTPError as exc:
+            raise ObjectStoreConfigurationError(f"S3 GET failed with HTTP {exc.code}") from exc
+        if len(payload) > max_bytes or len(payload) != metadata.size_bytes:
+            raise ObjectStoreIntegrityError("private object size differs from immutable metadata")
+        if hashlib.sha256(payload).hexdigest() != metadata.sha256:
+            raise ObjectStoreIntegrityError("private object sha256 differs from immutable metadata")
+        return payload
+
     def ensure_private_bucket(self) -> None:
         if self._bucket_ready:
             return

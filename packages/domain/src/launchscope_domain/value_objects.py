@@ -16,6 +16,16 @@ _IDEMPOTENCY_PATTERN: Final[re.Pattern[str]] = re.compile(r"^[A-Za-z0-9][A-Za-z0
 _VERSION_PATTERN: Final[re.Pattern[str]] = re.compile(r"^[0-9]+\.[0-9]+$")
 _SHA256_PATTERN: Final[re.Pattern[str]] = re.compile(r"^[0-9a-fA-F]{64}$")
 
+# ADR 0004 clarification-loop field calibre.  These are the one authoritative
+# set of limits: the AgentHandoff contract, the persisted columns and the REST
+# validation all derive from them, so an Agent can never emit a question the
+# database would refuse to store.
+MAX_PROFILE_FIELD_CHARS: Final[int] = 120
+MAX_CLARIFICATION_QUESTION_CHARS: Final[int] = 1000
+MAX_CLARIFICATION_REASON_CHARS: Final[int] = 1000
+MAX_CLARIFICATION_ANSWER_CHARS: Final[int] = 4000
+MAX_IMPACT_DIMENSION_CHARS: Final[int] = 64
+
 
 def _uuid(value: UUID | str, field_name: str) -> UUID:
     if isinstance(value, UUID):

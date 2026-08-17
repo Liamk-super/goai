@@ -23,8 +23,9 @@ class IntakeValidationError(ValueError):
     """The product intake is not ready for its requested state change."""
 
 
-_REQUIRED_FIELDS = ("target_user", "payer", "stage", "region", "validation_goal")
+_REQUIRED_FIELDS = ("one_line_value_claim", "target_user", "payer", "stage", "region", "validation_goal")
 _QUESTION_TEXT = {
+    "one_line_value_claim": "What is the product's one-sentence value proposition?",
     "target_user": "Who is the primary target user?",
     "payer": "Who pays for the product or service?",
     "stage": "What is the current product stage?",
@@ -60,14 +61,16 @@ class IntakeApplication:
     ) -> tuple[ProductProfileDraft, tuple[GapQuestion, ...]]:
         if not has_validated_material:
             raise IntakeValidationError("at least one validated quarantined material is required before gap diagnosis")
+        if product_version_id in self.confirmed:
+            return self._draft(product_version_id), ()
         draft = ProductProfileDraft.create(product_version_id, {field: None for field in _REQUIRED_FIELDS})
         questions = tuple(
             GapQuestion(uuid4(), product_version_id, field, _QUESTION_TEXT[field], priority, correlation_id)
             for priority, field in enumerate(_REQUIRED_FIELDS, start=1)
         )
         # Keep this invariant local and explicit even if mandatory fields later change.
-        if not 3 <= len(questions) <= 5:
-            raise RuntimeError("gap diagnosis must emit between 3 and 5 priority questions")
+        if not 3 <= len(questions) <= 6:
+            raise RuntimeError("gap diagnosis must emit between 3 and 6 priority questions")
         self.drafts[product_version_id] = draft
         self.questions[product_version_id] = questions
         return draft, questions
@@ -105,6 +108,9 @@ class IntakeApplication:
             raise IntakeValidationError(
                 "the user must acknowledge that the draft is model inference, not a confirmed fact"
             )
+        existing = self.confirmed.get(product_version_id)
+        if existing is not None:
+            return existing
         missing = [field for field in _REQUIRED_FIELDS if not draft.answers.get(field)]
         if missing:
             raise IntakeValidationError(

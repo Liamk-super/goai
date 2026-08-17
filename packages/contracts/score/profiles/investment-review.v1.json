@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "profile_id": "investment-review",
+  "version": "1.0",
+  "evaluation_mode": "INVESTMENT_REVIEW",
+  "weights": { "user_value": 0.25, "product_capability": 0.20, "investment_potential": 0.45, "evidence_quality": 0.10 },
+  "thresholds": { "PROCEED": 80, "VALIDATE_FURTHER": 65, "ADJUST": 50 },
+  "required_agents": ["business-investment"],
+  "coverage_rules": { "proceed_minimum": 0.70, "scoring_minimum": 0.50, "rejected_findings_score_zero": true },
+  "recommendation_caps": { "missing_optional_agent": "VALIDATE_FURTHER", "unresolved_conflict": "VALIDATE_FURTHER", "low_coverage": "VALIDATE_FURTHER" }
+}

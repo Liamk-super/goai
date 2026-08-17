@@ -1,0 +1,21 @@
+{
+  "schema_version": "2.0",
+  "skill_code": "evidence-grounding-audit",
+  "version": "2.1.0",
+  "content_sha256": "33584a3f59b5de86088bc874c7c5f5c604f4f19119cc6d7c6aefe0f55eb8dd89",
+  "package_sha256": "f633e69156e97ff5ee935d3efc9a9bf3fe4ef132b0c2dd2417b826472a060c7c",
+  "runner_sha256": "cd14704c50cfa3cd9f774ea30b91653ede65705558170c10625d4d8e7892f1f1",
+  "prompt_sha256": "daaefa7ec808caa8b9a6cc6d7e8b50f90cef6484a01983bd0d590586ae07845f",
+  "knowledge_package_sha256": "5c051ef7098550f55e3aa3fd41165e62a68631415a095ec802db83a4dec05830",
+  "input_schema_ref": "../../../contracts/audit/audit-request.v2.json",
+  "input_schema_sha256": "d1160a64b52e30d9f02fcd2f849483faa4afb02b9e21d8d5806608e329dcb502",
+  "output_schema_ref": "../../../evidence-grounding-audit/schema/output.v2.1.schema.json",
+  "output_schema_sha256": "3769c3af624c12d0fcbc17579457ba3a14bca8aa75650a3aae4dd2a5b3ec3c71",
+  "preconditions": ["auditable finding and immutable evidence references", "task-scoped evidence-auditor capability", "source locators captured at evidence creation when public provenance is required"],
+  "permissions": ["evidence.read", "evidence_source_locator.read", "finding.read", "user_validation.audit.read"],
+  "failure_classes": ["VALIDATION", "AUTHORIZATION", "DEPENDENCY", "POLICY"],
+  "budget": {"max_cost": 0, "currency": "USD", "max_model_turns": 8, "max_agent_iterations": 16, "task_timeout_seconds": 600},
+  "evidence_requirements": ["every decision cites exact Evidence and source-locator identifiers", "support strength, source independence, freshness, citation status, and score admission are explicit", "the audit preserves every immutable source Finding and only emits calibrated wording as a separate field"],
+  "lifecycle": {"status": "APPROVED_DISABLED", "feature_flag": "LAUNCHSCOPE_REPORT_V2_ENABLED", "rollback": "Disable the feature flag for new Runs; retain immutable v2.1 audit results."},
+  "may_write_business_state": false
+}

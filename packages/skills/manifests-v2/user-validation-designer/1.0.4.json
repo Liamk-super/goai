@@ -1,0 +1,53 @@
+{
+  "schema_version": "2.0",
+  "skill_code": "user-validation-designer",
+  "version": "1.0.4",
+  "content_sha256": "1a206a37958f1788abfd0605746816bffc8717993411f4cb663648ed843b5b2b",
+  "package_sha256": "8e080e41ae91a959748f9f67122d4604fa1ed719d19e22171006f2a03c57ba6d",
+  "runner_sha256": "c062cccbd2a4a1258b5cd327a47e84064c6926f118c2ef7a11151b03922e8b84",
+  "prompt_sha256": "95b5650e1b4b14da2f90918d623fee51e53a9580cfc59340ed169faeadbc12d9",
+  "knowledge_package_sha256": "d5951922224c9d16e9b013139795d074c706c3f589f8ffec918c499e910300d2",
+  "input_schema_ref": "../../../user-validation-designer/schema/input.schema.json",
+  "input_schema_sha256": "676b1d0968b1337bae5aa60dd148a17b94f885b874eddbb68cc1ea3ab816ce05",
+  "output_schema_ref": "../../../user-validation-designer/schema/output.schema.json",
+  "output_schema_sha256": "f63f51683c06339d8696fc3c5330e34a6820d4e15d5541677e79233a8cce78a0",
+  "preconditions": [
+    "confirmed product profile with one_line_value_claim",
+    "task-scoped AgentTeams capability token",
+    "immutable product validation script for regression"
+  ],
+  "permissions": [
+    "profile.read",
+    "material.read",
+    "evidence.read",
+    "user_validation.checkpoint.write",
+    "user_validation.result.write"
+  ],
+  "failure_classes": [
+    "VALIDATION",
+    "AUTHORIZATION",
+    "DEPENDENCY",
+    "BUDGET",
+    "POLICY",
+    "SUBMISSION_UNKNOWN",
+    "BUSINESS"
+  ],
+  "budget": {
+    "max_cost": 0,
+    "currency": "USD",
+    "max_model_turns": 12,
+    "max_agent_iterations": 32,
+    "task_timeout_seconds": 1200
+  },
+  "evidence_requirements": [
+    "issued evidence is capped at E2 and identifies simulation",
+    "caller E3-E5 evidence retains immutable source hash and applicability",
+    "full report is object-backed and Matrix carries only ref plus sha256"
+  ],
+  "lifecycle": {
+    "status": "APPROVED_DISABLED",
+    "feature_flag": "LAUNCHSCOPE_USER_VALIDATION_ENABLED",
+    "rollback": "Disable the feature flag for new Runs; retain immutable results and audits."
+  },
+  "may_write_business_state": false
+}

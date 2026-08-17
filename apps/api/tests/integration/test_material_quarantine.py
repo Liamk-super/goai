@@ -47,3 +47,27 @@ def test_completion_rejects_object_metadata_mismatches_after_quarantine(
     result = ingestion.complete(actor, upload.material_id)
     assert result.status is MaterialStatus.REJECTED
     assert result.rejection_reason == "object metadata does not match the upload initiation"
+
+
+def test_private_material_analysis_json_is_allowed_and_hash_verified() -> None:
+    actor = Actor(uuid4(), "alice")
+    store = InMemoryQuarantineObjectStore()
+    ingestion = MaterialIngestionApplication(store)
+    payload = b'{"analysis_type":"LAUNCHSCOPE_PDF_MIXED_ANALYSIS"}'
+    digest = sha256(payload).hexdigest()
+    mime_type = "application/vnd.launchscope.material-analysis+json"
+    upload = ingestion.initiate(
+        actor,
+        workspace_id=uuid4(),
+        project_id=uuid4(),
+        product_version_id=uuid4(),
+        display_name="brief.pdf.launchscope-analysis.json",
+        sha256=digest,
+        size_bytes=len(payload),
+        mime_type=mime_type,
+    )
+    store.stage_uploaded_object(upload.object_key, ObjectMetadata(digest, len(payload), mime_type))
+
+    result = ingestion.complete(actor, upload.material_id)
+
+    assert result.status is MaterialStatus.VALIDATED

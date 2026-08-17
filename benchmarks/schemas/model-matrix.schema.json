@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "version", "suite_id", "case_ids", "candidates", "minimum_independent_repeats"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "version": {"const": "1.0.0"},
+    "suite_id": {"const": "model-benchmark-v1"},
+    "case_ids": {
+      "type": "array",
+      "minItems": 2,
+      "uniqueItems": true,
+      "items": {"type": "string"}
+    },
+    "candidates": {
+      "type": "array",
+      "minItems": 3,
+      "uniqueItems": true,
+      "items": {"enum": ["kimi-k3", "glm-5.2", "qwen3.8-max"]}
+    },
+    "minimum_independent_repeats": {"type": "integer", "minimum": 1},
+    "cache_allowed": {"const": false},
+    "required_runtime_identity_source": {"const": "PROVIDER_RESPONSE"}
+  }
+}

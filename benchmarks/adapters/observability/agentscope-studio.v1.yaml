@@ -1,0 +1,27 @@
+apiVersion: launchscope.io/v1alpha1
+kind: BenchmarkTraceBackend
+metadata:
+  name: agentscope-studio
+spec:
+  enabled: false
+  mode: local-only
+  endpointEnv: AGENTSCOPE_STUDIO_ENDPOINT
+  pinnedImage: null
+  integrationMode: AGENTSCOPE_STUDIO_URL
+  directOtlpIngestDocumented: false
+  collectorBridgeStatus: NOT_IMPLEMENTED
+  compatibility:
+    status: BLOCKED_NO_PINNED_COMPATIBLE_BACKEND
+    ingestionVerified: false
+    uiTraceDisplayVerified: false
+    lastAttemptedAt: null
+    requiredEvidence:
+      - pinned image digest and version
+      - AgentScope Studio URL integration or a separately proven compatible bridge
+      - Run to Stage to Agent Task hierarchy visible in UI
+      - screenshot or exported trace ID tied to the validation run
+  privacy:
+    allowBusinessBodies: false
+    requiredProcessorsForAnyBridge: [memory_limiter, attributes/body_guard, batch]
+    sourceConfig: infra/observability/otel-collector.yaml
+  acceptanceBoundary: "Do not claim Studio integration until both ingestionVerified and uiTraceDisplayVerified are true."

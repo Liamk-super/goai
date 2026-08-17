@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "version",
+    "status",
+    "storage",
+    "planned_case_count",
+    "distribution",
+    "case_ids_sha256",
+    "governance"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "version": {
+      "const": "1.0.0"
+    },
+    "status": {
+      "enum": [
+        "AWAITING_INDEPENDENT_OWNER",
+        "SEALED",
+        "RETIRED"
+      ]
+    },
+    "storage": {
+      "const": "EXTERNAL_SEALED"
+    },
+    "planned_case_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "distribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "agents",
+        "system_e2e"
+      ],
+      "properties": {
+        "model": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "agents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "system_e2e": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "case_ids_sha256": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner_role",
+        "repository_contains_inputs",
+        "release_condition",
+        "rotation_condition",
+        "minimum_reviewers",
+        "prohibited_coupling"
+      ],
+      "properties": {
+        "owner_role": {
+          "type": "string"
+        },
+        "repository_contains_inputs": {
+          "const": false
+        },
+        "release_condition": {
+          "type": "string"
+        },
+        "rotation_condition": {
+          "type": "string"
+        },
+        "minimum_reviewers": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "prohibited_coupling": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

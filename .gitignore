@@ -43,3 +43,14 @@ Thumbs.db
 /output/
 /artifacts/
 /reference/
+
+# Local assistant state and generated delivery artifacts
+/.agents/
+/.claude/
+/.codex-tmp/
+/agent/
+/deliverables/
+/tmp/
+/benchmarks.zip
+/apps/web/.next-demo/
+/apps/web/.next-recorded-e2e/

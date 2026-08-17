@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/audit/audit-result.v2.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["finding_id", "decision", "reason", "rule_ids", "evidence_ids", "score_components", "flags"],
+  "properties": {
+    "finding_id": { "type": "string", "format": "uuid" },
+    "decision": { "enum": ["ACCEPTED", "DOWNGRADED", "REJECTED", "NEEDS_MORE"] },
+    "reason": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "rule_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^KB-EVD-" }
+    },
+    "evidence_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
+    "score_components": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_strength", "source_reliability", "freshness", "reasoning_quality", "total"],
+      "properties": {
+        "evidence_strength": { "type": "number", "minimum": 0, "maximum": 40 },
+        "source_reliability": { "type": "number", "minimum": 0, "maximum": 20 },
+        "freshness": { "type": "number", "minimum": 0, "maximum": 20 },
+        "reasoning_quality": { "type": "number", "minimum": 0, "maximum": 20 },
+        "total": { "type": "number", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "flags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "enum": ["SIMULATION_ONLY", "SELF_CLAIM", "EXPIRED", "UNTRACEABLE", "TAMPERED", "CONFLICT"] }
+    }
+  }
+}

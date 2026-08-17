@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/tools/user-validation-designer.start.v1.json",
+  "x-network-policy": { "allowed_domains": [], "max_redirects": 0, "max_response_bytes": 65536 },
+  "x-execution-policy": { "timeout_seconds": 15, "max_cost": 0 },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "tool_id", "permission", "network_level", "read_only", "input_schema", "output_schema"],
+  "properties": {
+    "contract_version": { "const": "1.0" },
+    "tool_id": { "const": "user-validation-designer.start.v1" },
+    "permission": { "const": "user_validation.checkpoint.write" },
+    "network_level": { "const": "INTERNAL" },
+    "read_only": { "const": false },
+    "input_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id", "task_id", "expected_revision", "checkpoint_sha256",
+        "idempotency_key", "correlation_id", "context_token"
+      ],
+      "properties": {
+        "run_id": { "type": "string", "format": "uuid" },
+        "task_id": { "type": "string", "format": "uuid" },
+        "expected_revision": { "const": 0 },
+        "checkpoint_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "Immutable RunManifest sha256 used as the revision-zero checkpoint binding."
+        },
+        "idempotency_key": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "correlation_id": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "context_token": { "type": "string", "minLength": 1 }
+      }
+    },
+    "output_schema": { "type": "object", "required": ["execution_id", "revision", "checkpoint_sha256", "status"] }
+  },
+  "examples": [{
+    "contract_version": "1.0",
+    "tool_id": "user-validation-designer.start.v1",
+    "permission": "user_validation.checkpoint.write",
+    "network_level": "INTERNAL",
+    "read_only": false,
+    "input_schema": {
+      "run_id": "00000000-0000-0000-0000-000000000001",
+      "task_id": "00000000-0000-0000-0000-000000000002",
+      "expected_revision": 0,
+      "checkpoint_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "idempotency_key": "uvd-start-1",
+      "correlation_id": "00000000-0000-0000-0000-000000000003",
+      "context_token": "signed-task-capability"
+    },
+    "output_schema": {
+      "execution_id": "00000000-0000-0000-0000-000000000004",
+      "revision": 0,
+      "checkpoint_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "status": "awaiting_step"
+    }
+  }]
+}

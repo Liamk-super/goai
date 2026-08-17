@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://launchscope.local/contracts/reports/citation-source.v1.json",
+  "title": "CitationSourceV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "citation_id", "claim_id", "evidence_id", "source_locator_id", "support_role", "audit_status", "label"
+  ],
+  "properties": {
+    "citation_id": {"type": "string", "pattern": "^citation-[A-Za-z0-9._-]+$"},
+    "claim_id": {"type": "string", "pattern": "^claim-[A-Za-z0-9._-]+$"},
+    "evidence_id": {"type": "string", "format": "uuid"},
+    "source_locator_id": {
+      "anyOf": [{"type": "null"}, {"type": "string", "format": "uuid"}]
+    },
+    "support_role": {"enum": ["SUPPORT", "COUNTER", "BACKGROUND"]},
+    "audit_status": {"enum": ["VERIFIED", "DOWNGRADED", "REJECTED", "NEEDS_MORE"]},
+    "label": {"type": "integer", "minimum": 1}
+  }
+}

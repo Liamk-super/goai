@@ -1,0 +1,714 @@
+{
+  "schema_version": "1.0",
+  "version": "1.0.0",
+  "rules": [
+    {
+      "id": "SUP-GOAL-MISSING",
+      "agent": "evaluation-manager",
+      "source_id": "KB-SUP",
+      "locator": "KB-SUP-R03 / KB-SUP-S2",
+      "kind": "IF_THEN",
+      "statement": "Missing validation goal must trigger clarification instead of an implicit full review.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "REQUEST_CLARIFICATION"
+      }
+    },
+    {
+      "id": "SUP-ALL-USERS-BLOCK",
+      "agent": "evaluation-manager",
+      "source_id": "KB-SUP",
+      "locator": "KB-SUP-F06 / KB-SUP-A01",
+      "kind": "IF_THEN",
+      "statement": "A target audience of all people is not admissible and must be clarified.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "BLOCK"
+      }
+    },
+    {
+      "id": "SUP-CORE-MISSING-BLOCK",
+      "agent": "evaluation-manager",
+      "source_id": "KB-SUP",
+      "locator": "KB-SUP-S1",
+      "kind": "IF_THEN",
+      "statement": "Missing core intake fields blocks formal review and yields only questions and an evidence plan.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "BLOCK"
+      }
+    },
+    {
+      "id": "SUP-UNKNOWN-VALID",
+      "agent": "evaluation-manager",
+      "source_id": "KB-SUP",
+      "locator": "KB-SUP-S1",
+      "kind": "MUST",
+      "statement": "A user answer of unknown remains unknown and is not fabricated or repeatedly demanded.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "MARK_UNKNOWN"
+      }
+    },
+    {
+      "id": "SUP-QUESTIONS-MAX5",
+      "agent": "evaluation-manager",
+      "source_id": "KB-SUP",
+      "locator": "KB-SUP-S1",
+      "kind": "MUST",
+      "statement": "Clarification contains no more than five prioritized questions and explains what each unlocks.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "REQUEST_CLARIFICATION"
+      }
+    },
+    {
+      "id": "SUP-AUDIT-BEFORE-SYNTHESIS",
+      "agent": "evaluation-manager",
+      "source_id": "KB-SUP",
+      "locator": "KB-SUP-S3 / KB-SUP-P01",
+      "kind": "MUST",
+      "statement": "Evidence calibration must occur after specialist work and before final synthesis.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "ROUTE_EVIDENCE_AUDITOR"
+      }
+    },
+    {
+      "id": "SUP-BUDGET80-FREEZE",
+      "agent": "evaluation-manager",
+      "source_id": "KB-SUP",
+      "locator": "KB-SUP-S5",
+      "kind": "IF_THEN",
+      "statement": "At 80 percent of budget, low-priority tasks are frozen.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "FREEZE_LOW_PRIORITY"
+      }
+    },
+    {
+      "id": "SUP-CONFLICT-NO-AVERAGE",
+      "agent": "evaluation-manager",
+      "source_id": "KB-SUP",
+      "locator": "KB-SUP-S6 / KB-SUP-P02",
+      "kind": "MUST_NOT",
+      "statement": "Unresolved conflict must be preserved and cannot be hidden by averaging.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "PRESERVE_CONFLICT"
+      }
+    },
+    {
+      "id": "SUP-COVERAGE50-CAP",
+      "agent": "evaluation-manager",
+      "source_id": "KB-SUP",
+      "locator": "KB-SUP-S7",
+      "kind": "IF_THEN",
+      "statement": "Coverage below 50 percent caps the recommendation at further validation.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "VALIDATE_FURTHER"
+      }
+    },
+    {
+      "id": "SUP-NEXT-ACTIONS-1-3",
+      "agent": "evaluation-manager",
+      "source_id": "KB-SUP",
+      "locator": "KB-SUP-F02 / KB-SUP-P01",
+      "kind": "MUST",
+      "statement": "A final recommendation contains one to three executable next actions with revalidation conditions.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "LIMIT_ACTIONS"
+      }
+    },
+    {
+      "id": "TEC-READ-ONLY",
+      "agent": "product-engineering",
+      "source_id": "KB-TEC",
+      "locator": "preamble / KB-TEC-P01 / KB-TEC-P02",
+      "kind": "MUST_NOT",
+      "statement": "Repository and product access is read-only; writes, deployment and deletion are forbidden.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "REJECT_WRITE"
+      }
+    },
+    {
+      "id": "TEC-MARKET-OUT-OF-SCOPE",
+      "agent": "product-engineering",
+      "source_id": "KB-TEC",
+      "locator": "preamble / KB-TEC-P02",
+      "kind": "IF_THEN",
+      "statement": "Market value questions are out of scope and route to the business-investment Agent.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "ROUTE_BUSINESS_INVESTMENT"
+      }
+    },
+    {
+      "id": "TEC-REPO-MISSING-CAP",
+      "agent": "product-engineering",
+      "source_id": "KB-TEC",
+      "locator": "KB-TEC-R04 / KB-TEC-S3",
+      "kind": "IF_THEN",
+      "statement": "Without a repository, architecture conclusions are inferred and capped at three or pending validation.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "DOWNGRADE"
+      }
+    },
+    {
+      "id": "TEC-NO-TEST-CI-CAP",
+      "agent": "product-engineering",
+      "source_id": "KB-TEC",
+      "locator": "KB-TEC-F04 / KB-TEC-P02",
+      "kind": "IF_THEN",
+      "statement": "No tests and no CI cap engineering quality at three.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "DOWNGRADE"
+      }
+    },
+    {
+      "id": "TEC-SECRET-HUMAN",
+      "agent": "product-engineering",
+      "source_id": "KB-TEC",
+      "locator": "KB-TEC-F04 / KB-TEC-S4",
+      "kind": "IF_THEN",
+      "statement": "A hard-coded secret triggers a security flag, human review and immediate rotation advice.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "ESCALATE_HUMAN"
+      }
+    },
+    {
+      "id": "TEC-DEMO-NOT-REAL",
+      "agent": "product-engineering",
+      "source_id": "KB-TEC",
+      "locator": "KB-TEC-F07 / KB-TEC-G03",
+      "kind": "IF_THEN",
+      "statement": "A detected fake demo is scored as concept demo and reported as an integrity risk.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "DOWNGRADE"
+      }
+    },
+    {
+      "id": "TEC-CODE-NOT-VOLUME",
+      "agent": "product-engineering",
+      "source_id": "KB-TEC",
+      "locator": "KB-TEC-P02",
+      "kind": "MUST_NOT",
+      "statement": "Code volume cannot be used as evidence of technical quality.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "REJECT_CLAIM"
+      }
+    },
+    {
+      "id": "TEC-PROBLEM-TRIPLET",
+      "agent": "product-engineering",
+      "source_id": "KB-TEC",
+      "locator": "KB-TEC-Q01",
+      "kind": "MUST",
+      "statement": "Each reported issue contains problem, impact and recommendation; only Top 5 are surfaced.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "LIMIT_FINDINGS"
+      }
+    },
+    {
+      "id": "USR-ALL-USERS-REJECT",
+      "agent": "user-evidence",
+      "source_id": "KB-USR",
+      "locator": "KB-USR-R04",
+      "kind": "IF_THEN",
+      "statement": "All people or anyone is not a usable target group; refuse modeling and ask who hurts, pays and adopts first.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "BLOCK"
+      }
+    },
+    {
+      "id": "USR-MISSING-TASK-LIMIT",
+      "agent": "user-evidence",
+      "source_id": "KB-USR",
+      "locator": "KB-USR-R04",
+      "kind": "IF_THEN",
+      "statement": "Without a product task, run first-impression simulation only and mark task testing missing.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "DOWNGRADE"
+      }
+    },
+    {
+      "id": "USR-SIMULATION-E2-CAP",
+      "agent": "user-evidence",
+      "source_id": "KB-USR",
+      "locator": "global simulation convention / KB-EVD-G03",
+      "kind": "MUST",
+      "statement": "All simulated personas, interviews and scores are labeled simulated and capped at E2.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "DOWNGRADE"
+      }
+    },
+    {
+      "id": "USR-REAL-E3-PRIORITY",
+      "agent": "user-evidence",
+      "source_id": "KB-USR",
+      "locator": "KB-USR-R04",
+      "kind": "IF_THEN",
+      "statement": "Existing E3 or stronger real-user evidence overrides conflicting simulation.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "PREFER_REAL_EVIDENCE"
+      }
+    },
+    {
+      "id": "USR-PERSONAS-3-5",
+      "agent": "user-evidence",
+      "source_id": "KB-USR",
+      "locator": "persona generation rules",
+      "kind": "MUST",
+      "statement": "Generate a bounded set of three to five differentiated personas when modeling is admissible.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "LIMIT_PERSONAS"
+      }
+    },
+    {
+      "id": "USR-NEGATIVE-INCLUDED",
+      "agent": "user-evidence",
+      "source_id": "KB-USR",
+      "locator": "simulation and interview rules",
+      "kind": "MUST",
+      "statement": "User simulation includes negative or refusing feedback rather than universal approval.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "INCLUDE_NEGATIVE"
+      }
+    },
+    {
+      "id": "USR-BEHAVIOR-NOT-SURVEY",
+      "agent": "user-evidence",
+      "source_id": "KB-USR",
+      "locator": "KB-USR-V02",
+      "kind": "IF_THEN",
+      "statement": "A behavioral hypothesis cannot be validated with a survey alone.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "REJECT_METHOD"
+      }
+    },
+    {
+      "id": "USR-PAYMENT-REAL-COMMITMENT",
+      "agent": "user-evidence",
+      "source_id": "KB-USR",
+      "locator": "KB-USR-V02",
+      "kind": "IF_THEN",
+      "statement": "Payment willingness validation requires a real commitment signal, not a verbal answer alone.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "REQUEST_REAL_VALIDATION"
+      }
+    },
+    {
+      "id": "INV-NO-EVIDENCE-BLOCK",
+      "agent": "business-investment",
+      "source_id": "KB-INV",
+      "locator": "KB-INV-R04",
+      "kind": "IF_THEN",
+      "statement": "An empty Evidence Package yields only a validation list, no score, and blocked status.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "BLOCK"
+      }
+    },
+    {
+      "id": "INV-LEGAL-HUMAN",
+      "agent": "business-investment",
+      "source_id": "KB-INV",
+      "locator": "KB-INV-R04",
+      "kind": "IF_THEN",
+      "statement": "Regulatory or legal judgment is escalated to a human and is not concluded by the Agent.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "ESCALATE_HUMAN"
+      }
+    },
+    {
+      "id": "INV-E1-NOT-SCORED",
+      "agent": "business-investment",
+      "source_id": "KB-INV",
+      "locator": "KB-INV-G01",
+      "kind": "IF_THEN",
+      "statement": "A dimension supported only by E0 or E1 is pending validation and excluded from scoring.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "MARK_UNKNOWN"
+      }
+    },
+    {
+      "id": "INV-NO-SUCCESS-PROBABILITY",
+      "agent": "business-investment",
+      "source_id": "KB-INV",
+      "locator": "KB-INV-G01",
+      "kind": "MUST_NOT",
+      "statement": "The ordinal score must not be represented as a success probability.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "REJECT_CLAIM"
+      }
+    },
+    {
+      "id": "INV-FACT-INFERENCE-HYPOTHESIS",
+      "agent": "business-investment",
+      "source_id": "KB-INV",
+      "locator": "KB-INV-P01",
+      "kind": "MUST",
+      "statement": "Facts, inferences and hypotheses are explicitly distinguished and missing numbers are not invented.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "CLASSIFY_CLAIMS"
+      }
+    },
+    {
+      "id": "INV-VETO-PAUSE",
+      "agent": "business-investment",
+      "source_id": "KB-INV",
+      "locator": "KB-INV-G03 / KB-INV-G04",
+      "kind": "IF_THEN",
+      "statement": "Any verified veto condition terminates scoring and yields pause.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "PAUSE"
+      }
+    },
+    {
+      "id": "INV-COVERAGE50-CAP",
+      "agent": "business-investment",
+      "source_id": "KB-INV",
+      "locator": "KB-INV-G04",
+      "kind": "IF_THEN",
+      "statement": "Coverage below 50 percent caps the recommendation at validation regardless of score.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "VALIDATE_FURTHER"
+      }
+    },
+    {
+      "id": "INV-SYNTHETIC-CAP",
+      "agent": "business-investment",
+      "source_id": "KB-INV",
+      "locator": "KB-INV-S3",
+      "kind": "IF_THEN",
+      "statement": "With only synthetic user evidence, demand strength is capped at medium preliminary.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "DOWNGRADE"
+      }
+    },
+    {
+      "id": "CTX-REQUIRED-INPUTS",
+      "agent": "geo-policy-trend",
+      "source_id": "KB-CTX",
+      "locator": "role input contract",
+      "kind": "MUST",
+      "statement": "Region, industry, product type and analysis time are required for a current contextual judgment.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "REQUEST_CLARIFICATION"
+      }
+    },
+    {
+      "id": "CTX-ALTERNATIVE-REGION",
+      "agent": "geo-policy-trend",
+      "source_id": "KB-CTX",
+      "locator": "KB-CTX-P01 / KB-CTX-P02",
+      "kind": "MUST",
+      "statement": "A region conclusion includes at least one alternative-region comparison.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "INCLUDE_ALTERNATIVE"
+      }
+    },
+    {
+      "id": "CTX-FACT-PREDICTION-SPLIT",
+      "agent": "geo-policy-trend",
+      "source_id": "KB-CTX",
+      "locator": "KB-CTX-P01 / KB-CTX-P02",
+      "kind": "MUST",
+      "statement": "Effective rules are facts and trends are predictions; the two are explicitly separated.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "CLASSIFY_CLAIMS"
+      }
+    },
+    {
+      "id": "CTX-EXPIRED-RESEARCH",
+      "agent": "geo-policy-trend",
+      "source_id": "KB-CTX",
+      "locator": "KB-CTX-P02 / time-driven rule",
+      "kind": "IF_THEN",
+      "statement": "Expired information cannot support a current conclusion and triggers refreshed research or pending validation.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "REQUEST_MORE_EVIDENCE"
+      }
+    },
+    {
+      "id": "CTX-HARD-COMPLIANCE-PAUSE",
+      "agent": "geo-policy-trend",
+      "source_id": "KB-CTX",
+      "locator": "environment decision rules",
+      "kind": "IF_THEN",
+      "statement": "A hard compliance obstacle yields pause and human review without waiting for the total score.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "PAUSE"
+      }
+    },
+    {
+      "id": "CTX-LEGAL-NO-CONCLUSION",
+      "agent": "geo-policy-trend",
+      "source_id": "KB-CTX",
+      "locator": "KB-CTX-P02",
+      "kind": "MUST_NOT",
+      "statement": "The Agent provides checklists and risk prompts but no formal legal conclusion.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "ESCALATE_HUMAN"
+      }
+    },
+    {
+      "id": "CTX-REGION-SWITCH",
+      "agent": "geo-policy-trend",
+      "source_id": "KB-CTX",
+      "locator": "environment decision rules",
+      "kind": "IF_THEN",
+      "statement": "A region fit of two or lower with an alternative at four or higher yields adjust-direction to that region.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "ADJUST"
+      }
+    },
+    {
+      "id": "CTX-FRESHNESS-FIELDS",
+      "agent": "geo-policy-trend",
+      "source_id": "KB-CTX",
+      "locator": "time-driven rules",
+      "kind": "MUST",
+      "statement": "A report includes collection time, confidence and recommended refresh time.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "INCLUDE_FRESHNESS"
+      }
+    },
+    {
+      "id": "EVD-MISSING-REFS-REJECT",
+      "agent": "evidence-auditor",
+      "source_id": "KB-EVD",
+      "locator": "KB-EVD-R04 / KB-EVD-S1",
+      "kind": "IF_THEN",
+      "statement": "A claim without evidence references enters the reject path without exception.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "REJECT"
+      }
+    },
+    {
+      "id": "EVD-EMPTY-PACKAGE-BLOCK",
+      "agent": "evidence-auditor",
+      "source_id": "KB-EVD",
+      "locator": "KB-EVD-R04",
+      "kind": "IF_THEN",
+      "statement": "An empty Evidence Package makes all claims request more evidence and blocks adoption.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "REQUEST_MORE_EVIDENCE"
+      }
+    },
+    {
+      "id": "EVD-INDIRECT-DOWNGRADE",
+      "agent": "evidence-auditor",
+      "source_id": "KB-EVD",
+      "locator": "KB-EVD-F01",
+      "kind": "IF_THEN",
+      "statement": "Indirect support cannot retain certainty language and must be downgraded or qualified.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "DOWNGRADE"
+      }
+    },
+    {
+      "id": "EVD-TWO-ASSUMPTIONS",
+      "agent": "evidence-auditor",
+      "source_id": "KB-EVD",
+      "locator": "KB-EVD-F02",
+      "kind": "IF_THEN",
+      "statement": "Two or more unsupported hidden assumptions yield reject or more-evidence request.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "REJECT"
+      }
+    },
+    {
+      "id": "EVD-UNTRACEABLE-REJECT",
+      "agent": "evidence-auditor",
+      "source_id": "KB-EVD",
+      "locator": "KB-EVD-F03 / KB-EVD-D03",
+      "kind": "IF_THEN",
+      "statement": "An untraceable source does not support a claim and the claim is treated as unsupported.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "REJECT"
+      }
+    },
+    {
+      "id": "EVD-EXPIRED-HANDLING",
+      "agent": "evidence-auditor",
+      "source_id": "KB-EVD",
+      "locator": "KB-EVD-F04 / KB-EVD-S5",
+      "kind": "IF_THEN",
+      "statement": "Expired evidence is re-requested when refreshable and rejected when not refreshable.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "REQUEST_MORE_EVIDENCE"
+      }
+    },
+    {
+      "id": "EVD-CONFLICT-NO-AVERAGE",
+      "agent": "evidence-auditor",
+      "source_id": "KB-EVD",
+      "locator": "KB-EVD-F05",
+      "kind": "MUST_NOT",
+      "statement": "Unresolved conflicting claims cannot enter as certain and source tiers are not averaged.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "DOWNGRADE"
+      }
+    },
+    {
+      "id": "EVD-SIMULATION-MISLABEL",
+      "agent": "evidence-auditor",
+      "source_id": "KB-EVD",
+      "locator": "KB-EVD-G03",
+      "kind": "IF_THEN",
+      "statement": "Simulation represented as real-user evidence is downgraded and marked simulation_mislabeled.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "DOWNGRADE"
+      }
+    },
+    {
+      "id": "EVD-PROBABILITY-DOWNGRADE",
+      "agent": "evidence-auditor",
+      "source_id": "KB-EVD",
+      "locator": "KB-EVD-F07",
+      "kind": "IF_THEN",
+      "statement": "A precise success or hit probability is downgraded to evidence level and conditional language.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "DOWNGRADE"
+      }
+    },
+    {
+      "id": "EVD-DECISION-TRACE",
+      "agent": "evidence-auditor",
+      "source_id": "KB-EVD",
+      "locator": "workflow global rule",
+      "kind": "MUST",
+      "statement": "Every audit decision cites claim ID, evidence ID when present, and rule ID.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "REQUIRE_TRACE"
+      }
+    },
+    {
+      "id": "EVD-FAKE-SOURCE-HUMAN",
+      "agent": "evidence-auditor",
+      "source_id": "KB-EVD",
+      "locator": "KB-EVD-R02 / KB-EVD-D03",
+      "kind": "IF_THEN",
+      "statement": "Confirmed fabricated data or sources are rejected, flagged integrity_issue and escalated to a human.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "ESCALATE_HUMAN"
+      }
+    },
+    {
+      "id": "EVD-REPORT-ADMISSION",
+      "agent": "evidence-auditor",
+      "source_id": "KB-EVD",
+      "locator": "KB-EVD-D05",
+      "kind": "MUST",
+      "statement": "Only PASS and DOWNGRADE claims may construct the final recommendation; requests stay gaps and rejects stay excluded.",
+      "automation": "AUTOMATED",
+      "expected_effect": {
+        "action": "FILTER_REPORT"
+      }
+    },
+    {
+      "id": "ARCH-POSTGRES-TRUTH",
+      "agent": "system",
+      "source_id": "ARCH-BASELINE",
+      "locator": "sections 8 and 18",
+      "kind": "MUST",
+      "statement": "PostgreSQL is the only business-state authority; transports and Agents cannot directly commit business state.",
+      "automation": "AUTOMATED",
+      "expected_effect": {"action": "COMMIT_CONTROL_PLANE_FIRST"}
+    },
+    {
+      "id": "ARCH-SUBMISSION-UNKNOWN",
+      "agent": "system",
+      "source_id": "ARCH-BASELINE",
+      "locator": "section 22",
+      "kind": "IF_THEN",
+      "statement": "Unknown external submission or billing freezes the run in needs-attention without retry or provider switching.",
+      "automation": "AUTOMATED",
+      "expected_effect": {"action": "NEEDS_ATTENTION_NO_RETRY"}
+    },
+    {
+      "id": "ARCH-AUDIT-BEFORE-REPORT",
+      "agent": "system",
+      "source_id": "ARCH-BASELINE",
+      "locator": "sections 23 and 31",
+      "kind": "MUST",
+      "statement": "Evidence review precedes rule synthesis and each critical report judgment remains traceable to findings and evidence.",
+      "automation": "AUTOMATED",
+      "expected_effect": {"action": "AUDIT_THEN_SYNTHESIZE"}
+    },
+    {
+      "id": "ARCH-EVIDENCE-CLAIMS",
+      "agent": "system",
+      "source_id": "ARCH-BASELINE",
+      "locator": "sections 9, 13 and 23",
+      "kind": "MUST",
+      "statement": "Non-hypothesis critical judgments require traceable evidence and unsupported assertions remain hypotheses or insufficient evidence.",
+      "automation": "AUTOMATED",
+      "expected_effect": {"action": "REQUIRE_EVIDENCE"}
+    },
+    {
+      "id": "ARCH-REAL-E2E-NO-MOCK",
+      "agent": "system",
+      "source_id": "ARCH-BASELINE",
+      "locator": "section 28",
+      "kind": "MUST_NOT",
+      "statement": "Mocks, health checks, unit tests and recordings cannot be reported as real end-to-end acceptance.",
+      "automation": "AUTOMATED",
+      "expected_effect": {"action": "BLOCKED_NO_AUTHORIZED_CASE"}
+    },
+    {
+      "id": "ARCH-VERSION-FROZEN-RUN",
+      "agent": "system",
+      "source_id": "ARCH-BASELINE",
+      "locator": "section 29",
+      "kind": "MUST",
+      "statement": "A running evaluation continues with the capability versions frozen in its Run Manifest.",
+      "automation": "AUTOMATED",
+      "expected_effect": {"action": "USE_FROZEN_MANIFEST"}
+    }
+  ]
+}

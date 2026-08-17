@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "suite_id", "baseline_run_id", "candidate_run_id", "summary", "cases"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "suite_id": {"type": "string"},
+    "baseline_run_id": {"type": "string"},
+    "candidate_run_id": {"type": "string"},
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseline_pass_rate", "candidate_pass_rate", "new_critical_violations", "regressed_cases"],
+      "properties": {
+        "baseline_pass_rate": {"type": "number", "minimum": 0, "maximum": 1},
+        "candidate_pass_rate": {"type": "number", "minimum": 0, "maximum": 1},
+        "new_critical_violations": {"type": "integer", "minimum": 0},
+        "regressed_cases": {"type": "integer", "minimum": 0}
+      }
+    },
+    "cases": {"type": "array", "items": {"type": "object"}}
+  }
+}

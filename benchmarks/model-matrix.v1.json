@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "version": "1.0.0",
+  "suite_id": "model-benchmark-v1",
+  "case_ids": ["MODEL-EVD-01", "MODEL-EVD-02"],
+  "candidates": ["kimi-k3", "glm-5.2", "qwen3.8-max"],
+  "minimum_independent_repeats": 3,
+  "cache_allowed": false,
+  "required_runtime_identity_source": "PROVIDER_RESPONSE"
+}
