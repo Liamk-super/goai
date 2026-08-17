@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#121c24">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <meta
+      name="description"
+      content="LaunchScope 静态流程演示：展示证据驱动的产品验证链路，不连接数据库、不调用模型、不执行真实预测。"
+    >
+    <title>LaunchScope · 静态流程演示</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="top-note" role="note">
+      <span class="pulse-dot" aria-hidden="true"></span>
+      <strong>STATIC DEMONSTRATION</strong>
+      <span>无数据库写入 · 无模型调用 · 无真实爆款预测</span>
+    </div>
+
+    <header class="masthead" id="top">
+      <a class="brand" href="#top" aria-label="返回 LaunchScope 静态演示顶部">
+        <span class="brand-mark" aria-hidden="true">LS</span>
+        <span class="brand-copy"><b>势能引擎</b><small>LAUNCHSCOPE</small></span>
+      </a>
+      <nav aria-label="页面导航">
+        <a href="#flow">流程</a>
+        <a href="#evidence">证据</a>
+        <a href="#decision">报告</a>
+        <a href="#boundary">边界</a>
+      </nav>
+      <a class="source-link" href="https://github.com/Liamk-super/goai" target="_blank" rel="noreferrer">查看源码 <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span>01</span> EVIDENCE-DRIVEN VALIDATION</p>
+          <h1 id="hero-title">不制造答案，<br><em>展示结论如何被约束。</em></h1>
+          <p class="hero-lede">
+            这是 LaunchScope 的固定流程样例：把一份产品判断拆成可审计的输入、协作、证据门与行动计划。
+            页面中的状态与数值均为展示素材，不代表实时运行、市场预测或商业结果。
+          </p>
+          <div class="hero-actions">
+            <a class="primary-button" href="#flow">进入流程回放 <span aria-hidden="true">↓</span></a>
+            <button class="text-button" type="button" data-jump="boundary">先看演示边界 <span aria-hidden="true">→</span></button>
+          </div>
+          <dl class="hero-facts">
+            <div><dt>1 + 4</dt><dd>主管与专项角色</dd></div>
+            <div><dt>5</dt><dd>展示性证据条目</dd></div>
+            <div><dt>0</dt><dd>外部调用与写入</dd></div>
+          </dl>
+        </div>
+
+        <div class="instrument" aria-label="展示性爆款潜力指数为 63 分，建议继续验证">
+          <div class="instrument-ruler" aria-hidden="true"></div>
+          <div class="instrument-dial">
+            <span class="dial-kicker">POTENTIAL INDEX</span>
+            <strong>63</strong>
+            <span class="dial-unit">/ 100</span>
+            <i></i>
+          </div>
+          <div class="instrument-label"><span>演示建议</span><b>继续验证</b></div>
+          <p>这是可解释的样例评分，不是 63% 的成功概率。</p>
+        </div>
+      </section>
+
+      <section class="section flow-section" id="flow" aria-labelledby="flow-title">
+        <div class="section-heading">
+          <p class="eyebrow"><span>02</span> THE CONTROLLED PATH</p>
+          <h2 id="flow-title">一份固定样例，沿着五道门通过。</h2>
+          <p>点击任一步查看其在演示中产出的固定内容。不会启动任务、连接服务或改变任何数据。</p>
+        </div>
+
+        <div class="flow-layout">
+          <ol class="flow-rail" aria-label="静态流程步骤">
+            <li><button class="flow-step is-active" type="button" data-step="0"><span>01</span><b>问题进入</b><small>Input brief</small></button></li>
+            <li><button class="flow-step" type="button" data-step="1"><span>02</span><b>主管拆解</b><small>Supervisor plan</small></button></li>
+            <li><button class="flow-step" type="button" data-step="2"><span>03</span><b>专项并行</b><small>1 + 4 analysis</small></button></li>
+            <li><button class="flow-step" type="button" data-step="3"><span>04</span><b>证据校准</b><small>Evidence gate</small></button></li>
+            <li><button class="flow-step" type="button" data-step="4"><span>05</span><b>行动建议</b><small>Decision report</small></button></li>
+          </ol>
+
+          <article class="flow-console" aria-live="polite">
+            <div class="console-topline"><span id="step-status">FIXED SAMPLE</span><span id="step-time">T + 00</span></div>
+            <p class="console-index" id="step-index">01 / 05</p>
+            <h3 id="step-title">问题进入：定义此次要验证什么</h3>
+            <p id="step-summary">用户的目标、已有材料和决策约束被整理成固定样例输入。它只用于说明数据应如何进入控制面。</p>
+            <dl class="console-output">
+              <div><dt>样例输出</dt><dd id="step-output">明确范围、限制条件与证据缺口</dd></div>
+              <div><dt>运行状态</dt><dd id="step-mode">DISPLAY_ONLY</dd></div>
+            </dl>
+            <div class="console-rule"><span aria-hidden="true">⌁</span><p id="step-rule">不把未经核验的主张直接变成评分或推荐。</p></div>
+          </article>
+        </div>
+
+        <div class="agent-grid" aria-label="1 加 4 角色分工">
+          <article class="agent-card lead-card"><span class="agent-num">01</span><p>SUPERVISOR</p><h3>主管 Agent</h3><b>规划、冲突整合、报告编排</b><small>不自行研究，不改写评分</small></article>
+          <article class="agent-card"><span class="agent-num">02</span><p>USER</p><h3>用户验证</h3><b>人群、需求、留存</b><small>以行为证据为先</small></article>
+          <article class="agent-card"><span class="agent-num">03</span><p>PRODUCT</p><h3>产品工程</h3><b>能力、交付、可维护性</b><small>不将功能等同价值</small></article>
+          <article class="agent-card"><span class="agent-num">04</span><p>BUSINESS</p><h3>商业投资</h3><b>单位经济、渠道、风险</b><small>不把想象当作收入</small></article>
+          <article class="agent-card audit-card"><span class="agent-num">05</span><p>AUDIT</p><h3>证据校准</h3><b>引用、冲突、准入</b><small>低质量证据不入评分</small></article>
+        </div>
+      </section>
+
+      <section class="section evidence-section" id="evidence" aria-labelledby="evidence-title">
+        <div class="section-heading split-heading">
+          <div>
+            <p class="eyebrow"><span>03</span> EVIDENCE, NOT DECORATION</p>
+            <h2 id="evidence-title">每个样例结论，都有它的证据位置。</h2>
+          </div>
+          <p>这组卡片是公开演示的固定目录。它们不会加载项目材料，也不包含真实客户正文或数据库记录。</p>
+        </div>
+        <div class="evidence-list">
+          <article class="evidence-card verified"><div class="evidence-number">[01]</div><p>项目材料</p><h3>季度付费客户记录摘要</h3><span>证据有限</span></article>
+          <article class="evidence-card limited"><div class="evidence-number">[02]</div><p>用户调研</p><h3>跨境卖家需求调研摘要</h3><span>证据有限</span></article>
+          <article class="evidence-card limited"><div class="evidence-number">[03]</div><p>运营记录</p><h3>运行、修复与补偿记录摘要</h3><span>证据有限</span></article>
+          <article class="evidence-card pending"><div class="evidence-number">[04]</div><p>审计结果</p><h3>续费、留存与单位经济缺口</h3><span>需要补充</span></article>
+          <article class="evidence-card verified"><div class="evidence-number">[05]</div><p>参考报告</p><h3>用户提供的 1 + 4 综合报告</h3><span>已验证</span></article>
+        </div>
+        <div class="evidence-rule"><b>准入规则</b><p><strong>PENDING VALIDATION</strong> 可以出现在待办与缺口中，但不能进入主评分或建议。</p></div>
+      </section>
+
+      <section class="section decision-section" id="decision" aria-labelledby="decision-title">
+        <div class="decision-wrap">
+          <div class="decision-copy">
+            <p class="eyebrow"><span>04</span> READ THE DECISION</p>
+            <h2 id="decision-title">结论不替你下注，<br>它告诉你下一步该验证什么。</h2>
+            <p>样例综合结论为“继续验证”：已有需求与早期付费信号，但留存、自然传播、价格弹性和单位经济仍没有足够证据支持扩张。</p>
+            <div class="decision-chip"><span>演示建议</span><b>继续验证</b><small>不是自动执行指令</small></div>
+          </div>
+          <div class="report-panel">
+            <div class="report-top"><span>STATIC REPORT / V2.2</span><button type="button" id="report-toggle" aria-expanded="false">展开四份专项摘要 <span aria-hidden="true">+</span></button></div>
+            <div class="report-score"><span>爆款潜力指数</span><strong>63</strong><em>/ 100</em><p>解释性起点，不是成功概率</p></div>
+            <div class="specialist-summary" id="specialist-summary" hidden>
+              <article><b>用户验证</b><p>需求成立；传播与留存待验证。</p></article>
+              <article><b>产品工程</b><p>早期产品化；交付韧性不足。</p></article>
+              <article><b>商业投资</b><p>早期信号存在；单位经济待补齐。</p></article>
+              <article><b>证据校准</b><p>关键主张需引用，缺口不可跨越。</p></article>
+            </div>
+            <ol class="action-plan">
+              <li><span>01</span><p><b>建立留存与 NPS 基线</b><small>先让“反馈较好”变成可比较指标</small></p></li>
+              <li><span>02</span><p><b>验证 Professional 模式需求</b><small>用 waitlist 观察深度使用意愿</small></p></li>
+              <li><span>03</span><p><b>进行固定价与阶梯价实验</b><small>解释意愿与实际付费之间的落差</small></p></li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="boundary-section" id="boundary" aria-labelledby="boundary-title">
+        <div class="boundary-serial">DISPLAY<br>ONLY</div>
+        <div>
+          <p class="eyebrow"><span>05</span> WHAT THIS PAGE NEVER DOES</p>
+          <h2 id="boundary-title">这是流程演示，不是在线预测器。</h2>
+        </div>
+        <ul>
+          <li><b>不写入</b><span>不创建 Run，不连 PostgreSQL，不保存任何访客输入。</span></li>
+          <li><b>不调用</b><span>不请求模型、搜索、浏览器工具或第三方 API。</span></li>
+          <li><b>不承诺</b><span>展示性分数不代表爆款概率、收入或商业预测准确度。</span></li>
+          <li><b>可审查</b><span>源码、演示边界和 Benchmark V1 记录均可在仓库中查看。</span></li>
+        </ul>
+      </section>
+    </main>
+
+    <footer>
+      <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">LS</span><span class="brand-copy"><b>势能引擎</b><small>LAUNCHSCOPE</small></span></a>
+      <p>静态产品叙事与交互回放 · 不连接真实控制面</p>
+      <a href="https://github.com/Liamk-super/goai" target="_blank" rel="noreferrer">GitHub 源码 ↗</a>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
